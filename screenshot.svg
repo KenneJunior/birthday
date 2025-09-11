@@ -1,0 +1,106 @@
+<?xml version="1.0" encoding="utf-8"?>
+<svg width="1200" height="630" viewBox="0 0 1200 630" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Girly birthday card for Princess Fhavur">
+    <defs>
+        <!-- Soft pink gradient background -->
+        <linearGradient id="bg" x1="0%" y1="0%" x2="100%" y2="100%">
+            <stop offset="0%" stop-color="#ffd6e7"/>
+            <stop offset="100%" stop-color="#ffc2d6"/>
+        </linearGradient>
+
+        <!-- Card gradient -->
+        <linearGradient id="cardGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+            <stop offset="0%" stop-color="#ffffff"/>
+            <stop offset="100%" stop-color="#fff5f8"/>
+        </linearGradient>
+
+        <!-- Glitter effect -->
+        <pattern id="glitter" patternUnits="userSpaceOnUse" width="40" height="40" patternTransform="rotate(25)">
+            <circle cx="5" cy="5" r="1.5" fill="#ffffff" opacity="0.7"/>
+            <circle cx="25" cy="15" r="1" fill="#ffffff" opacity="0.5"/>
+            <circle cx="35" cy="35" r="1.2" fill="#ffffff" opacity="0.6"/>
+        </pattern>
+
+        <!-- Soft shadow filter -->
+        <filter id="softShadow" x="-50%" y="-50%" width="200%" height="200%">
+            <feDropShadow dx="0" dy="14" stdDeviation="30" flood-color="#d48a9e" flood-opacity="0.25"/>
+        </filter>
+
+        <!-- Floral pattern -->
+        <pattern id="floralPattern" patternUnits="userSpaceOnUse" width="80" height="80" patternTransform="rotate(15)">
+            <path d="M40,20 C45,15 55,15 60,20 C65,25 65,35 60,40 C55,45 45,45 40,40 C35,35 35,25 40,20 Z" fill="#ff9ebb" opacity="0.3"/>
+        </pattern>
+    </defs>
+
+    <!-- Background with soft gradient and floral pattern -->
+    <rect width="1200" height="630" fill="url(#bg)"/>
+    <rect width="1200" height="630" fill="url(#floralPattern)" opacity="0.15"/>
+    <rect width="1200" height="630" fill="url(#glitter)" opacity="0.3"/>
+
+    <!-- Decorative elements -->
+    <g opacity="0.25">
+        <!-- Floating hearts -->
+        <path d="M150,120 C140,100 120,95 110,100 C100,105 95,120 100,135 C105,150 120,160 135,155 C150,150 160,135 155,120 C150,105 135,100 120,105 C105,110 95,125 100,140" fill="#ff9ebb" transform="rotate(-15 130 130)"/>
+        <path d="M1050,100 C1040,80 1020,75 1010,80 C1000,85 995,100 1000,115 C1005,130 1020,140 1035,135 C1050,130 1060,115 1055,100 C1050,85 1035,80 1020,85 C1005,90 995,105 1000,120" fill="#ff9ebb" transform="rotate(20 1030 110)"/>
+
+        <!-- Sparkles -->
+        <g fill="#ffffff">
+            <circle cx="250" cy="80" r="8" opacity="0.7"/>
+            <circle cx="950" cy="70" r="6" opacity="0.6"/>
+            <circle cx="1100" cy="150" r="10" opacity="0.8"/>
+            <circle cx="100" cy="200" r="7" opacity="0.5"/>
+            <circle cx="800" cy="100" r="9" opacity="0.7"/>
+        </g>
+    </g>
+
+    <!-- Center card -->
+    <g transform="translate(200,120)" filter="url(#softShadow)">
+        <rect x="0" y="0" width="800" height="390" rx="35" fill="url(#cardGrad)" stroke="#ffc2d6" stroke-width="4"/>
+
+        <!-- Decorative corner elements -->
+        <path d="M30,30 C15,30 5,40 5,55 L5,60 L60,5 L55,5 C40,5 30,15 30,30 Z" fill="#ff9ebb" opacity="0.3"/>
+        <path d="M770,30 C785,30 795,40 795,55 L795,60 L740,5 L745,5 C760,5 770,15 770,30 Z" fill="#ff9ebb" opacity="0.3" transform="translate(800,0) scale(-1,1)"/>
+        <path d="M30,360 C15,360 5,350 5,335 L5,330 L60,385 L55,385 C40,385 30,375 30,360 Z" fill="#ff9ebb" opacity="0.3" transform="translate(0,390) scale(1,-1)"/>
+        <path d="M770,360 C785,360 795,350 795,335 L795,330 L740,385 L745,385 C760,385 770,375 770,360 Z" fill="#ff9ebb" opacity="0.3" transform="translate(800,390) scale(-1,-1)"/>
+    </g>
+
+    <!-- Heading with princess theme -->
+    <text x="600" y="220" text-anchor="middle" font-family="'Parisienne', cursive" font-size="72" font-weight="400" fill="#db7093" opacity="0.95">
+        Happy Birthday
+    </text>
+
+    <!-- Princess crown decoration -->
+    <path d="M500,250 L520,210 L540,230 L560,200 L580,230 L600,210 L620,250 L560,270 L500,250 Z" fill="#ffd700" stroke="#ffb347" stroke-width="2"/>
+    <circle cx="560" cy="210" r="5" fill="#ff69b4"/>
+    <circle cx="540" cy="220" r="4" fill="#ff69b4"/>
+    <circle cx="580" cy="220" r="4" fill="#ff69b4"/>
+
+    <!-- Name with emphasis -->
+    <text x="600" y="310" text-anchor="middle" font-family="'Dancing Script', cursive" font-size="86" font-weight="700" fill="#ff69b4" letter-spacing="1">
+        Fhavur
+    </text>
+
+    <!-- Decorative underline -->
+    <path d="M450,330 C500,340 700,340 750,330" fill="none" stroke="#ffb6c1" stroke-width="3" stroke-linecap="round" stroke-dasharray="10,8"/>
+
+    <!-- Message with feminine styling -->
+    <text x="600" y="370" text-anchor="middle" font-family="'Cormorant Garamond', serif" font-size="28" fill="#d46a8c" opacity="0.95">
+        A late birthday surprise filled with love and joy,
+    </text>
+    <text x="600" y="410" text-anchor="middle" font-family="'Cormorant Garamond', serif" font-size="28" fill="#d46a8c" opacity="0.95">
+        let's celebrate with sun, water, and pure vibes.
+    </text>
+
+    <!-- Final decorative elements -->
+    <g opacity="0.7">
+        <path d="M200,500 C250,480 300,470 350,490 C400,510 450,530 500,520 C550,510 600,490 650,500 C700,510 750,530 800,520 C850,510 900,490 950,500 C1000,510 1050,530 1100,520" fill="none" stroke="#ff9ebb" stroke-width="2" stroke-linecap="round" stroke-dasharray="8,6"/>
+
+        <!-- Small hearts -->
+        <g fill="#ff69b4">
+            <path d="M250,520 C245,515 240,513 235,515 C230,517 228,522 230,527 C232,532 237,535 242,534 C247,533 252,530 253,525 C254,520 251,517 247,517 C243,517 240,520 240,525" transform="scale(0.7)"/>
+            <path d="M450,520 C445,515 440,513 435,515 C430,517 428,522 430,527 C432,532 437,535 442,534 C447,533 452,530 453,525 C454,520 451,517 447,517 C443,517 440,520 440,525" transform="translate(140,0) scale(0.7)"/>
+            <path d="M650,520 C645,515 640,513 635,515 C630,517 628,522 630,527 C632,532 637,535 642,534 C647,533 652,530 653,525 C654,520 651,517 647,517 C643,517 640,520 640,525" transform="translate(280,0) scale(0.7)"/>
+            <path d="M850,520 C845,515 840,513 835,515 C830,517 828,522 830,527 C832,532 837,535 842,534 C847,533 852,530 853,525 C854,520 851,517 847,517 C843,517 840,520 840,525" transform="translate(420,0) scale(0.7)"/>
+            <path d="M1050,520 C1045,515 1040,513 1035,515 C1030,517 1028,522 1030,527 C1032,532 1037,535 1042,534 C1047,533 1052,530 1053,525 C1054,520 1051,517 1047,517 C1043,517 1040,520 1040,525" transform="translate(560,0) scale(0.7)"/>
+        </g>
+    </g>
+</svg>

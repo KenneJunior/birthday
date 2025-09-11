@@ -1,0 +1,428 @@
+export class UltimateModal {
+
+    constructor() {
+        this.elements = {
+            modal: document.getElementById('imageModal'),
+            modalImage: document.querySelector('.modal-image'),
+            modalVideo: document.querySelector('.modal-video'),
+            profileImage: document.querySelector('#profile_pic'),
+            profileImageContainer: document.querySelector('#profile_image'),
+            closeButton: document.querySelector('.modal-close'),
+            prevButton: document.querySelector('.modal-prev'),
+            nextButton: document.querySelector('.modal-next'),
+            counter: document.querySelector('.modal-counter'),
+            thumbnails: document.querySelectorAll('.photo-thumbnail'),
+            socialLinks: document.querySelectorAll('.modal-social a')
+        };
+
+        this.state = {
+            currentIndex: 0,
+            images: [],
+            videos: [],
+            isZoomed: false,
+            transitionStyle: 'slide-up', // Can be 'zoom-in', 'fade-in', or 'slide-up'
+            panStart: { x: 0, y: 0 },
+            panOffset: { x: 0, y: 0 }
+        };
+    }
+     init() {
+        this.generateGallery();
+    }
+
+    cacheImages() {
+        this.elements.thumbnails = document.querySelectorAll('.photo-thumbnail');
+        this.state.images = Array.from(this.elements.thumbnails).map(thumb => ({
+            src: thumb.querySelector('img').src,
+            alt: thumb.querySelector('img').alt
+        }));
+        this.state.videos = [{src:'vid1.mp4'},
+                            {src:'vid2.mp4'},
+                            {src:'vid3.mp4'}];
+
+    }
+
+    setupEventListeners() {
+        // Open modal
+        this.elements.thumbnails.forEach((thumb, index) => {
+            thumb.addEventListener('click', () => this.openModal(index));
+        });
+        const {length: profile_index} = this.elements.thumbnails;
+        this.elements.profileImage.addEventListener('click', () => this.openModal(profile_index));
+
+        // Modal controls
+        this.elements.closeButton.addEventListener('click', () => this.closeModal());
+        this.elements.prevButton.addEventListener('click', () => this.navigate(-1));
+        this.elements.nextButton.addEventListener('click', () => this.navigate(1));
+
+        // Keyboard navigation
+        document.addEventListener('keydown', (e) => {
+            if (!this.elements.modal.open) return;
+
+            switch(e.key) {
+                case 'Escape':
+                    this.closeModal();
+                    break;
+                case 'ArrowLeft':
+                    this.navigate(-1);
+                    break;
+                case 'ArrowRight':
+                    this.navigate(1);
+                    break;
+            }
+        });
+
+        // Zoom/Pan functionality
+        this.elements.modalImage.addEventListener('click', (e) => {
+            if (this.state.isZoomed) {
+                this.resetZoom();
+            } else {
+                // Only zoom if not clicking on navigation areas
+                const rect = this.elements.modalImage.getBoundingClientRect();
+                const clickX = e.clientX - rect.left;
+                const clickY = e.clientY - rect.top;
+
+                // Check if click is within central area (not near edges)
+                if (clickX > 50 && clickX < rect.width - 50 &&
+                    clickY > 50 && clickY < rect.height - 50) {
+                    this.zoomImage(e);
+                }
+            }
+        });
+
+        // Pan functionality
+        this.elements.modalImage.addEventListener('mousedown', (e) => {
+            if (this.state.isZoomed) {
+                this.startPan(e);
+            }
+        });
+
+        document.addEventListener('mousemove', (e) => {
+            if (this.state.isZoomed) {
+                this.panImage(e);
+            }
+        });
+
+        document.addEventListener('mouseup', () => {
+            if (this.state.isZoomed) {
+                this.endPan();
+            }
+        });
+
+        // Touch events
+        this.elements.modalImage.addEventListener('touchstart', (e) => {
+            if (e.touches.length === 1 && this.state.isZoomed) {
+                e.preventDefault();
+                this.startPan(e.touches[0]);
+            }
+        }, { passive: false });
+
+        document.addEventListener('touchmove', (e) => {
+            if (e.touches.length === 1 && this.state.isZoomed) {
+                e.preventDefault();
+                this.panImage(e.touches[0]);
+            }
+        }, { passive: false });
+
+        document.addEventListener('touchend', () => {
+            if (this.state.isZoomed) {
+                this.endPan();
+            }
+        }, { passive: true });
+
+    }
+
+    setupSocialSharing() {
+        this.elements.socialLinks.forEach(link => {
+            link.addEventListener('click', (e) => {
+                e.preventDefault();
+                this.handleSocialShare(link);
+            });
+        });
+    }
+
+    openModal(index) {
+        this.state.currentIndex = index;
+        this.updateModalContent();
+        this.elements.modal.showModal();
+        document.body.style.overflow = 'hidden';
+        this.elements.modal.classList.add('active');
+        this.resetZoom();
+        this.activeThumbnail();
+    }
+
+    closeModal() {
+        this.elements.modal.close();
+        document.body.style.overflow = '';
+        if (!this.elements.modalVideo.hidden) {this.elements.modalVideo.pause()}
+        this.elements.modal.classList.remove('active');
+        this.elements.thumbnails[this.state.currentIndex].classList.remove('active');
+    }
+
+    navigate(direction) {
+        this.resetZoom();
+        this.state.currentIndex += direction;
+
+        // Circular navigation
+        if (this.state.currentIndex < 0) {
+            this.state.currentIndex = this.state.images.length - 1;
+        } else if (this.state.currentIndex >= this.state.images.length) {
+            this.state.currentIndex = 0;
+        }
+
+        this.updateModalContent();
+        this.animateTransition(direction);
+    }
+
+    updateModalContent() {
+        let src;
+        let alt = this.state.images[this.state.currentIndex].alt;
+        if (this.state.images.length > this.state.currentIndex + this.state.videos.length) {
+            src = this.state.images[this.state.currentIndex].src;
+            this.elements.modalImage.src = src;
+            this.elements.modalImage.alt = alt;
+            this.elements.modalVideo.hidden = true;
+            this.elements.modalImage.hidden = false;
+        }else {
+            this.elements.modalVideo.src = src = window.location.origin +'/'+ this.state.videos[(this.state.currentIndex+this.state.videos.length) - (this.state.images.length )].src;
+            this.elements.modalVideo.hidden = false;
+            this.elements.modalImage.hidden = true ;
+            this.elements.modalVideo.play();
+        }
+        this.elements.counter.textContent = `${this.state.currentIndex + 1}/${this.state.images.length}`;
+        this.activeThumbnail();
+        this.updateSocialLinks(src, alt);
+    }
+
+    activeThumbnail() {
+        this.elements.thumbnails.forEach(thumb => {
+            thumb.classList.remove('active');
+        });
+        const thumbnail = this.elements.thumbnails[this.state.currentIndex];
+        if (thumbnail) {
+            thumbnail.classList.add('active');
+        }
+    }
+
+    createGalleryFigure(imgData, index){
+        const figure = document.createElement('figure');
+        figure.className = 'photo-thumbnail';
+        figure.style.animationDelay = `${index * 5.1}s`;
+
+        const img = document.createElement('img');
+        img.src = imgData.src;
+        img.alt = imgData.alt;
+        img.loading = 'lazy';
+        img.width = 80;
+        img.height = 80;
+        figure.appendChild(img);
+
+        return figure;
+    }
+
+    async generateGallery() {
+        const galleryContainer = document.getElementById('photo-gallery');
+        const imageData = await this.loadImageData();
+        imageData.images.forEach((imgData, index) => {
+            const figure = this.createGalleryFigure(imgData, index);
+            galleryContainer.appendChild(figure);
+        });
+        this.cacheImages();
+        this.setupEventListeners();
+        this.setupSocialSharing();
+    }
+
+    updateSocialLinks(imageUrl, description) {
+        const encodedUrl = encodeURIComponent(window.location.href);
+        const encodedDesc = encodeURIComponent(description);
+        const encodedImage = encodeURIComponent(imageUrl);
+
+        document.querySelector('.share-facebook').href =
+            `https://www.facebook.com/sharer/sharer.php?u=${encodedUrl}`;
+
+        document.querySelector('.share-twitter').href =
+            `https://twitter.com/intent/tweet?url=${encodedUrl}&text=${encodedDesc}`;
+
+        document.querySelector('.share-pinterest').href =
+            `https://pinterest.com/pin/create/button/?url=${encodedUrl}&media=${encodedImage}&description=${encodedDesc}`;
+
+        document.querySelector('.share-link').addEventListener('click', (e) => {
+            e.preventDefault();
+            navigator.clipboard.writeText(window.location.href);
+            this.showTooltip('Link copied!', e.target);
+        });
+    }
+
+    animateTransition(direction) {
+        // Remove all animation classes
+        this.elements.modalImage.classList.remove(
+            'zoom-in', 'fade-in', 'slide-up', 'slide-left', 'slide-right'
+        );
+
+        // Force reflow
+        void this.elements.modalImage.offsetWidth;
+       // Apply selected animation
+        if (this.state.transitionStyle === 'zoom-in') {
+            this.elements.modalImage.classList.add('zoom-in');
+        } else if (this.state.transitionStyle === 'fade-in') {
+            this.elements.modalImage.classList.add('fade-in');
+        } else if (this.state.transitionStyle === 'slide-up') {
+            this.elements.modalImage.classList.add('slide-up');
+        } else {
+            // Default direction-based slide
+            const animationClass = direction > 0 ? 'slide-left' : 'slide-right';
+            this.elements.modalImage.classList.add(animationClass);
+        }
+    }
+
+    zoomImage(e) {
+        if (this.state.isZoomed) return;
+
+        this.state.isZoomed = true;
+        this.elements.modalImage.classList.add('zoomed');
+
+        // Center zoom on click position if possible
+        const rect = this.elements.modalImage.getBoundingClientRect();
+        const clickX = e.clientX - rect.left;
+        const clickY = e.clientY - rect.top;
+
+        // Calculate initial pan offset to center the click point
+        this.state.panOffset = {
+            x: (rect.width / 2 - clickX) * 2,
+            y: (rect.height / 2 - clickY) * 2
+        };
+
+        this.updateImageTransform();
+    }
+
+    resetZoom() {
+        if (!this.state.isZoomed) return;
+
+        this.state.isZoomed = false;
+        this.elements.modalImage.classList.remove('zoomed');
+        this.state.panOffset = { x: 0, y: 0 };
+        this.elements.modalImage.style.transition = 'transform 0.25s ease';
+        setTimeout(() => {
+            this.elements.modalImage.style.transition = 'none';
+        }, 300);
+        this.updateImageTransform();
+    }
+
+    startPan(e) {
+        this.state.panStart = {
+            x: e.clientX - this.state.panOffset.x,
+            y: e.clientY - this.state.panOffset.y
+        };
+        this.elements.modalImage.style.cursor = 'grabbing';
+        this.elements.modalImage.style.transition = 'none';
+    }
+
+    panImage(e) {
+        if (!this.state.isZoomed) return;
+
+        this.elements.modalImage.style.cursor = 'grab';
+        this.elements.modalImage.style.transition = 'transform 0.25s ease'; // smooth after pan
+
+        this.state.panOffset = {
+            x: e.clientX - this.state.panStart.x,
+            y: e.clientY - this.state.panStart.y
+        };
+
+        this.updateImageTransform();
+    }
+
+    endPan() {
+        if (!this.state.isZoomed) return;
+
+        this.elements.modalImage.style.cursor = 'grab';
+        this.elements.modalImage.style.transition = 'transform 0.25s ease';
+
+        // Constrain panning to image edges
+        const img = this.elements.modalImage;
+        const naturalWidth = img.naturalWidth;
+        const naturalHeight = img.naturalHeight;
+        const scale = 2;
+
+        const containerWidth = img.clientWidth;
+        const containerHeight = img.clientHeight;
+
+        // Max panning distance (image width/height * scale / 2)
+        const maxX = (naturalWidth * scale - containerWidth) / 2;
+        const maxY = (naturalHeight * scale - containerHeight) / 2;
+
+        this.state.panOffset.x = Math.max(-maxX, Math.min(maxX, this.state.panOffset.x));
+        this.state.panOffset.y = Math.max(-maxY, Math.min(maxY, this.state.panOffset.y));
+
+        this.updateImageTransform();
+    }
+
+    updateImageTransform() {
+        this.elements.modalImage.style.transform = this.state.isZoomed
+            ? `scale(2) translate(${this.state.panOffset.x}px, ${this.state.panOffset.y}px)`
+            : 'scale(1) translate(0, 0)';
+    }
+
+    handleSocialShare(link) {
+        const type = link.classList.contains('share-facebook') ? 'facebook' :
+            link.classList.contains('share-twitter') ? 'twitter' :
+                link.classList.contains('share-pinterest') ? 'pinterest' : 'link';
+
+        // Add click animation
+        link.classList.add('animate__animated', 'animate__tada');
+        setTimeout(() => {
+            link.classList.remove('animate__animated', 'animate__tada');
+        }, 1000);
+
+        // For direct links, we already handle in updateSocialLinks
+        if (type === 'link') return;
+
+        // Open share window
+        const popup = window.open(
+            link.href,
+            'share-popup',
+            'width=600,height=600,top=100,left=100'
+        );
+
+        if (popup) {
+            popup.focus();
+        } else {
+            alert('Please allow popups for sharing');
+        }
+    }
+
+    showTooltip(message, element) {
+        const tooltip = document.createElement('div');
+        tooltip.className = 'modal-tooltip';
+        tooltip.textContent = message;
+
+        const rect = element.getBoundingClientRect();
+        tooltip.style.left = `${rect.left + rect.width/2}px`;
+        tooltip.style.top = `${rect.top - 40}px`;
+
+        document.body.appendChild(tooltip);
+
+        setTimeout(() => {
+            tooltip.classList.add('visible');
+        }, 10);
+
+        setTimeout(() => {
+            tooltip.classList.remove('visible');
+            setTimeout(() => {
+                tooltip.remove();
+            }, 300);
+        }, 2000);
+    }
+
+    async loadImageData(){
+        try {
+            const response = await fetch('\imagesDIR.json');
+            if (!response.ok) {
+                throw new Error('Network response was not ok');
+            }
+            const imageData = await response.json();
+            console.log(imageData);
+            return imageData;
+        } catch (error) {
+            console.error('Error loading JSON:', error);
+        }
+    }
+}

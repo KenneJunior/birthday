@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<body>
+<input type="file" id="fileInput" />
+<img src="/img5.jpg" id="img" alt="">
+
+<script>
+    document.addEventListener("DOMContentLoaded", function(){
+        const s = document.getElementById("img");
+       const d = getDataURL(s);
+       console.log(d);
+    })
+    function getDataUrl(file) {
+        return new Promise((resolve, reject) => {
+            const reader = new FileReader();
+            reader.onload = () => resolve(reader.result);
+            reader.onerror = reject;
+            reader.readAsDataURL(file);
+        });
+    }
+
+    // Example usage
+    document.querySelector('#fileInput').addEventListener('change', async (event) => {
+        const file = event.target.files[0];
+        if (file) {
+            try {
+                const dataURL = await getDataUrl(file);
+                console.log(dataURL); // Output the Data URL
+            } catch (error) {
+                console.error("Error reading file: ", error);
+            }
+        }
+    });
+
+    function getDataURL(img) {
+
+        const canvas = document.createElement('canvas');
+
+        const ctx = canvas.getContext('2d');
+
+        canvas.width = img.width;
+
+        canvas.height = img.height;
+
+        ctx.drawImage(img, 0, 0);
+
+        return canvas.toDataURL('image/png');
+
+    }
+</script>
+</body>
+</html>
