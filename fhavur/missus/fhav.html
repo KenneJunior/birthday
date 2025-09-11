@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<link rel="stylesheet" href="fhav.css">
+
+<script type="application/ld+json">
+    {
+        "@context": "https://schema.org",
+        "@type": "CreativeWork",
+        "name": "Interactive Greeting Experience",
+        "description": "A beautiful interactive greeting with animated gradient background",
+        "author": {
+            "@type": "Person",
+            "name": "Junior"
+        },
+        "creator": {
+            "@type": "Person",
+            "name": "Junior"
+        }
+    }
+</script>
+
+<body>
+
+<div class="cursor-follower" aria-hidden="true">
+    <div class="cursor-inner"></div>
+    <div class="cursor-outer"></div>
+</div>
+
+<main id="main-content" class="main-content" role="main">
+    <div class="card" role="article" aria-labelledby="greeting-heading">
+        <div class="card-inner">
+            <div class="card-effects">
+                <svg
+                        viewBox="0 0 100% 100%"
+                        xmlns='http://www.w3.org/2000/svg'
+                        class="noise"
+                >
+                    <filter id='noiseFilter'>
+                        <feTurbulence
+                                type='fractalNoise'
+                                baseFrequency='0.85'
+                                numOctaves='6'
+                                stitchTiles='stitch'/>
+                    </filter>
+
+                    <rect
+                            width='100%'
+                            height='100%'
+                            preserveAspectRatio="xMidYMid meet"
+                            filter='url(#noiseFilter)'/>
+                </svg>
+                <div class="card-shine" aria-hidden="true"></div>
+                <div class="card-glare" aria-hidden="true"></div>
+            </div>
+            <div class="content">
+                <header class="content-header">
+                    <h1 id="greeting-heading" class="greeting-title">
+                        <span class="title-word">Interactive Gradient</span>
+                        <span class="title-punctuation">!</span>
+                    </h1>
+                    <div class="decoration-line" aria-hidden="true"></div>
+                </header>
+                <div class="message-content">
+                    <p class="message-text">ruth is… you’ve been on my mind way more than I ever planned. 🥺 I kept telling myself to chill, but my heart didn’t get the memo. What I really want… is to take you out, spend time with you, and make memories that are just ours.
+                        So here’s me being brave: would you give me the honor of a real date with you? 💕</p>
+                </div>
+
+                <footer class="content-footer">
+                    <div class="interaction-buttons">
+                        <button class="cta-button primary" id="yes-btn" aria-label="Continue to next experience">
+                            <span class="button-text">Im happy to </span>
+                            <span class="button-icon" aria-hidden="true">
+                                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none"
+                                         xmlns="http://www.w3.org/2000/svg">
+                                        <path d="M5 12H19M19 12L12 5M19 12L12 19" stroke="currentColor" stroke-width="2"
+                                              stroke-linecap="round" stroke-linejoin="round"/>
+                                    </svg>
+                                </span>
+                        </button>
+                        <button class="cta-button primary" id="maybe-btn" aria-label="Continue to next experience">
+                            <span class="button-text">i will think about it</span>
+                            <span class="button-icon" aria-hidden="true">
+                                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none"
+                                         xmlns="http://www.w3.org/2000/svg">
+                                        <path d="M5 12H19M19 12L12 5M19 12L12 19" stroke="currentColor" stroke-width="2"
+                                              stroke-linecap="round" stroke-linejoin="round"/>
+                                    </svg>
+                                </span>
+                        </button>
+                        <button class="cta-button primary" id="nope-btn" aria-label="Continue to next experience">
+                            <span class="button-text">No But thanks </span>
+                            <span class="button-icon" aria-hidden="true">
+                                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none"
+                                         xmlns="http://www.w3.org/2000/svg">
+                                        <path d="M5 12H19M19 12L12 5M19 12L12 19" stroke="currentColor" stroke-width="2"
+                                              stroke-linecap="round" stroke-linejoin="round"/>
+                                    </svg>
+                                </span>
+                        </button>
+                    </div>
+                </footer>
+            </div>
+        </div>
+    </div>
+</main>
+
+<div class="gradient-bg">
+    <svg
+            viewBox="0 0 100vw 100vw"
+            xmlns='http://www.w3.org/2000/svg'
+            class="noiseBg"
+    >
+        <filter id='noiseFilterBg'>
+            <feTurbulence
+                    type='fractalNoise'
+                    baseFrequency='0.6'
+                    stitchTiles='stitch'/>
+        </filter>
+
+        <rect
+                width='100%'
+                height='100%'
+                preserveAspectRatio="xMidYMid meet"
+                filter='url(#noiseFilterBg)'/>
+    </svg>
+    <svg xmlns="http://www.w3.org/2000/svg" class="svgBlur">
+        <defs>
+            <filter id="goo">
+                <feGaussianBlur in="SourceGraphic" stdDeviation="10" result="blur"/>
+                <feColorMatrix in="blur" mode="matrix" values="1 0 0 0 0  0 1 0 0 0  0 0 1 0 0  0 0 0 18 -8"
+                               result="goo"/>
+                <feBlend in="SourceGraphic" in2="goo"/>
+            </filter>
+        </defs>
+    </svg>
+    <div class="gradients-container">
+        <div class="g1"></div>
+        <div class="g2"></div>
+        <div class="g3"></div>
+        <div class="g4"></div>
+        <div class="g5"></div>
+        <div class="interactive"></div>
+    </div>
+</div>
+<div class="particles-container" aria-hidden="true">
+    <canvas id="particles-canvas" role="presentation"></canvas>
+</div>
+<audio id="hover-sound" preload="auto">
+    <source src="data:audio/mpeg;base64,SUQzBAAAAAAAI1RTU0UAAAAPAAADTGF2ZjU4Ljc2LjEwMAAAAAAAAAAAAAAA//tQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAWGluZwAAAA8AAAACAAADwADw8PDw8PDw8PDw8PDw8PDw8PDw8PDw8PDw8PDw8PDw8PDw8PDw8PDw8PDw8PD///////////////////////////////////////////////////////////////////////////8AAAA8TEFNRTMuMTAwBK8AAAAAAAAAADUgJAa8QABAAAAAAAADw2mpWvAAAAAAAAAAAAAAAAAAAA//tQxAAAAAAAAAAAAAAAAAAAAAAAASW5mbwAAAA8AAAAMAAAHwABISEhISEhISEhISEhISEhISEhISEhISEhISEhISEhISEhISEhISEhISEhISEhISEhISEhISEhISEhISEhISEhISEhISEhISEhISEhISEhISEhISEhISEhISEhISEhISEhISEhISEhISEhISEhISEhISEhISEhISEhISEhISEhISEhISEhISEhISEhISEhISEhISEhISEhISEhISEhISEhISEhISEhISEhISEhISEhISEhISEhISEhISEhISEhISEhISEhISEhISEhISEhISEhISEhISEhISEhISEhISEhISEhISEhISEhISEhISEhISEhISEhISEhISEhISEh" type="audio/mpeg">
+</audio>
+<script src="fhav.js"></script>
+</body>
+</html>

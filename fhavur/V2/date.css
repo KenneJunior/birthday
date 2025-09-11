@@ -1,0 +1,255 @@
+@import url('https://fonts.googleapis.com/css?family=Montserrat:400,700&display=swap');
+
+:root {
+    /* Base colors (pink, brown, black accents) */
+    --color-bg1: rgb(15, 10, 15);
+    --color-bg2: rgb(40, 20, 30);
+    --color1: 255, 182, 193; /* light pink */
+    --color2: 205, 133, 63;  /* brown */
+    --color3: 255, 105, 180; /* hot pink */
+    --color4: 139, 69, 19;   /* darker brown */
+    --color5: 75, 0, 130;    /* purple accent */
+    --color-interactive: 255, 105, 180;
+
+    --circle-size: 80%;
+    --blending: hard-light;
+}
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+html, body {
+    height: 100%;
+    width: 100%;
+    font-family: 'Montserrat', sans-serif;
+    background: var(--color-bg1);
+    color: #fff;
+    overflow: hidden;
+}
+
+button {
+    cursor: pointer;
+    border: none;
+    font-family: inherit;
+    font-size: 1rem;
+}
+
+/* ===== Card ===== */
+.card {
+    position: absolute;
+    z-index: 10;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    max-width: 600px;
+    padding: 48px;
+    border-radius: 12px;
+    background: rgba(0, 0, 0, 0.4);
+    backdrop-filter: blur(10px);
+    box-shadow: 0 8px 60px rgba(0,0,0,0.4);
+    text-align: center;
+    user-select: none;
+}
+
+.card .noise {
+    position: absolute;
+    inset: 0;
+    opacity: 0.1;
+    z-index: 1;
+}
+
+.card .content {
+    position: relative;
+    z-index: 2;
+}
+
+.headline {
+    font-size: 2.5rem;
+    margin-bottom: 16px;
+    color: #f8c8dc; /* soft pink */
+}
+
+.heart-btn {
+    margin-top: 24px;
+    font-size: 2rem;
+    padding: 12px 24px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, pink, peru);
+    color: black;
+    animation: pulse 1.5s infinite;
+    transition: transform 0.3s ease;
+}
+
+.heart-btn:hover {
+    transform: scale(1.2);
+}
+
+/* ===== Proposal Section ===== */
+.proposal {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    text-align: center;
+    z-index: 20;
+    background: rgba(0, 0, 0, 0.6);
+    padding: 40px;
+    border-radius: 16px;
+    box-shadow: 0 6px 40px rgba(0,0,0,0.5);
+}
+
+.proposal.hidden {
+    display: none;
+}
+
+.proposal .question {
+    font-size: 2.5rem;
+    margin-bottom: 24px;
+    color: #ff8da1;
+}
+
+.options {
+    display: flex;
+    justify-content: center;
+    gap: 20px;
+}
+
+.btn {
+    font-size: 1.2rem;
+    padding: 12px 20px;
+    border-radius: 8px;
+    background: linear-gradient(135deg, var(--color3), var(--color2));
+    color: #fff;
+    transition: transform 0.2s ease;
+}
+
+.btn:hover {
+    transform: scale(1.1);
+}
+
+/* ===== Confetti ===== */
+.confetti {
+    position: fixed;
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    background: pink;
+    top: -10px;
+    animation: fall linear forwards;
+}
+
+@keyframes fall {
+    to { transform: translateY(100vh) rotate(720deg); opacity: 0; }
+}
+
+/* ===== Animations ===== */
+@keyframes pulse {
+    0%, 100% { transform: scale(1); }
+    50% { transform: scale(1.2); }
+}
+
+@keyframes moveInCircle {
+    0% { transform: rotate(0deg); }
+    50% { transform: rotate(180deg); }
+    100% { transform: rotate(360deg); }
+}
+
+@keyframes moveVertical {
+    0% { transform: translateY(-50%); }
+    50% { transform: translateY(50%); }
+    100% { transform: translateY(-50%); }
+}
+
+@keyframes moveHorizontal {
+    0% { transform: translateX(-50%) translateY(-10%); }
+    50% { transform: translateX(50%) translateY(10%); }
+    100% { transform: translateX(-50%) translateY(-10%); }
+}
+
+/* ===== Gradient Background ===== */
+.gradient-bg {
+    width: 100vw;
+    height: 100vh;
+    position: relative;
+    overflow: hidden;
+    background: linear-gradient(40deg, var(--color-bg1), var(--color-bg2));
+}
+
+.gradient-bg .noiseBg {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    opacity: 0.3;
+    mix-blend-mode: soft-light;
+    z-index: 1;
+}
+
+.gradient-bg .gradients-container {
+    filter: url(#goo) blur(40px);
+    width: 100%;
+    height: 100%;
+}
+
+.g1, .g2, .g3, .g4, .g5 {
+    position: absolute;
+    width: var(--circle-size);
+    height: var(--circle-size);
+    mix-blend-mode: var(--blending);
+    opacity: 0.8;
+}
+
+.g1 {
+    background: radial-gradient(circle at center, rgba(var(--color1), 0.8) 0, rgba(var(--color1), 0) 50%);
+    top: calc(50% - var(--circle-size)/2);
+    left: calc(50% - var(--circle-size)/2);
+    animation: moveVertical 30s ease infinite;
+}
+
+.g2 {
+    background: radial-gradient(circle at center, rgba(var(--color2), 0.8) 0, rgba(var(--color2), 0) 50%);
+    top: calc(50% - var(--circle-size)/2);
+    left: calc(50% - var(--circle-size)/2);
+    transform-origin: calc(50% - 400px);
+    animation: moveInCircle 20s reverse infinite;
+}
+
+.g3 {
+    background: radial-gradient(circle at center, rgba(var(--color3), 0.8) 0, rgba(var(--color3), 0) 50%);
+    top: calc(50% - var(--circle-size)/2 + 200px);
+    left: calc(50% - var(--circle-size)/2 - 500px);
+    transform-origin: calc(50% + 400px);
+    animation: moveInCircle 40s linear infinite;
+}
+
+.g4 {
+    background: radial-gradient(circle at center, rgba(var(--color4), 0.8) 0, rgba(var(--color4), 0) 50%);
+    top: calc(50% - var(--circle-size)/2);
+    left: calc(50% - var(--circle-size)/2);
+    transform-origin: calc(50% - 200px);
+    animation: moveHorizontal 40s ease infinite;
+    opacity: 0.7;
+}
+
+.g5 {
+    background: radial-gradient(circle at center, rgba(var(--color5), 0.8) 0, rgba(var(--color5), 0) 50%);
+    width: calc(var(--circle-size) * 2);
+    height: calc(var(--circle-size) * 2);
+    top: calc(50% - var(--circle-size));
+    left: calc(50% - var(--circle-size));
+    transform-origin: calc(50% - 800px) calc(50% + 200px);
+    animation: moveInCircle 20s ease infinite;
+}
+
+.interactive {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    top: -50%;
+    left: -50%;
+    background: radial-gradient(circle at center, rgba(var(--color-interactive), 0.8) 0, rgba(var(--color-interactive), 0) 50%);
+    mix-blend-mode: var(--blending);
+    opacity: 0.7;
+}

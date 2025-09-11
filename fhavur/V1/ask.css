@@ -1,0 +1,322 @@
+@import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@400;700&display=swap');
+
+:root {
+    /* Colors from date.css */
+    --color-bg1: rgb(15, 10, 15);
+    --color-bg2: rgb(40, 20, 30);
+    --color1: 255, 182, 193; /* light pink */
+    --color2: 205, 133, 63;  /* brown */
+    --color3: 255, 105, 180; /* hot pink */
+    --color4: 139, 69, 19;   /* darker brown */
+    --color5: 75, 0, 130;    /* purple accent */
+    --color-interactive: 255, 105, 180;
+    --circle-size: 80%;
+    --blending: hard-light;
+}
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+html, body {
+    height: 100%;
+    width: 100%;
+    font-family: 'Montserrat', sans-serif;
+    background: var(--color-bg1);
+    color: #fff;
+    overflow-x: hidden;
+    overflow-y: auto;
+}
+
+/* Gradient Background */
+.gradient-bg {
+    width: 100vw;
+    height: 100vh;
+    position: relative;
+    top: 0;
+    left: 0;
+    background: linear-gradient(40deg, var(--color-bg1), var(--color-bg2));
+    z-index: 1;
+}
+
+.gradient-bg .noiseBg {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    opacity: 0.3;
+    mix-blend-mode: soft-light;
+    z-index: 2;
+}
+
+.gradient-bg .gradients-container {
+    filter: url(#goo) blur(40px);
+    width: 100%;
+    height: 100%;
+    position: absolute;
+    z-index: 3;
+}
+
+.g1, .g2, .g3, .g4, .g5 {
+    position: absolute;
+    width: var(--circle-size);
+    height: var(--circle-size);
+    mix-blend-mode: var(--blending);
+    opacity: 0.8;
+}
+
+.g1 {
+    background: radial-gradient(circle at center, rgba(var(--color1), 0.8) 0, rgba(var(--color1), 0) 50%);
+    top: calc(50% - var(--circle-size)/2);
+    left: calc(50% - var(--circle-size)/2);
+    animation: moveVertical 30s ease infinite;
+}
+
+.g2 {
+    background: radial-gradient(circle at center, rgba(var(--color2), 0.8) 0, rgba(var(--color2), 0) 50%);
+    top: calc(50% - var(--circle-size)/2);
+    left: calc(50% - var(--circle-size)/2);
+    transform-origin: calc(50% - 400px);
+    animation: moveInCircle 20s reverse infinite;
+}
+
+.g3 {
+    background: radial-gradient(circle at center, rgba(var(--color3), 0.8) 0, rgba(var(--color3), 0) 50%);
+    top: calc(50% - var(--circle-size)/2 + 200px);
+    left: calc(50% - var(--circle-size)/2 - 500px);
+    transform-origin: calc(50% + 400px);
+    animation: moveInCircle 40s linear infinite;
+}
+
+.g4 {
+    background: radial-gradient(circle at center, rgba(var(--color4), 0.8) 0, rgba(var(--color4), 0) 50%);
+    top: calc(50% - var(--circle-size)/2);
+    left: calc(50% - var(--circle-size)/2);
+    transform-origin: calc(50% - 200px);
+    animation: moveHorizontal 40s ease infinite;
+    opacity: 0.7;
+}
+
+.g5 {
+    background: radial-gradient(circle at center, rgba(var(--color5), 0.8) 0, rgba(var(--color5), 0) 50%);
+    width: calc(var(--circle-size) * 2);
+    height: calc(var(--circle-size) * 2);
+    top: calc(50% - var(--circle-size));
+    left: calc(50% - var(--circle-size));
+    transform-origin: calc(50% - 800px) calc(50% + 200px);
+    animation: moveInCircle 20s ease infinite;
+}
+
+/* Header */
+header {
+    position: relative;
+    z-index: 10;
+    text-align: center;
+    padding: 20px;
+    margin-top: 20px;
+}
+
+header h1 {
+    font-size: 2.5rem;
+    color: rgb(var(--color3));
+    margin-bottom: 10px;
+}
+
+header p {
+    font-size: 1.5rem;
+    color: rgb(var(--color1));
+}
+
+/* Teaser Section */
+.teaser {
+    position: relative;
+    z-index: 10;
+    text-align: center;
+    padding: 20px;
+}
+
+.teaser p {
+    font-size: 1.5rem;
+    color: #fff;
+    margin-bottom: 20px;
+}
+
+.heart-btn {
+    font-size: 2rem;
+    padding: 12px 24px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, rgb(var(--color3)), rgb(var(--color2)));
+    color: #fff;
+    border: none;
+    cursor: pointer;
+    animation: pulse 1.5s infinite;
+    transition: transform 0.3s ease;
+}
+
+.heart-btn:hover {
+    transform: scale(1.2);
+}
+
+/* Interactive Adventure Section */
+#interactive-adventure {
+    position: relative;
+    z-index: 10;
+    max-width: 600px;
+    margin: 20px auto;
+    padding: 20px;
+    background: rgba(0, 0, 0, 0.4);
+    backdrop-filter: blur(10px);
+    border-radius: 12px;
+    box-shadow: 0 8px 60px rgba(0, 0, 0, 0.4);
+    text-align: center;
+}
+
+.stage, .ending {
+    display: none;
+    padding: 20px;
+}
+
+.stage.active, .ending.active {
+    display: block;
+    animation: fadeIn 0.5s ease-in;
+}
+
+.stage h2, .ending h2 {
+    font-size: 2rem;
+    color: rgb(var(--color3));
+    margin-bottom: 15px;
+}
+
+.stage p, .ending p {
+    font-size: 1.2rem;
+    color: #fff;
+    margin-bottom: 20px;
+}
+
+/* Buttons */
+.stage-buttons {
+    display: flex;
+    justify-content: center;
+    gap: 15px;
+    flex-wrap: wrap;
+}
+
+.stage-btn, .back-btn {
+    font-size: 1.1rem;
+    padding: 10px 20px;
+    border-radius: 8px;
+    background: linear-gradient(135deg, rgb(var(--color3)), rgb(var(--color2)));
+    color: #fff;
+    border: none;
+    cursor: pointer;
+    transition: transform 0.2s ease;
+}
+
+.stage-btn:hover, .back-btn:hover {
+    transform: scale(1.1);
+}
+
+/* Audio Button */
+#playBtn {
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    font-size: 1.2rem;
+    padding: 10px;
+    border-radius: 50%;
+    background: rgb(var(--color3));
+    color: #fff;
+    border: none;
+    cursor: pointer;
+    z-index: 15;
+}
+
+#playBtn:hover {
+    transform: scale(1.1);
+}
+
+/* Confetti */
+.confetti {
+    position: fixed;
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    background: rgb(var(--color3));
+    top: -10px;
+    z-index: 5;
+    animation: fall linear forwards;
+}
+
+/* Fix for photo-thumbnail.active in fhavur.html */
+.photo-thumbnail {
+    border: 1px solid transparent;
+    transition: border 0.3s ease, box-shadow 0.3s ease;
+    position: relative;
+}
+
+.photo-thumbnail.active {
+    border: 2px solid rgb(var(--color3)) !important;
+    box-shadow: 0 0 10px rgba(var(--color3), 0.5) !important;
+}
+
+.photo-thumbnail img {
+    display: block;
+    width: 100%;
+    height: auto;
+    border-radius: 8px;
+}
+
+/* Animations */
+@keyframes pulse {
+    0%, 100% { transform: scale(1); }
+    50% { transform: scale(1.2); }
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(20px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes fall {
+    to { transform: translateY(100vh) rotate(720deg); opacity: 0; }
+}
+
+@keyframes moveInCircle {
+    0% { transform: rotate(0deg); }
+    50% { transform: rotate(180deg); }
+    100% { transform: rotate(360deg); }
+}
+
+@keyframes moveVertical {
+    0% { transform: translateY(-50%); }
+    50% { transform: translateY(50%); }
+    100% { transform: translateY(-50%); }
+}
+
+@keyframes moveHorizontal {
+    0% { transform: translateX(-50%) translateY(-10%); }
+    50% { transform: translateX(50%) translateY(10%); }
+    100% { transform: translateX(-50%) translateY(-10%); }
+}
+
+/* Responsive Design */
+@media (max-width: 600px) {
+    header h1 {
+        font-size: 2rem;
+    }
+    .stage h2, .ending h2 {
+        font-size: 1.5rem;
+    }
+    .stage p, .ending p {
+        font-size: 1rem;
+    }
+    .stage-btn, .back-btn {
+        font-size: 1rem;
+        padding: 8px 16px;
+    }
+    #interactive-adventure {
+        margin: 10px;
+        padding: 15px;
+    }
+}
