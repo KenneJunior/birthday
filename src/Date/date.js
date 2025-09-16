@@ -135,14 +135,10 @@ document.addEventListener('DOMContentLoaded', () => {
     const init = () => {
         addEventListeners();
         initAnimation();
-            const continue btn = document.queryselector('#continue');
-            btn.addEventListener('click',()=>{
-                window.location.href = '../fhavur/missus/fhavur.html'
-            });
         // Add loaded class to body for CSS transitions
         setTimeout(() => {
             document.body.classList.add('loaded');
-        }, 1000);
+        }, 100);
     };
 
     // Clean up function
