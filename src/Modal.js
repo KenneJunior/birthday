@@ -1,5 +1,4 @@
 import {Notification} from "./notification.js";
-import Hammer from 'hammerjs';
 export class UltimateModal {
 
     constructor() {
