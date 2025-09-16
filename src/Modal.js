@@ -554,7 +554,7 @@ export class UltimateModal {
 
     async loadImageData(){
         try {
-            const response = await fetch('/public/imagesDIR.json');
+            const response = await fetch('public/imagesDIR.json');
             if (!response.ok) {
                 throw new Error('Network response was not ok');
             }
