@@ -3,9 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description"
-          content="A beautiful girly birthday card with animations and interactive elements for Fhavur">
-    <link rel="manifest" href="/fhavur/manifest.json">
+    <link rel="manifest" href="fhavur/manifest.json">
     <meta name="theme-color" content="#db7093">
 
     <title>Happy Birthday Fhavur!</title>
@@ -25,8 +23,8 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Dancing+Script:wght@700&family=Montserrat:wght@300;400;600&family=Pacifico&display=swap"
           rel="stylesheet">
-    <link rel="stylesheet" href="/fhavur/notification.css">
-    <link rel="stylesheet" href="/public/int.css">
+    <link rel="stylesheet" href="fhavur/notification.css">
+    <link rel="stylesheet" href="public/int.css">
 
 </head>
 <body>
@@ -69,6 +67,10 @@
              </div>
         </section>
 
+        <button class="open-modal-btn" id="modal_open" aria-label="Open memory gallery">
+            <i class="fas fa-images" aria-hidden="true"></i> View Memories
+        </button>
+
         <address class="signature animate__animated animate__fadeIn">
             With all my love,<br>
             <span>Your Secret Admirer</span>
@@ -78,6 +80,7 @@
                 aria-label="Celebrate birthday">
             <i class="fas fa-gift" aria-hidden="true"></i> Celebrate Princess!
         </button>
+
         <aside class="social-share animate__animated animate__fadeIn" aria-label="Share options">
             <h2 class="visually-hidden">Share this card</h2>
             <a href="https://api.whatsapp.com/send?text=Check%20out%20this%20beautiful%20birthday%20wish%20I%20received!"
@@ -108,7 +111,7 @@
         <i class="fas fa-play" aria-hidden="true"></i>
     </button>
     <audio id="birthdayAudio" loop aria-label="Birthday music">
-        <source src="/Simi_ft_Adekunle_Gold_DeJa_-_Happy_Birthday.mp3" type="audio/mpeg">
+        <source src="public/Simi_ft_Adekunle_Gold_DeJa_-_Happy_Birthday.mp3" type="audio/mpeg">
         Your browser does not support audio.
     </audio>
 </aside>
@@ -116,14 +119,24 @@
 <!-- Image Modal -->
 <dialog class="modal-overlay" id="imageModal">
     <div class="modal-container">
-        <button class="modal-close" aria-label="Close modal">&times;</button>
+        <button class="modal-close" aria-label="Close modal">
+            <i class="fas fa-times"></i>
+        </button>
 
+        <button class="modal-maximize" aria-label="Maximize modal">
+        <i class="fas fa-expand"></i>
+        </button>
+        <div class="modal-tooltip">This is a tooltip message</div>
         <div class="modal-content">
             <div class="modal-image-container">
-                <button class="modal-nav modal-prev" aria-label="Previous image">❮</button>
+                <button class="modal-nav modal-prev" aria-label="Previous image">
+                    <i class="fas fa-chevron-left"></i>
+                </button>
                 <img class="modal-image zoomable"  src="" alt="Enlarged memory photo">
                 <video class="modal-image modal-video zoomable " hidden="" controls></video>
-                <button class="modal-nav modal-next" aria-label="Next image">❯</button>
+                <button class="modal-nav modal-next" aria-label="Next image">
+                    <i class="fas fa-chevron-right"></i>
+                </button>
                 <div class="modal-counter">1/4</div>
             </div>
 
@@ -170,7 +183,7 @@
         </div>
     </div>
 </div>
-<script src="/src/HBD.js" type="module"></script>
+<script src="src/HBD.js" type="module"></script>
 <script>
 </script>
 </body>

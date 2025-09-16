@@ -1,18 +1,24 @@
+import {Notification} from "./notification.js";
+import Hammer from 'hammerjs';
 export class UltimateModal {
 
     constructor() {
         this.elements = {
             modal: document.getElementById('imageModal'),
+            modalContainer: document.querySelector('.modal-container'),
+            openModalBtn: document.getElementById('modal_open'),
             modalImage: document.querySelector('.modal-image'),
             modalVideo: document.querySelector('.modal-video'),
             profileImage: document.querySelector('#profile_pic'),
             profileImageContainer: document.querySelector('#profile_image'),
             closeButton: document.querySelector('.modal-close'),
+            maximizeModalBtn: document.querySelector('.modal-maximize'),
             prevButton: document.querySelector('.modal-prev'),
             nextButton: document.querySelector('.modal-next'),
             counter: document.querySelector('.modal-counter'),
             thumbnails: document.querySelectorAll('.photo-thumbnail'),
-            socialLinks: document.querySelectorAll('.modal-social a')
+            socialLinks: document.querySelectorAll('.modal-social a'),
+            profile_pic: document.querySelector('.image-container'),
         };
 
         this.state = {
@@ -20,11 +26,15 @@ export class UltimateModal {
             images: [],
             videos: [],
             isZoomed: false,
+            isMaximized:  false,
+            isFullscreen: false,
             transitionStyle: 'slide-up', // Can be 'zoom-in', 'fade-in', or 'slide-up'
             panStart: { x: 0, y: 0 },
             panOffset: { x: 0, y: 0 }
         };
+        this.hammer = new Hammer(this.elements.modalContainer);
     }
+
      init() {
         this.generateGallery();
     }
@@ -49,14 +59,26 @@ export class UltimateModal {
         const {length: profile_index} = this.elements.thumbnails;
         this.elements.profileImage.addEventListener('click', () => this.openModal(profile_index));
 
+        this.elements.maximizeModalBtn.addEventListener('click',() => this.toggleMaximize());
+
+        this.elements.openModalBtn.addEventListener('click', () => this.openModal(0));
+
         // Modal controls
         this.elements.closeButton.addEventListener('click', () => this.closeModal());
         this.elements.prevButton.addEventListener('click', () => this.navigate(-1));
         this.elements.nextButton.addEventListener('click', () => this.navigate(1));
+        this.hammer.on('swipeleft', () => this.navigate(1));
+        this.hammer.on('swiperight', () => this.navigate(-1));
+        this.hammer.on('swipeup', () => this.closeModal());
+        this.hammer.on('swipedown', () => this.closeModal());
+        this.hammer.on('doubletap', () => this.toggleMaximize());
 
+        this.elements.modalContainer.addEventListener('swipe', () => this.closeModal());
+
+        this.elements.profile_pic.addEventListener('click', () => this.HTU());
         // Keyboard navigation
         document.addEventListener('keydown', (e) => {
-            if (!this.elements.modal.open) return;
+            if (!this.elements.modal.classList.contains('active')) return;
 
             switch(e.key) {
                 case 'Escape':
@@ -67,6 +89,10 @@ export class UltimateModal {
                     break;
                 case 'ArrowRight':
                     this.navigate(1);
+                    break;
+                case 'f':
+                case 'F':
+                    this.toggleFullscreen();
                     break;
             }
         });
@@ -129,6 +155,11 @@ export class UltimateModal {
             }
         }, { passive: true });
 
+        // Handle fullscreen change events
+        document.addEventListener('fullscreenchange', ()=> this.handleFullscreenChange());
+        document.addEventListener('webkitfullscreenchange',()=> this.handleFullscreenChange());
+        document.addEventListener('msfullscreenchange',()=> this.handleFullscreenChange());
+
     }
 
     setupSocialSharing() {
@@ -143,23 +174,75 @@ export class UltimateModal {
     openModal(index) {
         this.state.currentIndex = index;
         this.updateModalContent();
-        this.elements.modal.showModal();
         document.body.style.overflow = 'hidden';
         this.elements.modal.classList.add('active');
-        this.resetZoom();
         this.activeThumbnail();
     }
 
     closeModal() {
-        this.elements.modal.close();
+        if (this.state.isFullscreen) {
+            this.exitFullscreen();
+        }
         document.body.style.overflow = '';
         if (!this.elements.modalVideo.hidden) {this.elements.modalVideo.pause()}
         this.elements.modal.classList.remove('active');
+        this.resetZoom();
         this.elements.thumbnails[this.state.currentIndex].classList.remove('active');
     }
 
+    toggleMaximize() {
+        if (this.state.isMaximized) {
+            this.elements.modal.classList.remove('fullscreen');
+            this.elements.maximizeModalBtn.innerHTML = '<i class="fas fa-expand"></i>';
+            this.elements.maximizeModalBtn.setAttribute('aria-label', 'Maximize modal');
+            if (this.state.isFullscreen) {
+                this.exitFullscreen();
+            }
+        } else {
+            this.elements.modal.classList.add('fullscreen');
+            this.elements.maximizeModalBtn.innerHTML = '<i class="fas fa-compress"></i>';
+            this.elements.maximizeModalBtn.setAttribute('aria-label', 'Minimize modal');
+        }
+        //this.toggleFullscreen();
+        this.state.isMaximized = !this.state.isMaximized;
+    }
+
+    HTU(){
+        new Notification().setupEventListeners().toggleViewDetails(false).showNotification('info', {
+            title: '📖 How to Use This Gallery',
+            message: `
+            <div style="line-height: 1.6;">
+                <p>Welcome to the image gallery! Here's how to navigate:</p>
+                <ul style="margin: 10px 0; padding-left: 20px;">
+                    <li>🖱️ <strong>Click</strong> on any thumbnail to open the image viewer</li>
+                    <li>⬅️ ➡️ Use <strong>arrow keys</strong> or navigation buttons to browse images</li>
+                    <li>🔍 <strong>Click</strong> on an open image to zoom in/out</li>
+                    <li>👆 <strong>Drag</strong> to pan around zoomed images</li>
+                    <li>📱 Use <strong>social media icons</strong> to share images</li>
+                    <li>🖼️ Press <strong>'F'</strong> or use the maximize button for fullscreen</li>
+                    <li>❌ Press <strong>ESC</strong> or click the X to close the viewer</li>
+                    <li>👆 <strong>click</strong> outside a box to create an emoji <strong>press and hold</strong> make the emoji bigger</li>
+                    <li>📷 Click the profile image anytime to see these instructions again</li>
+                </ul>
+                <p style="margin-top: 10px; font-style: italic;">Enjoy exploring this page 🥰💕💘!</p>
+            </div>
+        `,
+            icon: 'fas fa-info-circle',
+            useHTML: true,
+            autoCloseTime: 15000, // Show for 15 seconds instead of 20
+        });
+    }
+
+
+    resetMaximizeButton() {
+        this.state.isMaximized = false;
+        this.elements.maximizeModalBtn.innerHTML = '<i class="fas fa-expand"></i>';
+        this.elements.maximizeModalBtn.setAttribute('aria-label', 'Maximize modal');
+    }
+
     navigate(direction) {
-        this.resetZoom();
+
+        if (!this.elements.modalVideo.hidden) {this.elements.modalVideo.pause()}
         this.state.currentIndex += direction;
 
         // Circular navigation
@@ -168,7 +251,7 @@ export class UltimateModal {
         } else if (this.state.currentIndex >= this.state.images.length) {
             this.state.currentIndex = 0;
         }
-
+        this.resetZoom();
         this.updateModalContent();
         this.animateTransition(direction);
     }
@@ -200,6 +283,63 @@ export class UltimateModal {
         const thumbnail = this.elements.thumbnails[this.state.currentIndex];
         if (thumbnail) {
             thumbnail.classList.add('active');
+        }
+    }
+
+    toggleFullscreen(){
+        if (!this.state.isFullscreen) {
+            this.enterFullscreen();
+        }else{
+            this.exitFullscreen()
+        }
+    }
+
+    enterFullscreen() {
+        if (this.elements.modalContainer.requestFullscreen) {
+            this.elements.modalContainer.requestFullscreen();
+        } else if (this.elements.modalContainer.webkitRequestFullscreen) {
+            this.elements.modalContainer.webkitRequestFullscreen();
+        } else if (this.elements.modalContainer.msRequestFullscreen) {
+            this.elements.modalContainer.msRequestFullscreen();
+        }
+
+        this.state.isFullscreen = true;
+        this.elements.maximizeModalBtn.innerHTML = '<i class="fas fa-compress"></i>';
+        this.elements.maximizeModalBtn.setAttribute('aria-label', 'Exit fullscreen');
+
+        // Add a class for custom fullscreen styling
+        this.elements.modal.classList.add('fullscreen');
+    }
+
+    // Exit fullscreen
+     exitFullscreen() {
+        if (document.exitFullscreen) {
+            document.exitFullscreen();
+        } else if (document.webkitExitFullscreen) {
+            document.webkitExitFullscreen();
+        } else if (document.msExitFullscreen) {
+            document.msExitFullscreen();
+        }
+
+        this.state.isFullscreen = false;
+        this.elements.maximizeModalBtn.innerHTML = '<i class="fas fa-expand"></i>';
+        this.elements.maximizeModalBtn.setAttribute('aria-label', 'Enter fullscreen');
+
+        // Remove the custom fullscreen styling
+        this.elements.modal.classList.remove('fullscreen');
+    }
+
+    handleFullscreenChange() {
+        const fullscreenElement = document.fullscreenElement ||
+            document.webkitFullscreenElement ||
+            document.msFullscreenElement;
+
+        if (!fullscreenElement) {
+            // We exited fullscreen
+            this.state.isFullscreen = false;
+            this.elements.maximizeModalBtn.innerHTML = '<i class="fas fa-expand"></i>';
+            this.elements.maximizeModalBtn.setAttribute('aria-label', 'Enter fullscreen');
+            this.elements.modal.classList.remove('fullscreen');
         }
     }
 
@@ -414,7 +554,7 @@ export class UltimateModal {
 
     async loadImageData(){
         try {
-            const response = await fetch('\imagesDIR.json');
+            const response = await fetch('/public/imagesDIR.json');
             if (!response.ok) {
                 throw new Error('Network response was not ok');
             }

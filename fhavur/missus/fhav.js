@@ -5,8 +5,16 @@ document.addEventListener('DOMContentLoaded', () => {
     const nopeBtn = document.getElementById('nope-btn');
     const yesBtn = document.getElementById('yes-btn');
     const maybeBtn = document.getElementById('maybe-btn');
+    const hoversound = document.getElementById('hover-sound');
 
-
+    card.addEventListener('click', () => {
+        hoversound.play().catch(
+            (error) => {
+                console.log("Sound play was prevented:", error);
+            }
+        );
+        console.log("playing sound");
+    });
     let curX = 0;
     let curY = 0;
     let tgX = 0;
@@ -17,6 +25,7 @@ document.addEventListener('DOMContentLoaded', () => {
         curY += (tgY - curY) / 20;
         interBubble.style.transform = `translate(${Math.round(curX)}px, ${Math.round(curY)}px)`;
         requestAnimationFrame(move);
+
     };
 
     window.addEventListener('mousemove', (event) => {
@@ -26,7 +35,8 @@ document.addEventListener('DOMContentLoaded', () => {
         const hue = Math.round((tgX / window.innerWidth) * 360);
         interBubble.style.background =
             `radial-gradient(circle, hsla(${hue}, 80%, 65%, 0.8) 0%, hsla(${hue}, 80%, 65%, 0) 60%)`;
-        cursor_follower.style.transform = `translate(${event.clientX}px, ${event.clientY}px)`;        const xTilt = (event.clientX / window.innerWidth - 0.5) * 20;
+        cursor_follower.style.transform = `translate(${event.clientX}px, ${event.clientY}px)`;
+        const xTilt = (event.clientX / window.innerWidth - 0.5) * 20;
         const yTilt = (event.clientY / window.innerHeight - 0.5) * 20;
 
     });

@@ -67,13 +67,22 @@
     margin: 0;
     padding: 0;
 }
-
+* {
+    -webkit-tap-highlight-color: transparent;
+    -webkit-touch-callout: none;
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+}
 html {
     font-size: 16px;
     scroll-behavior: smooth;
 }
 
 body {
+    padding-bottom: env(safe-area-inset-bottom);
+    padding-top: env(safe-area-inset-top);
     font-family: 'Montserrat', sans-serif;
     overflow-x: hidden;
     height: 100%;
@@ -85,7 +94,10 @@ body {
     flex-direction: column;
     min-height: 100vh;
 }
-
+#nope-btn, #yes-btn, #maybe-btn {
+    padding: 12px 24px;
+    font-size: 16px; /* Minimum recommended size for touch */
+}
 /* Improved focus styles */
 body:not(.using-mouse) *:focus {
     outline: 3px solid rgba(var(--color-accent), 0.8);

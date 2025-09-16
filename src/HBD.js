@@ -41,7 +41,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Constants
     const HEART_COOLDOWN = 300; // ms between heart creations
-    const EMOJIS = ['❤️', '💖', '💗', '💓', '💞', '🌸', '✨', '🎀'];
+    const EMOJIS = ['❤️', '💖', '💗', '💓', '💞', '🌸', '✨', '🎀', '💘', '💕', '💝'];
     const LETTER_ANIMATIONS = [
         'fadeInUp',
         'swing',
@@ -92,10 +92,8 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   `;
        document.head.appendChild(style);
-        const modal = new UltimateModal();
-        modal.init();
-        const notification = new Notification();
-        notification.initialize();
+         new Notification().toggleViewDetails(true).initialize();
+         new UltimateModal().init();
         setupEventListeners()
         loadImages();
         triggerCelebration(1000); // Initial celebration after 1 second
@@ -170,6 +168,7 @@ document.addEventListener('DOMContentLoaded', () => {
             toggleAudio();
         }
     }
+
     function createFloatingElements() {
         const symbols = [
             {class: 'hearts', emoji: '❤️'},
@@ -204,7 +203,7 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
-        function triggerConfetti() {
+    function triggerConfetti() {
             elements.confettiElements.forEach((confetti, index) => {
                 confetti.style.animation = 'none';
                 void confetti.offsetWidth; // Trigger reflow
@@ -232,13 +231,23 @@ document.addEventListener('DOMContentLoaded', () => {
 
         }
 
-        function getRandomColor() {
-            const colors = ['#ff6b6b', '#ff8e53', '#ffd700', '#4caf50', '#2196f3', '#9c27b0', '#ff4081', '#00bcd4'];
+    function getRandomColor() {
+            const colors = ['#ff6b6b',
+                '#ff8e53',
+                '#ffd700',
+                '#4caf50',
+                '#2196f3',
+                '#9c27b0',
+                '#ff4081',
+                '#00bcd4',
+                '#8bc34a',
+                '#ff5722',
+                '#3e0909'
+            ];
             return colors[Math.floor(Math.random() * colors.length)];
         }
 
-
-        function animateName() {
+    function animateName() {
         const nameElement = elements.nameElement;
         if (!nameElement) return;
 
@@ -265,6 +274,7 @@ document.addEventListener('DOMContentLoaded', () => {
             nameElement.appendChild(span);
         });
     }
+
    function getUniqueRandomAnimations(count) {
         const shuffled = [...LETTER_ANIMATIONS];
         // Fisher-Yates shuffle algorithm
@@ -400,12 +410,9 @@ document.addEventListener('DOMContentLoaded', () => {
             position: 'fixed',
             fontSize: `${initialiseSize}px`,
             animation: `float ${3 + Math.random() * 4}s ease-in-out forwards`,
-            opacity: '0.8',
-            zIndex: '5',
             pointerEvents: 'none',
             transform: `rotate(${Math.random() * 360}deg)`,
             filter: `hue-rotate(${Math.random() * 360}deg)`,
-            transition: 'font-size 0.1s ease-out, transform 0.2s ease-out'
         });
 
         elements.clickHeartsContainer.appendChild(heart);
@@ -427,6 +434,7 @@ document.addEventListener('DOMContentLoaded', () => {
         return heart;
 
     }
+
     function startGrowingHeart(e) {
         // Clear any existing growing heart
         if (state.heart.growing) {

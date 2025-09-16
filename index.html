@@ -13,6 +13,13 @@
   <!-- Google Fonts -->
   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&family=Dancing+Script:wght@700&display=swap" rel="stylesheet">
   <!-- Custom CSS -->
+  <meta property="og:title" content="Beautiful Birthday Wishes">
+  <meta property="og:image" content="/public/profile_pic.jpg">
+  <meta property="og:description" content="Wishing you a day as wonderful as you are, filled with joy and happiness!">
+  <meta property="description" content="Wishing you a day as wonderful as you are, filled with joy and happiness!" />
+  <meta property="twitter:card" content="summary_large_image" />
+
+
   <style>
     :root {
       --primary: #8E2DE2;
@@ -378,7 +385,7 @@
           <span class="photo-text">Add Birthday Photo</span>
         </div>
         <!-- Actual image -->
-        <img class="birthday-image d-none" src="/tata.jpg" alt="Birthday Person" id="birthdayImage">
+        <img class="birthday-image d-none" src="/profile_pic.jpg" alt="Birthday Person" id="birthdayImage">
       </div>
     </div>
 
@@ -386,7 +393,7 @@
     <div class="col-lg-6">
       <div class="content-section">
         <h1 class="birthday-title animate__animated animate__fadeInDown">
-          Happy Day <span class="name-highlight glow">My Love! 💝❤</span>
+          Happy Day <span class="name-highlight glow">My Love! 💝💘💖💗💓</span>
         </h1>
 
         <div class="birthday-message">
@@ -432,7 +439,7 @@
           </div>
         </div>
       </div>
-    </div>
+    </div>  <iframe width="560" height="560" src="https://www.youtube.com/embed/WgTMeICssXY?list=RDWgTMeICssXY" title="Ruth B. - Dandelions (Lyrics)" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
   </div>
 </div>
 
@@ -471,6 +478,11 @@
 
       this.setupCanvas();
       this.setupResizeListener();
+      this.animate = this.animate.bind(this);
+      this.animate();
+      document.querySelector('.image-container').addEventListener('click', ()=>{
+        window.location.href = 'fhavur.html';
+      });
     }
 
     setupCanvas() {
@@ -773,7 +785,7 @@
 
     startApp() {
       // Load your image here - replace with actual path
-      this.imageLoader.loadImage('/tata.jpg');
+      this.imageLoader.loadImage('/public/profile_pic.jpg');
 
       // Initial animations
       this.scrollAnimator.init();
