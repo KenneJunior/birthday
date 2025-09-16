@@ -138,7 +138,7 @@ document.addEventListener('DOMContentLoaded', () => {
         // Add loaded class to body for CSS transitions
         setTimeout(() => {
             document.body.classList.add('loaded');
-        }, 10);
+        }, 1000);
     };
 
     // Clean up function
