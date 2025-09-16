@@ -50,7 +50,7 @@ export class Notification {
             },
             onShow: null,
             onHide: null,
-            onViewDetails: () => window.location.href = '/fhavur/confession.html',
+            onViewDetails: () => window.location.href = '/confession.html',
             viewMore:  true
         };
 
