@@ -65,10 +65,10 @@
   ],
   "shortcuts": [
     {
-      "name": "Confession",
-      "short_name": "New",
-      "description": "Create a new greeting",
-      "url": "/fhavur/missus/fhav.html",
+      "name": "HBD",
+      "short_name": "Memories",
+      "description": "your Memories",
+      "url": "fhavur",
       "icons": [
         {
           "src": "data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iOTYiIGhlaWdodD0iOTYiIHZpZXdCb3g9IjAgMCA5NiA5NiIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KPGNpcmNsZSBjeD0iNDgiIGN5PSI0OCIgcj0iNDgiIGZpbGw9IiNkYjcwN2EiLz4KPHBhdGggZD0iTTQ4IDMyVjY0TTMyIDQ4SDY0IiBzdHJva2U9IndoaXRlIiBzdHJva2Utd2lkdGg9IjgiIHN0cm9rZS1saW5lY2FwPSJyb3VuZCIvPgo8L3N2Zz4=",
