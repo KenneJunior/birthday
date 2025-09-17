@@ -5,13 +5,8 @@
     { "src": "**/*", "use": "@vercel/static" }
   ],
   "routes": [
-    // Serve direct .html files
     { "src": "/(.*)\\.html", "dest": "/$1.html" },
-
-    // Allow clean URLs without .html
     { "src": "/(.*)", "dest": "/$1.html" },
-
-    // Fallback to index.html for root
     { "src": "/", "dest": "/index.html" }
   ]
 }
