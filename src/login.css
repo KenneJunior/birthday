@@ -177,6 +177,72 @@ button[type="submit"]:hover {
 button[type="submit"]:active {
     transform: translateY(0);
 }
+.shake {
+    animation: shake 0.5s cubic-bezier(.36,.07,.19,.97) both;
+}
+
+@keyframes shake {
+    10%, 90% { transform: translateX(-1px); }
+    20%, 80% { transform: translateX(2px); }
+    30%, 50%, 70% { transform: translateX(-4px); }
+    40%, 60% { transform: translateX(4px); }
+}
+
+/* Password toggle states */
+.password-toggle.visible .eye-icon {
+    color: var(--primary);
+}
+
+/* Input validation states */
+input.valid {
+    border-color: var(--success) !important;
+    box-shadow: 0 0 0 3px rgba(6, 214, 160, 0.2) !important;
+}
+
+input.invalid {
+    border-color: var(--error) !important;
+    box-shadow: 0 0 0 3px rgba(239, 71, 111, 0.2) !important;
+}
+
+input.focused {
+    transform: translateY(-1px);
+    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.1);
+}
+
+/* Notification animations */
+.notification {
+    position: fixed;
+    bottom: -100px;
+    left: 50%;
+    transform: translateX(-50%);
+    padding: 1rem 1.5rem;
+    border-radius: var(--radius-md);
+    color: white;
+    font-weight: 500;
+    z-index: 1000;
+    opacity: 0;
+    transition: all 0.3s ease;
+    min-width: 300px;
+    text-align: center;
+    box-shadow: var(--shadow-lg);
+}
+
+.notification.show {
+    bottom: 20px;
+    opacity: 1;
+}
+
+.notification.success {
+    background-color: var(--success);
+}
+
+.notification.error {
+    background-color: var(--error);
+}
+
+.notification.info {
+    background-color: var(--primary);
+}
 
 .message {
     padding: 1rem;
@@ -222,7 +288,13 @@ button[type="submit"]:active {
     .container {
         padding: 2rem 1.5rem;
     }
-    
+      .notification {
+        left: 5%;
+        right: 5%;
+        transform: none;
+        min-width: auto;
+        width: 90%;
+    }
     h1 {
         font-size: 1.5rem;
     }
