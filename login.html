@@ -1,1 +1,91 @@
 
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Secure Password Access | Account Login</title>
+    <meta name="description" content="Secure password authentication form for birthday form">
+    <link rel="stylesheet" href="src/login.css">
+</head>
+<body>
+    <div class="login-container">
+        <div class="login-card">
+            <header class="login-header">
+                <div class="logo">
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
+                        <path d="M18 10a6 6 0 10-12 0 6 6 0 0012 0zM6 10a4 4 0 118 0 4 4 0 01-8 0z"/>
+                        <path d="M12 12a2 2 0 100-4 2 2 0 000 4z"/>
+                        <path d="M20 10a8 8 0 10-16 0 8 8 0 0016 0zM4 10a6 6 0 1112 0 6 6 0 01-12 0z"/>
+                        <path fill-rule="evenodd" clip-rule="evenodd" d="M12 2a8 8 0 00-8 8c0 1.848.627 3.551 1.674 4.906l-1.62 1.62a1 1 0 00 0 1.414l1.414 1.414a1 1 0 001.414 0l1.62-1.62A7.96 7.96 0 0012 18a7.96 7.96 0 004.906-1.674l1.62 1.62a1 1 0 001.414 0l1.414-1.414a1 1 0 000-1.414l-1.62-1.62A7.96 7.96 0 0020 10a8 8 0 00-8-8zm-6 8a6 6 0 1112 0 6 6 0 01-12 0z"/>
+                    </svg>
+                    <span>SecureAccess</span>
+                </div>
+                <h1>Welcome Back</h1>
+                <p>Enter your password to continue to your account</p>
+            </header>
+
+            <main class="login-content">
+                <form id="loginForm" class="login-form" novalidate>
+                    <div class="input-group">
+                        <label for="password" class="sr-only">Password</label>
+                        <div class="password-wrapper">
+                            <input 
+                                type="password" 
+                                id="password" 
+                                name="password" 
+                                required 
+                                autocomplete="current-password"
+                                minlength="8"
+                                placeholder="Enter your password"
+                                aria-describedby="password-requirements"
+                            >
+                            <button type="button" id="togglePassword" class="password-toggle" aria-label="Show password">
+                                <svg class="eye-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
+                                    <circle cx="12" cy="12" r="3"></circle>
+                                </svg>
+                            </button>
+                        </div>
+                        <p id="password-requirements" class="input-help">Must be at least 8 characters</p>
+                    </div>
+
+                    <div class="form-actions">
+                        <button type="submit" class="btn btn-primary">
+                            <span class="btn-text">Continue</span>
+                            <svg class="btn-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M5 12h14M12 5l7 7-7 7"></path>
+                            </svg>
+                        </button>
+                    </div>
+                </form>
+
+                <div class="login-info">
+                    <div class="info-notice" role="status">
+                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
+                            <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-2h2v2zm0-4h-2V7h2v6z"/>
+                        </svg>
+                        <p>This is a demo application. Your password is stored locally in your browser.</p>
+                    </div>
+                </div>
+            </main>
+
+            <footer class="login-footer">
+                <p>Need help? <a href="#" aria-label="Contact support">Contact support</a></p>
+                <p class="security-note">
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
+                        <path d="M12 1L3 5v6c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V5l-9-4zm0 10.99h7c-.53 4.12-3.28 7.79-7 8.94V12H5V6.3l7-3.11v8.8z"/>
+                    </svg>
+                    Your data remains on your device
+                </p>
+            </footer>
+        </div>
+
+        <div class="notification" id="notification" aria-live="polite">
+            <span class="notification-text" id="notificationText"></span>
+        </div>
+    </div>
+
+    <script src="src/login.js"></script>
+</body>
+</html>
