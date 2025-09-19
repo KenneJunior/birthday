@@ -1,0 +1,346 @@
+ :root {
+      --primary: #8E2DE2;
+      --secondary: #4A00E0;
+      --accent: #FF6B6B;
+      --light: #F8F9FA;
+      --dark: #212529;
+      --text: #495057;
+      --shadow-lg: 0 15px 30px rgba(0, 0, 0, 0.12);
+      --transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    body {
+      font-family: 'Poppins', sans-serif;
+      background: linear-gradient(135deg, #f5f7fa 0%, #e4e8f0 100%);
+      min-height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      padding: 2rem;
+      color: var(--text);
+      line-height: 1.7;
+    }
+
+    .birthday-card {
+      max-width: 1100px;
+      width: 100%;
+      background: white;
+      border-radius: 24px;
+      overflow: hidden;
+      box-shadow: var(--shadow-lg);
+      transition: var(--transition);
+      position: relative;
+      z-index: 1;
+    }
+
+    .birthday-card:hover {
+      transform: translateY(-8px);
+      box-shadow: 0 20px 40px rgba(0, 0, 0, 0.15);
+    }
+
+    .image-container {
+      height: 100%;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .image-container::after {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(135deg, rgba(142, 45, 226, 0.2), rgba(74, 0, 224, 0.2));
+      z-index: 1;
+      opacity: 0;
+      transition: var(--transition);
+    }
+
+    .image-container:hover::after {
+      opacity: 1;
+    }
+
+    .image-placeholder {
+      width: 100%;
+      height: 100%;
+      min-height: 400px;
+      background: linear-gradient(135deg, var(--primary), var(--secondary));
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      color: white;
+      position: relative;
+    }
+
+    .birthday-image {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      object-position: center;
+      transition: var(--transition);
+      position: absolute;
+      top: 0;
+      left: 0;
+    }
+
+    .image-container:hover .birthday-image {
+      transform: scale(1.08);
+    }
+
+    .content-section {
+      padding: 3rem 3.5rem;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      position: relative;
+    }
+
+    .birthday-title {
+      font-weight: 700;
+      margin-bottom: 1.5rem;
+      color: var(--primary);
+      position: relative;
+      display: inline-block;
+      font-size: 2.5rem;
+    }
+
+    .birthday-title::after {
+      content: '';
+      position: absolute;
+      bottom: -12px;
+      left: 0;
+      width: 80px;
+      height: 5px;
+      background: linear-gradient(to right, var(--primary), var(--secondary));
+      border-radius: 3px;
+      transition: var(--transition);
+    }
+
+    .birthday-card:hover .birthday-title::after {
+      width: 120px;
+    }
+
+    .name-highlight {
+      font-family: 'Dancing Script', cursive;
+      color: var(--accent);
+      font-size: 1.2em;
+    }
+
+    .birthday-message {
+      margin-bottom: 2rem;
+    }
+
+    .message-item {
+      margin-bottom: 1rem;
+      padding-left: 2rem;
+      position: relative;
+      transition: var(--transition);
+    }
+
+    .message-item:hover {
+      transform: translateX(5px);
+    }
+
+    .message-item::before {
+      content: '';
+      position: absolute;
+      left: 0;
+      top: 0.7em;
+      width: 1rem;
+      height: 3px;
+      background: var(--accent);
+      border-radius: 3px;
+    }
+
+    .birthday-icon {
+      color: var(--accent);
+      margin-right: 12px;
+      font-size: 1.3rem;
+      vertical-align: middle;
+    }
+
+    .birthday-wishes {
+      font-family: 'Dancing Script', cursive;
+      font-size: 1.8rem;
+      color: var(--secondary);
+      margin-top: 2rem;
+      padding-top: 2rem;
+      border-top: 1px dashed rgba(74, 0, 224, 0.2);
+      text-align: center;
+      position: relative;
+    }
+
+    .birthday-wishes::before,
+    .birthday-wishes::after {
+      content: '\f004';
+      font-family: 'Font Awesome 6 Free';
+      font-weight: 900;
+      color: var(--accent);
+      position: absolute;
+      top: 1.8rem;
+      font-size: 1.2rem;
+    }
+
+    .birthday-wishes::before {
+      left: 30%;
+    }
+
+    .birthday-wishes::after {
+      right: 30%;
+    }
+
+    .share-section {
+      margin-top: 2.5rem;
+      padding-top: 2rem;
+      border-top: 1px solid rgba(0, 0, 0, 0.05);
+    }
+
+    .share-title {
+      font-size: 0.9rem;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      color: var(--text);
+      opacity: 0.7;
+      margin-bottom: 1rem;
+      text-align: center;
+    }
+
+    .share-buttons {
+      display: flex;
+      justify-content: center;
+      gap: 1rem;
+    }
+
+    .share-btn {
+      width: 42px;
+      height: 42px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: white;
+      font-size: 1.2rem;
+      transition: var(--transition);
+      position: relative;
+      overflow: hidden;
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+    }
+
+    .share-btn::after {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(135deg, rgba(255,255,255,0.2), rgba(255,255,255,0));
+      opacity: 0;
+      transition: var(--transition);
+    }
+
+    .share-btn:hover {
+      transform: translateY(-3px) scale(1.1);
+      box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
+    }
+
+    .share-btn:hover::after {
+      opacity: 1;
+    }
+
+    .whatsapp { background: #25D366; }
+    .instagram { background: linear-gradient(45deg, #405DE6, #5851DB, #833AB4, #C13584, #E1306C, #FD1D1D); }
+    .facebook { background: #1877F2; }
+    .twitter { background: #1DA1F2; }
+    .telegram { background: #0088CC; }
+
+    .photo-icon {
+      font-size: 3.5rem;
+      margin-bottom: 1.5rem;
+      color: rgba(255, 255, 255, 0.9);
+      text-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+    }
+
+    .photo-text {
+      font-size: 1.1rem;
+      opacity: 0.9;
+      letter-spacing: 0.5px;
+    }
+
+    @media (max-width: 992px) {
+      .content-section {
+        padding: 2.5rem;
+      }
+
+      .birthday-title {
+        font-size: 2.2rem;
+      }
+    }
+
+    @media (max-width: 768px) {
+      .birthday-card {
+        flex-direction: column;
+      }
+
+      .content-section {
+        padding: 2rem;
+      }
+
+      .birthday-title {
+        font-size: 2rem;
+      }
+
+      .birthday-wishes {
+        font-size: 1.5rem;
+      }
+    }
+
+    /* Animations */
+    .animate-delay-1 { animation-delay: 0.2s; }
+    .animate-delay-2 { animation-delay: 0.4s; }
+    .animate-delay-3 { animation-delay: 0.6s; }
+
+    @keyframes float {
+      0% { transform: translateY(0px); }
+      50% { transform: translateY(-15px); }
+      100% { transform: translateY(0px); }
+    }
+
+    .floating {
+      animation: float 4s ease-in-out infinite;
+    }
+
+    /* Glow effect for special elements */
+    .glow {
+      animation: glow 2s ease-in-out infinite alternate;
+    }
+
+    @keyframes glow {
+      from { text-shadow: 0 0 5px rgba(142, 45, 226, 0.5); }
+      to { text-shadow: 0 0 15px rgba(142, 45, 226, 0.8); }
+    }
+
+    /* Decorative elements */
+    .decorative-circle {
+      position: absolute;
+      border-radius: 50%;
+      opacity: 0.1;
+      z-index: -1;
+    }
+
+    .circle-1 {
+      width: 200px;
+      height: 200px;
+      background: var(--primary);
+      top: -100px;
+      right: -100px;
+    }
+
+    .circle-2 {
+      width: 150px;
+      height: 150px;
+      background: var(--accent);
+      bottom: -75px;
+      left: -75px;
+    }
