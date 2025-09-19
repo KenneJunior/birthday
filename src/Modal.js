@@ -58,7 +58,7 @@ export class UltimateModal {
         const {length: profile_index} = this.elements.thumbnails;
         this.elements.profileImage.addEventListener('click', () => this.openModal(profile_index));
 
-        this.elements.maximizeModalBtn.addEventListener('click',() => this.toggleMaximize());
+        this.elements.maximizeModalBtn.addEventListener('click',() => this.toggleFullscreen());
 
         this.elements.openModalBtn.addEventListener('click', () => this.openModal(0));
 
