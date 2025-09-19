@@ -332,8 +332,10 @@ document.addEventListener('DOMContentLoaded', () => {
             link.addEventListener('click', handleSocialShareClick);
         });
 
-        // Window resize
-        window.addEventListener('resize', debounce(handleWindowResize, 200));
+        // Window resize - debounce to avoid excessive calls
+        window.addEventListener('resize', debounce(() => {
+            // Handle any responsive adjustments if needed
+        }, 200));
     }
     // Audio functions
     function enableAudio() {
@@ -494,12 +496,6 @@ document.addEventListener('DOMContentLoaded', () => {
         if (e.key === 'Enter' || e.key === ' ') {
             e.preventDefault();
             triggerCelebration();
-        }
-    }
-
-    function handleWindowResize() {
-        if (elements.imageModal.open) {
-            elements.imageModal.scrollTop = 0;
         }
     }
 
