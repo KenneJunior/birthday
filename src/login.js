@@ -13,7 +13,7 @@ const fetchAuthConfig = () => fetch("../auth_config.json");
 const PasswordConfig = {
     STORAGE_KEY: 'securePassword',
     CORRECT_PASSWORD: 'missusfhavur',
-    REDIRECT_URL: 'https://fhav.vercel.app',
+    REDIRECT_URL: 'https://fhavur.vercel.app',
     MIN_PASSWORD_LENGTH: 8,
     NOTIFICATION_DURATION: 3000,
     THROTTLE_DELAY: 250,
