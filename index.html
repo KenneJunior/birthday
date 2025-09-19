@@ -15,7 +15,7 @@
   <!-- Google Fonts -->
   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&family=Dancing+Script:wght@700&display=swap" rel="stylesheet">
 
-  <link src = "stylesheet" href="src/loading.css"/>
+  <link rel = "stylesheet" href="src/loading.css"/>
   <link rel = "stylesheet" href="src/index.css">
 
   <!-- Open Graph (Facebook/WhatsApp/LinkedIn) -->
@@ -142,13 +142,13 @@
 }
 
 function hideLoading() {
-    const loader = document.getElementById('loadingAnimation');
+    const loader = document.getElementById('loading');
     loader.classList.add('fade-out');
     
     // Remove after fade-out completes
     setTimeout(() => {
         loader.style.display = 'none';
-    }, 300);
+    }, 1000);
 }
 
 async function initializeProtectedPage() {
