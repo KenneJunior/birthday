@@ -1,4 +1,3 @@
-// auth-check.js - Comprehensive Authentication Check System
 
 // Configuration
 const AuthConfig = {
@@ -247,8 +246,7 @@ async function setupAuthProtection() {
 
 // Initialize on page load
 document.addEventListener('DOMContentLoaded', async () => {
-    // You can automatically protect pages by calling:
-    // await setupAuthProtection();
+    await setupAuthProtection();
 });
 
 // Export functions for use in other modules
