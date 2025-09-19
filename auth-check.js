@@ -129,6 +129,37 @@ async function requireAuth(options = {}) {
 }
 
 /**
+ * Show loading animation
+ */
+function showLoadingAnimation() {
+    const loadingEl = document.getElementById('loading');
+    if (loadingEl) {
+        loadingEl.style.display = 'flex';
+    }
+}
+
+function updateLoadingText(text) {
+    const textEl = document.querySelector('.loading-text');
+    if (textEl) {
+        // Keep the dots animation
+        const dotsHtml = textEl.querySelector('.loading-dots')?.outerHTML || '';
+        textEl.innerHTML = text + dotsHtml;
+    }
+}
+
+/**
+ * Hide loading animation
+ */
+function hideLoadingAnimation() {
+    const loadingEl = document.getElementById('loading');
+    if (loadingEl) {
+        loadingEl.classList.add('fade-out');
+        setTimeout(() => {
+            loadingEl.style.display = 'none';
+        }, 300);
+    }
+}
+/**
  * Logout user from all authentication methods
  */
 async function logout() {
@@ -243,15 +274,6 @@ async function setupAuthProtection() {
     
     return authResult;
 }
-
-// Initialize on page load
-document.addEventListener('DOMContentLoaded', async () => {
-   const authResult = await setupAuthProtection();
-            if (authResult.authenticated) {
-            document.getElementById('loading').classlist.add('d-none');
-            document.getElementById('protectedContent').classlist.remove('d-none');
-        }
-});
 
 // Export functions for use in other modules
 if (typeof module !== 'undefined' && module.exports) {
