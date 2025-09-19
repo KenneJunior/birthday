@@ -70,7 +70,8 @@ export class UltimateModal {
         this.hammer.on('swiperight', () => this.navigate(-1));
         this.hammer.on('swipeup', () => this.closeModal());
         this.hammer.on('swipedown', () => this.closeModal());
-        this.hammer.on('doubletap', () => this.toggleMaximize());
+        this.hammer.on('pinchin', () => this.toggleMaximize());
+        this.hammer.on('double-tap',()=> this.toggleFullscreen());
 
         this.elements.modalContainer.addEventListener('swipe', () => this.closeModal());
 

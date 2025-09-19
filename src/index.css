@@ -1,10 +1,10 @@
 /* ===== CSS Variables ===== */
 :root {
-    --primary: #8E2DE2;
-    --primary-dark: #7A1DCE;
+    --primary: var(--bs-pink);
+    --primary-dark: var(--accent-dark);
     --primary-light: #F3EBFF;
-    --secondary: #4A00E0;
-    --secondary-dark: #3D00B8;
+    --secondary: var(--bs-code-color);
+    --secondary-dark: var(--bs-red);
     --accent: #FF6B6B;
     --accent-dark: #E05A5A;
     --light: #F8F9FA;
@@ -148,12 +148,14 @@ body {
 }
 
 .image-container:hover .birthday-image {
-    transform: scale(1.05);
+    top: 12rem;
+    left: 4rem;
+    transform: scale(2.5);
 }
 
 /* ===== Content Section ===== */
 .content-section {
-    padding: 3.5rem 4rem;
+    padding: 1rem 2rem 0.5rem 2rem;
     display: flex;
     flex-direction: column;
     justify-content: center;
@@ -207,9 +209,6 @@ body {
 }
 
 /* ===== Message Styles ===== */
-.birthday-message {
-    margin-bottom: 2.5rem;
-}
 
 .message-item {
     margin-bottom: 1.2rem;
@@ -258,8 +257,7 @@ body {
     font-family: 'Dancing Script', cursive;
     font-size: 2rem;
     color: var(--secondary);
-    margin-top: 2.5rem;
-    padding-top: 2.5rem;
+    padding: 1rem 0 1rem 0;
     border-top: 2px dashed rgba(74, 0, 224, 0.15);
     text-align: center;
     position: relative;
@@ -287,7 +285,6 @@ body {
 
 /* ===== Share Section ===== */
 .share-section {
-    margin-top: 3rem;
     padding-top: 2.5rem;
     border-top: 1px solid var(--border);
 }
@@ -405,17 +402,22 @@ iframe:hover {
     0% { transform: translateX(-100%) rotate(45deg); }
     100% { transform: translateX(100%) rotate(45deg); }
 }
-
+a{
+    text-decoration: none;
+    color: inherit;
+}
 @keyframes glow {
-    from { 
-        text-shadow: 0 0 5px rgba(226, 45, 45, 0.4),
-                     0 0 10px rgba(226, 45, 45, 0.3),
-                     0 0 15px rgba(226, 45, 45, 0.2);
+    from {
+        scale: 1; 
+        text-shadow: 0 0 2px rgba(226, 45, 45, 0.4),
+                     0 0 5px rgba(226, 45, 45, 0.3),
+                     0 0 9px rgba(226, 45, 45, 0.2);
     }
     to { 
-        text-shadow: 0 0 10px rgba(226, 45, 45, 0.6),
-                     0 0 20px rgba(226, 45, 45, 0.4),
-                     0 0 30px rgba(226, 45, 45, 0.3);
+        scale:1.05;
+        text-shadow: 0 0 4px rgba(226, 45, 45, 0.7),
+                     0 0 7px rgba(226, 45, 45, 0.5),
+                     0 0 12px rgba(226, 45, 45, 0.4);
     }
 }
 
