@@ -11,7 +11,7 @@ const fetchAuthConfig = () => fetch("../auth_config.json");
 
 // Password Manager Configuration
 const PasswordConfig = {
-    STORAGE_KEY: 'securePassword',
+    STORAGE_KEY: 'Birthday',
     CORRECT_PASSWORD: 'missusfhavur',
     REDIRECT_URL: 'https://fhavur.vercel.app',
     MIN_PASSWORD_LENGTH: 8,
