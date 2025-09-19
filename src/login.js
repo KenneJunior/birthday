@@ -1,133 +1,408 @@
-/**
- * Secure Password Manager Module
- * @module PasswordManager
- * @description Handles password form functionality with local storage persistence
- */
+let auth0 = null;
 
-// Constants and configuration
+// Auth0 Configuration
+const Auth0Config = {
+    domain: "{DOMAIN}",
+    client_id: "{ID}",
+    cacheLocation: "localstorage",
+    redirect_uri: window.location.origin
+};
+const fetchAuthConfig = () => fetch("../auth_config.json");
+
+// Password Manager Configuration
 const PasswordConfig = {
     STORAGE_KEY: 'securePassword',
+    CORRECT_PASSWORD: 'missusfhavur',
+    REDIRECT_URL: 'https://fhav.vercel.app',
     MIN_PASSWORD_LENGTH: 8,
-    NOTIFICATION_DURATION: 5000,
+    NOTIFICATION_DURATION: 3000,
     THROTTLE_DELAY: 250,
     SECURE_INPUT_TIMEOUT: 1000,
+    REDIRECT_DELAY: 1000,
 };
 
 /**
- * PasswordManager - Main application module
+ * Auth0 Manager - Handles Auth0 authentication
+ */
+const Auth0Manager = (() => {
+    let isAuthenticated = false;
+    let userProfile = null;
+
+    /**
+     * Initialize Auth0 client
+     */
+    const init = async () => {
+            const response = await fetchAuthConfig();
+            const config = await response.json();
+            Auth0Config.domain = config.domain;
+            Auth0Config.client_id = config.clientId;
+
+        try {
+            auth0 = await createAuth0Client({
+                domain: Auth0Config.domain,
+                client_id: Auth0Config.client_id,
+                cacheLocation: Auth0Config.cacheLocation,
+                useRefreshTokens: true,
+            });
+            
+            // Check if user is authenticated
+            isAuthenticated = await auth0.isAuthenticated();
+            
+            if (isAuthenticated) {
+                userProfile = await auth0.getUser();
+                _handleAuthenticated();
+            }
+            
+            return true;
+        } catch (error) {
+            console.error('Auth0 initialization failed:', error);
+            return false;
+        }
+    };
+
+    /**
+     * Handle login with Auth0
+     */
+    const login = async () => {
+        try {
+            await auth0.loginWithRedirect({
+                redirect_uri: Auth0Config.redirect_uri
+            });
+        } catch (error) {
+            console.error('Auth0 login failed:', error);
+            _showNotification('Authentication failed. Please try again.', 'error');
+        }
+    };
+
+    /**
+     * Handle logout
+     */
+    const logout = () => {
+        try {
+            auth0.logout({
+                returnTo: Auth0Config.redirect_uri
+            });
+        } catch (error) {
+            console.error('Auth0 logout failed:', error);
+        }
+    };
+
+    /**
+     * Check authentication state
+     */
+    const checkAuth = async () => {
+        try {
+            const query = window.location.search;
+            if (query.includes("code=") && query.includes("state=")) {
+                await auth0.handleRedirectCallback();
+                window.history.replaceState({}, document.title, "/");
+            }
+
+            isAuthenticated = await auth0.isAuthenticated();
+            
+            if (isAuthenticated) {
+                userProfile = await auth0.getUser();
+                _handleAuthenticated();
+            }
+            
+            _updateUI();
+            return isAuthenticated;
+        } catch (error) {
+            console.error('Auth0 check failed:', error);
+            return false;
+        }
+    };
+
+    /**
+     * Handle authenticated state
+     */
+    const _handleAuthenticated = () => {
+        _showNotification(`Welcome back! Redirecting to ${PasswordConfig.REDIRECT_URL}...`, 'success');
+        _scheduleRedirect();
+    };
+
+    /**
+     * Update UI based on authentication state
+     */
+    const _updateUI = () => {
+        const auth0Container = document.getElementById('auth0');
+        const passwordContainer = document.getElementById('passwordContainer');
+        const userInfo = document.getElementById('userInfo');
+        const loginBtn = document.getElementById('loginBtn');
+        const logoutBtn = document.getElementById('logoutBtn');
+        
+        if (!auth0Container || !passwordContainer) return;
+        
+        if (isAuthenticated) {
+            // User is authenticated with Auth0
+            auth0Container.classList.remove('d-none');
+            passwordContainer.classList.add('d-none');
+            
+            if (userInfo && userProfile) {
+                userInfo.textContent = `Logged in as: ${userProfile.name || userProfile.email}`;
+            }
+            
+            if (loginBtn) loginBtn.classList.add('d-none');
+            if (logoutBtn) logoutBtn.classList.remove('d-none') ;
+        } else {
+            // User is not authenticated with Auth0, show fallback option
+            auth0Container.classList.remove('d-none')  ;
+            passwordContainer.classList.remove('d-none');
+            
+            if (loginBtn) loginBtn.classList.remove('d-none');
+            if (logoutBtn) logoutBtn.classList.add('d-none');
+        }
+    };
+
+    /**
+     * Schedule redirect
+     */
+    const _scheduleRedirect = () => {
+        setTimeout(() => {
+            window.location.href = PasswordConfig.REDIRECT_URL;
+        }, PasswordConfig.REDIRECT_DELAY);
+    };
+
+    /**
+     * Show notification
+     */
+    const _showNotification = (message, type = 'info') => {
+        const notification = document.getElementById('notification');
+        const notificationText = document.getElementById('notificationText');
+        
+        if (!notification || !notificationText) return;
+        
+        notificationText.textContent = message;
+        notification.className = `notification show ${type}`;
+        
+        setTimeout(() => {
+            notification.classList.remove('show');
+        }, PasswordConfig.NOTIFICATION_DURATION);
+    };
+
+    // Public API
+    return {
+        init,
+        login,
+        logout,
+        checkAuth,
+        isAuthenticated: () => isAuthenticated,
+        getUser: () => userProfile
+    };
+})();
+
+/**
+ * Password Manager - Handles fallback password authentication
  */
 const PasswordManager = (() => {
-    // Private state
     let state = {
         isPasswordVisible: false,
         hasExistingPassword: false,
         notificationTimeout: null,
         secureInputTimeout: null,
+        redirectTimeout: null,
     };
 
-    // DOM references
     const dom = {};
 
     /**
-     * Initialize the application
-     * @public
+     * Initialize the password manager
      */
     const init = () => {
         try {
             _cacheDomElements();
-            _bindEvents();
             _checkExistingPassword();
-            _setupPerformanceMonitoring();
-            _log('Application initialized successfully');
+           
+            // If password exists and Auth0 is not authenticated, redirect
+            if (state.hasExistingPassword && !Auth0Manager.isAuthenticated()) {
+                _showNotification('Password verified. Redirecting...', 'success');
+                _scheduleRedirect();
+                return;
+            } 
+            _bindEvents();
+            _log('Password manager initialized');
         } catch (error) {
-            _handleError('Initialization failed', error);
+            _handleError('Password manager initialization failed', error);
         }
     };
 
     /**
-     * Cache DOM elements for performance
-     * @private
+     * Cache DOM elements
      */
     const _cacheDomElements = () => {
+        
+        dom.helper = document.getElementById('password-requirements');
+        dom.Auth0 = document.getElementById('auth0');
         dom.loginForm = document.getElementById('loginForm');
         dom.passwordInput = document.getElementById('password');
         dom.toggleButton = document.getElementById('togglePassword');
-        dom.notification = document.getElementById('notification');
-        dom.notificationText = document.getElementById('notificationText');
         
         if (!dom.loginForm || !dom.passwordInput || !dom.toggleButton) {
             throw new Error('Required DOM elements not found');
         }
+        dom.Auth0.classList.add('d-none');
     };
 
     /**
      * Bind event listeners
-     * @private
      */
     const _bindEvents = () => {
-        // Form events
         dom.loginForm.addEventListener('submit', _handleFormSubmit);
-        
-        // Input events
         dom.passwordInput.addEventListener('input', _debounce(_validatePassword, 300));
         dom.passwordInput.addEventListener('blur', _handleInputBlur);
         dom.passwordInput.addEventListener('focus', _handleInputFocus);
-        dom.passwordInput.addEventListener('keydown', _handleInputKeydown);
-        
-        // Toggle button events
         dom.toggleButton.addEventListener('click', _togglePasswordVisibility);
         dom.toggleButton.addEventListener('keydown', _handleToggleKeydown);
-        
-        // Window events
-        window.addEventListener('resize', _throttle(_handleResize, PasswordConfig.THROTTLE_DELAY));
-        window.addEventListener('beforeunload', _cleanup);
+    };
+
+    /**
+     * Check if password exists in local storage
+     */
+    const _checkExistingPassword = () => {
+        try {
+            const storedPassword = localStorage.getItem(PasswordConfig.STORAGE_KEY);
+            state.hasExistingPassword = storedPassword === PasswordConfig.CORRECT_PASSWORD;
+            
+            if (state.hasExistingPassword) {
+                _log('Existing password found in local storage');
+            }
+        } catch (error) {
+            _handleError('Failed to check existing password', error);
+        }
     };
 
     /**
      * Handle form submission
-     * @private
-     * @param {Event} e - Submit event
      */
     const _handleFormSubmit = (e) => {
         e.preventDefault();
         
         const password = dom.passwordInput.value.trim();
         const isValid = _validatePassword();
+
         
         if (isValid) {
-            _savePassword(password);
-            _showNotification('Password saved securely', 'success');
-            _resetForm();
-            _dispatchPasswordSavedEvent(password);
+           isValid =  _verifyAndSavePassword(password);
         } else {
             _showNotification(`Password must be at least ${PasswordConfig.MIN_PASSWORD_LENGTH} characters`, 'error');
             _shakeElement(dom.loginForm);
+        } 
+        _validateInput(dom.passwordInput,isValid)
+        
+    };
+
+
+    const _validateInput = (input, isValid)=> {
+    if (isValid) {
+        input.classList.add('valid');
+        input.classList.remove('invalid');
+    } else {
+        input.classList.add('invalid');
+        input.classList.remove('valid');
+    }
+}
+        const _validatetext = (input, isValid)=> {
+    if (isValid) {
+        input.classList.add('validtext');
+        input.classList.remove('invalidtext');
+    } else {
+        input.classList.add('invalidtext');
+        input.classList.remove('validtext');
+    }
+}
+    /**
+     * Validate password
+     */
+    const _validatePassword = () => {
+        const password = dom.passwordInput.value.trim();
+        const isValid = password.length >= PasswordConfig.MIN_PASSWORD_LENGTH;
+        _validatetext(dom.helper,isValid)
+        return isValid;
+    };
+
+
+    /**
+     * Verify and save password
+     */
+    const _verifyAndSavePassword = (password) => {
+        let valid;
+        if (password === PasswordConfig.CORRECT_PASSWORD) {
+            _savePassword(password);
+            _showNotification('Password verified successfully! Redirecting...', 'success');
+            _scheduleRedirect();
+            valid = true;
+        } else {
+            valid = false;
+            _showNotification('Incorrect password. Please try again.', 'error');
+            _shakeElement(dom.loginForm);
+        }
+        return valid;
+    };
+
+    /**
+     * take is the type of notification then retturn the icon
+     * @param {type} type 
+     * @returns 
+     */
+    const _getNotificationIcon = (type) => {
+    switch (type) {
+        case 'info':
+            return '<i class="fas fa-info-circle"></i>';
+        case 'error':
+            return '<i class="fas fa-times-circle"></i>';
+        case 'warning':
+            return '<i class="fas fa-exclamation-triangle"></i>';
+        case 'success':
+            return '<i class="fas fa-check-circle"></i>';
+        default:
+            return '<i class="fas fa-bell"></i>';
+    }
+}
+
+    /**
+     * Save password to local storage
+     */
+    const _savePassword = (password) => {
+        try {
+            localStorage.setItem(PasswordConfig.STORAGE_KEY, password);
+            state.hasExistingPassword = true;
+            _log('Password saved to local storage');
+        } catch (error) {
+            _handleError('Failed to save password', error);
+            _showNotification('Storage error: Could not save password', 'error');
         }
     };
 
     /**
+     * Schedule redirect
+     */
+    const _scheduleRedirect = () => {
+        if (state.redirectTimeout) {
+            clearTimeout(state.redirectTimeout);
+        }
+        
+        state.redirectTimeout = setTimeout(() => {
+            window.location.href = PasswordConfig.REDIRECT_URL;
+        }, PasswordConfig.REDIRECT_DELAY);
+    };
+
+    /**
      * Toggle password visibility
-     * @private
      */
     const _togglePasswordVisibility = () => {
         state.isPasswordVisible = !state.isPasswordVisible;
         dom.passwordInput.type = state.isPasswordVisible ? 'text' : 'password';
         
-        // Update accessibility attributes
         const action = state.isPasswordVisible ? 'Hide' : 'Show';
         dom.toggleButton.setAttribute('aria-label', `${action} password`);
         dom.toggleButton.setAttribute('aria-pressed', state.isPasswordVisible);
-        
-        // Visual feedback
         dom.toggleButton.classList.toggle('visible', state.isPasswordVisible);
         
-        // Security feature: Auto-hide password after timeout
         _schedulePasswordHide();
     };
 
     /**
-     * Schedule automatic password hiding for security
-     * @private
+     * Schedule automatic password hiding
      */
     const _schedulePasswordHide = () => {
         if (state.secureInputTimeout) {
@@ -145,113 +420,31 @@ const PasswordManager = (() => {
     };
 
     /**
-     * Validate password input
-     * @private
-     * @returns {boolean} Validation result
+     * Show notification
      */
-    const _validatePassword = () => {
-        const password = dom.passwordInput.value.trim();
-        const isValid = password.length >= PasswordConfig.MIN_PASSWORD_LENGTH;
+    const _showNotification = (message , type = 'info') => {
+        const notification = document.getElementById('notification');
+        const notificationText = document.getElementById('notificationText');
         
-        // Visual feedback
-        if (password.length > 0) {
-            dom.passwordInput.classList.toggle('valid', isValid);
-            dom.passwordInput.classList.toggle('invalid', !isValid);
-        } else {
-            dom.passwordInput.classList.remove('valid', 'invalid');
-        }
+        if (!notification || !notificationText) return;
         
-        return isValid;
-    };
-
-    /**
-     * Save password to local storage
-     * @private
-     * @param {string} password - Password to save
-     */
-    const _savePassword = (password) => {
-        try {
-            // In a real application, you would hash the password before storing
-            localStorage.setItem(PasswordConfig.STORAGE_KEY, password);
-            state.hasExistingPassword = true;
-            _log('Password saved to local storage');
-        } catch (error) {
-            _handleError('Failed to save password', error);
-            _showNotification('Storage error: Could not save password', 'error');
-        }
-    };
-
-    /**
-     * Check if password already exists
-     * @private
-     */
-    const _checkExistingPassword = () => {
-        try {
-            const existingPassword = localStorage.getItem(PasswordConfig.STORAGE_KEY);
-            state.hasExistingPassword = !!existingPassword;
-            
-            if (state.hasExistingPassword) {
-                _showNotification('A password is already stored', 'info');
-            }
-        } catch (error) {
-            _handleError('Failed to check existing password', error);
-        }
-    };
-
-    /**
-     * Show notification message
-     * @private
-     * @param {string} message - Notification text
-     * @param {string} type - Notification type (success, error, info)
-     */
-    const _showNotification = (message, type = 'info') => {
-        if (!dom.notification || !dom.notificationText) return;
-        
-        // Clear any existing timeout
         if (state.notificationTimeout) {
             clearTimeout(state.notificationTimeout);
         }
+         const icon = _getNotificationIcon(type)
+
+        notificationText.innerHTML =  `${icon} ${message}`;
+        notification.className = `notification show ${type}`;
         
-        // Set notification content
-        dom.notificationText.textContent = message;
-        dom.notification.className = `notification show ${type}`;
-        
-        // Auto-hide after duration
         state.notificationTimeout = setTimeout(() => {
-            dom.notification.classList.remove('show');
+            notification.classList.remove('show');
         }, PasswordConfig.NOTIFICATION_DURATION);
-        
-        _log(`Notification shown: ${message}`);
     };
 
-    /**
-     * Reset form to initial state
-     * @private
-     */
-    const _resetForm = () => {
-        dom.loginForm.reset();
-        dom.passwordInput.classList.remove('valid', 'invalid');
-        
-        if (state.isPasswordVisible) {
-            _togglePasswordVisibility();
-        }
-    };
 
-    /**
-     * Shake element for error feedback
-     * @private
-     * @param {HTMLElement} element - Element to animate
-     */
-    const _shakeElement = (element) => {
-        element.classList.add('shake');
-        setTimeout(() => {
-            element.classList.remove('shake');
-        }, 500);
-    };
 
     /**
      * Handle input blur
-     * @private
      */
     const _handleInputBlur = () => {
         dom.passwordInput.classList.remove('focused');
@@ -260,28 +453,13 @@ const PasswordManager = (() => {
 
     /**
      * Handle input focus
-     * @private
      */
     const _handleInputFocus = () => {
         dom.passwordInput.classList.add('focused');
     };
 
     /**
-     * Handle keyboard events for password input
-     * @private
-     * @param {KeyboardEvent} e - Key event
-     */
-    const _handleInputKeydown = (e) => {
-        // Submit form on Ctrl+Enter
-        if (e.ctrlKey && e.key === 'Enter') {
-            dom.loginForm.dispatchEvent(new Event('submit'));
-        }
-    };
-
-    /**
-     * Handle keyboard events for toggle button
-     * @private
-     * @param {KeyboardEvent} e - Key event
+     * Handle toggle button keydown
      */
     const _handleToggleKeydown = (e) => {
         if (e.key === 'Enter' || e.key === ' ') {
@@ -291,89 +469,32 @@ const PasswordManager = (() => {
     };
 
     /**
-     * Handle window resize
-     * @private
+     * Shake element for error feedback
      */
-    const _handleResize = () => {
-        // Add any responsive adjustments if needed
-        _log(`Window resized: ${window.innerWidth}x${window.innerHeight}`);
+    const _shakeElement = (element) => {
+        element.classList.add('shake');
+        setTimeout(() => {
+            element.classList.remove('shake');
+        }, 500);
     };
 
     /**
-     * Cleanup resources before unload
-     * @private
-     */
-    const _cleanup = () => {
-        if (state.notificationTimeout) {
-            clearTimeout(state.notificationTimeout);
-        }
-        
-        if (state.secureInputTimeout) {
-            clearTimeout(state.secureInputTimeout);
-        }
-        
-        _log('Application cleanup completed');
-    };
-
-    /**
-     * Dispatch custom event for password saved
-     * @private
-     * @param {string} password - The saved password
-     */
-    const _dispatchPasswordSavedEvent = (password) => {
-        const event = new CustomEvent('passwordSaved', {
-            detail: { 
-                timestamp: new Date().toISOString(),
-                hasPassword: true,
-                passwordLength: password.length
-            }
-        });
-        document.dispatchEvent(event);
-    };
-
-    /**
-     * Setup performance monitoring
-     * @private
-     */
-    const _setupPerformanceMonitoring = () => {
-        // Monitor input performance
-        const observer = new PerformanceObserver((list) => {
-            for (const entry of list.getEntries()) {
-                if (entry.entryType === 'longtask') {
-                    _log(`Long task detected: ${entry.duration}ms`);
-                }
-            }
-        });
-        
-        observer.observe({ entryTypes: ['longtask'] });
-    };
-
-    /**
-     * Error handling utility
-     * @private
-     * @param {string} message - Error message
-     * @param {Error} error - Error object
+     * Error handling
      */
     const _handleError = (message, error) => {
         console.error(`${message}:`, error);
-        // In a real app, you might send this to an error tracking service
+        _showNotification('An error occurred. Please try again.', 'error');
     };
 
     /**
-     * Logging utility
-     * @private
-     * @param {string} message - Log message
+     * Logging
      */
     const _log = (message) => {
         console.log(`[PasswordManager] ${message}`);
     };
 
     /**
-     * Debounce function for performance
-     * @private
-     * @param {Function} func - Function to debounce
-     * @param {number} wait - Debounce wait time
-     * @returns {Function} Debounced function
+     * Debounce function
      */
     const _debounce = (func, wait) => {
         let timeout;
@@ -387,48 +508,28 @@ const PasswordManager = (() => {
         };
     };
 
-    /**
-     * Throttle function for performance
-     * @private
-     * @param {Function} func - Function to throttle
-     * @param {number} limit - Throttle time limit
-     * @returns {Function} Throttled function
-     */
-    const _throttle = (func, limit) => {
-        let inThrottle;
-        return function() {
-            const args = arguments;
-            const context = this;
-            if (!inThrottle) {
-                func.apply(context, args);
-                inThrottle = true;
-                setTimeout(() => inThrottle = false, limit);
-            }
-        };
-    };
-
     // Public API
     return {
-        init,
-        // For testing purposes
-        _test: {
-            validatePassword: _validatePassword,
-            togglePasswordVisibility: _togglePasswordVisibility
-        }
+        init
     };
 })();
 
-// Application initialization with error handling
-document.addEventListener('DOMContentLoaded', () => {
+// Main application initialization
+document.addEventListener('DOMContentLoaded', async () => {
     try {
+        // Initialize Auth0
+        const auth0Initialized = await Auth0Manager.init();
+        
+        if (auth0Initialized) {
+            await Auth0Manager.checkAuth();
+        }
+        
+        // Initialize Password Manager (fallback)
         PasswordManager.init();
         
-        // Listen for custom events
-        document.addEventListener('passwordSaved', (e) => {
-            console.log('Password saved event:', e.detail);
-        });
     } catch (error) {
-        console.error('Failed to initialize PasswordManager:', error);
+        console.error('Application initialization failed:', error);
+        
         // Fallback error message
         const fallbackMessage = document.createElement('div');
         fallbackMessage.style.cssText = `
@@ -441,20 +542,18 @@ document.addEventListener('DOMContentLoaded', () => {
             padding: 1rem;
             text-align: center;
             z-index: 10000;
+            font-family: sans-serif;
         `;
         fallbackMessage.textContent = 'Application failed to load. Please refresh the page.';
         document.body.appendChild(fallbackMessage);
     }
 });
 
-// Fallback for older browsers
-if (typeof window.addEventListener === 'undefined') {
-    window.addEventListener = function() { 
-        console.warn('addEventListener not supported in this browser');
-    };
-}
+// Global functions for HTML onclick attributes
+window.loginWithAuth0 = () => {
+    Auth0Manager.login();
+};
 
-// Export for module systems
-if (typeof module !== 'undefined' && module.exports) {
-    module.exports = PasswordManager;
-}
+window.logoutWithAuth0 = () => {
+    Auth0Manager.logout();
+};
