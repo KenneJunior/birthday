@@ -246,7 +246,11 @@ async function setupAuthProtection() {
 
 // Initialize on page load
 document.addEventListener('DOMContentLoaded', async () => {
-    await setupAuthProtection();
+   const authResult = await setupAuthProtection();
+            if (authResult.authenticated) {
+            document.getElementById('loading').classlist.add('d-none');
+            document.getElementById('protectedContent').classlist.remove('d-none');
+        }
 });
 
 // Export functions for use in other modules
