@@ -13,6 +13,7 @@
     <meta property="og:description" content="A beautiful interactive greeting with animated gradient background">
     <meta property="og:type" content="website">
     <meta property="og:image" content="https://example.com/preview.jpg">
+    
 
     <title>Interactive Greeting | Creative Experience</title>
 
@@ -29,6 +30,8 @@
     <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>✨</text></svg>">
     <link rel="apple-touch-icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>✨</text></svg>">
     <link rel="manifest" href="manifest.json">
+     <link rel = "stylesheet" href="../src/loading.css"/>
+
 
     <!-- Structured Data -->
     <script type="application/ld+json">
@@ -49,6 +52,20 @@
     </script>
 </head>
 <body>
+    <div class="loading-container" id="loading">
+    <div class="loading-spinner">
+        <div class="loading-spinner-inner"></div>
+    </div>
+    <div class="loading-text">
+        Verifying access
+        <span class="loading-dots">
+            <span></span>
+            <span></span>
+            <span></span>
+        </span>
+    </div>
+</div>
+  
 
 <!-- Custom cursor for enhanced experience -->
 <div class="cursor-follower" aria-hidden="true">
@@ -56,15 +73,6 @@
     <div class="cursor-outer"></div>
 </div>
 
-<!-- Loading screen -->
-<div class="loading-screen" aria-label="Loading" role="status">
-    <div class="loading-animation">
-        <div class="loading-dot"></div>
-        <div class="loading-dot"></div>
-        <div class="loading-dot"></div>
-    </div>
-    <p class="loading-text">Loading please wait</p>
-</div>
 
 <!-- Main content -->
 <main id="main-content" class="main-content" role="main">
@@ -193,8 +201,54 @@
 
 <!-- JavaScript -->
 <script src="../src/Date/date.js"></script>
+<script src="../auth-check.js"></script> 
 
-<!-- Inline script for critical functionality -->
+  <script>
+    function showLoading() {
+    const loader = document.getElementById('loading');
+    loader.style.display = 'flex';
+    loader.classList.remove('fade-out');
+}
+
+function hideLoading() {
+    const loader = document.getElementById('loading');
+    loader.classList.add('fade-out');
+    
+    // Remove after fade-out completes
+    setTimeout(() => {
+        loader.style.display = 'none';
+    }, 300);
+}
+
+async function initializeProtectedPage() {
+    showLoading();
+    
+    try {
+        const authResult = await setupAuthProtection();
+        if (authResult.authenticated) {
+            // Hide loading with smooth transition
+            setTimeout(hideLoading, 500);
+            initializePageContent();
+        }
+    } catch (error) {
+        hideLoading();
+        console.error('Authentication failed:', error);
+        window.location.href = '/login';
+    }
+}
+
+function initializePageContent() {
+    console.log('Protected content loaded successfully');
+        document.querySelectorAll('button, input').forEach(element => {
+        element.disabled = false;
+    });
+}
+if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', initializeProtectedPage);
+} else {
+    initializeProtectedPage();
+}
+  </script>
 <script>
     // Remove no-js class and add js class
     document.documentElement.classList.remove('no-js');
