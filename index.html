@@ -839,6 +839,10 @@
 
   // Initialize the application when DOM is ready
   document.addEventListener('DOMContentLoaded', () => {
+    const key = localStorage.getItem('Birthday')
+    if(!key){
+    windows.location.href=login
+    }
     new BirthdayApp();
   });
 </script>
