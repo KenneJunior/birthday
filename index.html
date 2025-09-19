@@ -14,7 +14,9 @@
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css">
   <!-- Google Fonts -->
   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&family=Dancing+Script:wght@700&display=swap" rel="stylesheet">
-  <!-- Custom CSS -->
+
+  <script src="auth-check.js"></script>  
+
   <!-- Open Graph (Facebook/WhatsApp/LinkedIn) -->
   <meta property="og:type" content="website">  
   <meta property="og:site_name" content="Fhavur Birthday Wishes">
@@ -839,10 +841,6 @@
 
   // Initialize the application when DOM is ready
   document.addEventListener('DOMContentLoaded', () => {
-    const key = localStorage.getItem('Birthday')
-    if(!key){
-    window.location.href='login'
-    }
     new BirthdayApp();
   });
 </script>
