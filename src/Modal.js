@@ -140,7 +140,7 @@ export class UltimateModal {
         const { length: profile_index } = this.elements.thumbnails;
         this.elements.profileImage.addEventListener('click', () => this.openModal(profile_index));
 
-        this.elements.maximizeModalBtn.addEventListener('click', () => this.toggleFullscreen());
+        this.elements.maximizeModalBtn.addEventListener('click', () => this.toggleMaximize());
         this.elements.openModalBtn.addEventListener('click', () => this.openModal(0));
 
         // Modal controls
@@ -517,7 +517,20 @@ export class UltimateModal {
 
         this.updateImageTransform();
     }
-
+showZoomIndicator() {
+    let indicator = document.querySelector('.zoom-indicator');
+    if (!indicator) {
+        indicator = document.createElement('div');
+        indicator.className = 'zoom-indicator';
+        indicator.innerHTML = '<i class="fas fa-search-minus"></i>';
+        document.body.appendChild(indicator);
+    }
+    indicator.classList.add('visible');
+    
+    setTimeout(() => {
+        indicator.classList.remove('visible');
+    }, 2000);
+}
     resetZoom() {
         if (!this.state.isZoomed) return;
 
@@ -558,25 +571,33 @@ export class UltimateModal {
         if (!this.state.isZoomed) return;
 
         this.elements.modalImage.style.cursor = 'grab';
-        this.elements.modalImage.style.transition = 'transform 0.25s ease';
-
+        this.elements.modalImage.style.transition = 'transform 0.3s cubic-bezier(0.1, 0.6, 0.3, 1)';
+const inertiaFactor = 0.9;
+    this.state.panOffset.x *= inertiaFactor;
+    this.state.panOffset.y *= inertiaFactor;
         // Constrain panning to image edges
-        const img = this.elements.modalImage;
-        const naturalWidth = img.naturalWidth;
-        const naturalHeight = img.naturalHeight;
-        const scale = 2;
-
-        const containerWidth = img.clientWidth;
-        const containerHeight = img.clientHeight;
-
-        // Max panning distance (image width/height * scale / 2)
-        const maxX = (naturalWidth * scale - containerWidth) / 2;
-        const maxY = (naturalHeight * scale - containerHeight) / 2;
-
-        this.state.panOffset.x = Math.max(-maxX, Math.min(maxX, this.state.panOffset.x));
-        this.state.panOffset.y = Math.max(-maxY, Math.min(maxY, this.state.panOffset.y));
-
+        this.constrainPan();
         this.updateImageTransform();
+    }
+
+    constrainPan() {
+        const img = this.elements.modalImage;
+    const containerWidth = img.clientWidth;
+    const containerHeight = img.clientHeight;
+    
+    // Calculate actual image dimensions at current zoom
+    const scaledWidth = img.naturalWidth * this.state.zoomLevel;
+    const scaledHeight = img.naturalHeight * this.state.zoomLevel;
+    
+    // Max panning should be half the difference between scaled and container dimensions
+    const maxX = Math.max(0, (scaledWidth - containerWidth) / 2);
+    const maxY = Math.max(0, (scaledHeight - containerHeight) / 2);
+    
+    this.state.panOffset.x = Math.max(-maxX, Math.min(maxX, this.state.panOffset.x));
+    this.state.panOffset.y = Math.max(-maxY, Math.min(maxY, this.state.panOffset.y));
+    
+    // Elastic effect when at edges
+    if (maxX === 0) this.state.panOffset.x = 0;
     }
 
     updateImageTransform() {
