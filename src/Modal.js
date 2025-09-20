@@ -31,11 +31,91 @@ export class UltimateModal {
             panStart: { x: 0, y: 0 },
             panOffset: { x: 0, y: 0 }
         };
-        this.hammer = new Hammer(this.elements.modalContainer);
+
+        this.hammer = null;
+        this.initHammerWhenReady();
     }
 
      init() {
         this.generateGallery();
+    }
+     initHammerWhenReady() {
+        if (typeof Hammer === 'undefined') {
+            console.warn('Hammer.js not available. Touch gestures will be disabled.');
+            return;
+        }
+
+        // Wait for modal container to be available
+        const checkContainer = () => {
+            if (this.elements.modalContainer) {
+                this.setupHammer();
+            } else {
+                setTimeout(checkContainer, 100);
+            }
+        };
+        
+        checkContainer();
+    }
+     setupHammer() {
+        try {
+            // Create Hammer instance with proper configuration
+            this.hammer = new Hammer(this.elements.modalContainer);
+            
+            // Configure recognizers
+            this.hammer.get('swipe').set({ 
+                direction: Hammer.DIRECTION_ALL,
+                threshold: 10,
+                velocity: 0.3
+            });
+            
+            this.hammer.get('pinch').set({ enable: true });
+            this.hammer.get('pan').set({ direction: Hammer.DIRECTION_ALL });
+            
+            // Set up event handlers
+            this.hammer.on('swipeleft', (event) => {
+                event.preventDefault();
+                this.navigate(1);
+            });
+            
+            this.hammer.on('swiperight', (event) => {
+                event.preventDefault();
+                this.navigate(-1);
+            });
+            
+            this.hammer.on('swipeup', (event) => {
+                event.preventDefault();
+                this.closeModal();
+            });
+            
+            this.hammer.on('swipedown', (event) => {
+                event.preventDefault();
+                this.closeModal();
+            });
+            
+            this.hammer.on('pinchin', (event) => {
+                event.preventDefault();
+                if (this.state.isZoomed) {
+                    this.resetZoom();
+                }
+            });
+            
+            this.hammer.on('pinchout', (event) => {
+                event.preventDefault();
+                if (!this.state.isZoomed) {
+                    this.zoomImage({ clientX: event.center.x, clientY: event.center.y });
+                }
+            });
+            
+            this.hammer.on('doubletap', (event) => {
+                event.preventDefault();
+                this.toggleFullscreen();
+            });
+            
+            console.log('Hammer.js gestures initialized successfully');
+            
+        } catch (error) {
+            console.error('Failed to initialize Hammer.js:', error);
+        }
     }
 
     cacheImages() {
@@ -44,10 +124,11 @@ export class UltimateModal {
             src: thumb.querySelector('img').src,
             alt: thumb.querySelector('img').alt
         }));
-        this.state.videos = [{src:'vid1.mp4'},
-                            {src:'vid2.mp4'},
-                            {src:'vid3.mp4'}];
-
+        this.state.videos = [
+            { src: 'vid1.mp4' },
+            { src: 'vid2.mp4' },
+            { src: 'vid3.mp4' }
+        ];
     }
 
     setupEventListeners() {
@@ -55,27 +136,23 @@ export class UltimateModal {
         this.elements.thumbnails.forEach((thumb, index) => {
             thumb.addEventListener('click', () => this.openModal(index));
         });
-        const {length: profile_index} = this.elements.thumbnails;
+        
+        const { length: profile_index } = this.elements.thumbnails;
         this.elements.profileImage.addEventListener('click', () => this.openModal(profile_index));
 
-        this.elements.maximizeModalBtn.addEventListener('click',() => this.toggleFullscreen());
-
+        this.elements.maximizeModalBtn.addEventListener('click', () => this.toggleFullscreen());
         this.elements.openModalBtn.addEventListener('click', () => this.openModal(0));
 
         // Modal controls
         this.elements.closeButton.addEventListener('click', () => this.closeModal());
         this.elements.prevButton.addEventListener('click', () => this.navigate(-1));
         this.elements.nextButton.addEventListener('click', () => this.navigate(1));
-        this.hammer.on('swipeleft', () => this.navigate(1));
-        this.hammer.on('swiperight', () => this.navigate(-1));
-        this.hammer.on('swipeup', () => this.closeModal());
-        this.hammer.on('swipedown', () => this.closeModal());
-        this.hammer.on('pinchin', () => this.toggleMaximize());
-        this.hammer.on('double-tap',()=> this.toggleFullscreen());
 
-        this.elements.modalContainer.addEventListener('swipe', () => this.closeModal());
+        // Remove the conflicting swipe event listener
+        // this.elements.modalContainer.addEventListener('swipe', () => this.closeModal());
 
         this.elements.profile_pic.addEventListener('click', () => this.HTU());
+        
         // Keyboard navigation
         document.addEventListener('keydown', (e) => {
             if (!this.elements.modal.classList.contains('active')) return;
@@ -171,12 +248,17 @@ export class UltimateModal {
         });
     }
 
-    openModal(index) {
+ openModal(index) {
         this.state.currentIndex = index;
         this.updateModalContent();
         document.body.style.overflow = 'hidden';
         this.elements.modal.classList.add('active');
         this.activeThumbnail();
+        
+        // Re-initialize Hammer if needed when modal opens
+        if (!this.hammer && typeof Hammer !== 'undefined') {
+            this.setupHammer();
+        }
     }
 
     closeModal() {
@@ -184,7 +266,9 @@ export class UltimateModal {
             this.exitFullscreen();
         }
         document.body.style.overflow = '';
-        if (!this.elements.modalVideo.hidden) {this.elements.modalVideo.pause()}
+        if (!this.elements.modalVideo.hidden) { 
+            this.elements.modalVideo.pause(); 
+        }
         this.elements.modal.classList.remove('active');
         this.resetZoom();
         this.elements.thumbnails[this.state.currentIndex].classList.remove('active');
