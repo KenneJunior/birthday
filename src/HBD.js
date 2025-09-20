@@ -108,7 +108,7 @@ document.addEventListener('DOMContentLoaded', () => {
         }, 10000);
     }
 
-    function setupGrowButtonEventListeners() {
+    /*function setupGrowButtonEventListeners() {
         elements.growButton.addEventListener('mousedown', startGrowing);
         elements.growButton.addEventListener('touchstart', startGrowing);
 
@@ -138,7 +138,7 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         });
     }
-
+*/
     function startGrowing(e) {
         e.preventDefault();
         state.growButton.currentScale = 1;
@@ -293,7 +293,7 @@ document.addEventListener('DOMContentLoaded', () => {
         elements.celebrateButton.addEventListener('click', () => triggerCelebration(0));
         elements.celebrateButton.addEventListener('keydown', handleCelebrateKeyDown);
 
-        setupGrowButtonEventListeners();
+       // setupGrowButtonEventListeners();
 
         // Mobile touch effects
         elements.celebrateButton.addEventListener('touchstart', () => {
@@ -312,13 +312,13 @@ document.addEventListener('DOMContentLoaded', () => {
 
         // Click effects
         document.addEventListener('mousedown', (e) => {
-            if (!e.target.closest('.btn-celebrate, .photo-thumbnail, .social-share a, .social-share button')) {
+            if (!e.target.closest('.btn-celebrate, .modal-container, .photo-thumbnail, .social-share a, .social-share button')) {
                 startGrowingHeart(e);
             }
         });
 
         document.addEventListener('touchstart', (e) => {
-            if (!e.target.closest('.btn-celebrate, .photo-thumbnail, .social-share a, .social-share button')) {
+            if (!e.target.closest('.btn-celebrate, .modal-container, .photo-thumbnail, .social-share a, .social-share button')) {
                 startGrowingHeart(e.touches[0]);
             }
         });

@@ -25,6 +25,7 @@ export class UltimateModal {
             images: [],
             videos: [],
             isZoomed: false,
+            isZoomPanSetup :false,
             isMaximized:  false,
             isFullscreen: false,
             transitionStyle: 'slide-up', // Can be 'zoom-in', 'fade-in', or 'slide-up'
@@ -58,10 +59,8 @@ export class UltimateModal {
     }
      setupHammer() {
         try {
-            // Create Hammer instance with proper configuration
             this.hammer = new Hammer(this.elements.modalContainer);
             
-            // Configure recognizers
             this.hammer.get('swipe').set({ 
                 direction: Hammer.DIRECTION_ALL,
                 threshold: 10,
@@ -92,27 +91,14 @@ export class UltimateModal {
                 this.closeModal();
             });
             
-            this.hammer.on('pinchin', (event) => {
-                event.preventDefault();
-                if (this.state.isZoomed) {
-                    this.resetZoom();
-                }
-            });
-            
-            this.hammer.on('pinchout', (event) => {
-                event.preventDefault();
-                if (!this.state.isZoomed) {
-                    this.zoomImage({ clientX: event.center.x, clientY: event.center.y });
-                }
-            });
             
             this.hammer.on('doubletap', (event) => {
                 event.preventDefault();
                 this.toggleFullscreen();
             });
-            
-            console.log('Hammer.js gestures initialized successfully');
-            
+
+            this.setupHammerForZoomPan();
+                        
         } catch (error) {
             console.error('Failed to initialize Hammer.js:', error);
         }
@@ -174,63 +160,8 @@ export class UltimateModal {
             }
         });
 
-        // Zoom/Pan functionality
-        this.elements.modalImage.addEventListener('click', (e) => {
-            if (this.state.isZoomed) {
-                this.resetZoom();
-            } else {
-                // Only zoom if not clicking on navigation areas
-                const rect = this.elements.modalImage.getBoundingClientRect();
-                const clickX = e.clientX - rect.left;
-                const clickY = e.clientY - rect.top;
+        this.setupZoomPanFunctionality();
 
-                // Check if click is within central area (not near edges)
-                if (clickX > 50 && clickX < rect.width - 50 &&
-                    clickY > 50 && clickY < rect.height - 50) {
-                    this.zoomImage(e);
-                }
-            }
-        });
-
-        // Pan functionality
-        this.elements.modalImage.addEventListener('mousedown', (e) => {
-            if (this.state.isZoomed) {
-                this.startPan(e);
-            }
-        });
-
-        document.addEventListener('mousemove', (e) => {
-            if (this.state.isZoomed) {
-                this.panImage(e);
-            }
-        });
-
-        document.addEventListener('mouseup', () => {
-            if (this.state.isZoomed) {
-                this.endPan();
-            }
-        });
-
-        // Touch events
-        this.elements.modalImage.addEventListener('touchstart', (e) => {
-            if (e.touches.length === 1 && this.state.isZoomed) {
-                e.preventDefault();
-                this.startPan(e.touches[0]);
-            }
-        }, { passive: false });
-
-        document.addEventListener('touchmove', (e) => {
-            if (e.touches.length === 1 && this.state.isZoomed) {
-                e.preventDefault();
-                this.panImage(e.touches[0]);
-            }
-        }, { passive: false });
-
-        document.addEventListener('touchend', () => {
-            if (this.state.isZoomed) {
-                this.endPan();
-            }
-        }, { passive: true });
 
         // Handle fullscreen change events
         document.addEventListener('fullscreenchange', ()=> this.handleFullscreenChange());
@@ -248,7 +179,7 @@ export class UltimateModal {
         });
     }
 
- openModal(index) {
+    openModal(index) {
         this.state.currentIndex = index;
         this.updateModalContent();
         document.body.style.overflow = 'hidden';
@@ -258,6 +189,11 @@ export class UltimateModal {
         // Re-initialize Hammer if needed when modal opens
         if (!this.hammer && typeof Hammer !== 'undefined') {
             this.setupHammer();
+        }
+        this.resetZoom();
+        this.resetMaximizeButton();
+        if (!this.state.isZoomPanSetup){
+            this.setupZoomPanFunctionality();
         }
     }
 
@@ -270,7 +206,6 @@ export class UltimateModal {
             this.elements.modalVideo.pause(); 
         }
         this.elements.modal.classList.remove('active');
-        this.resetZoom();
         this.elements.thumbnails[this.state.currentIndex].classList.remove('active');
     }
 
@@ -316,7 +251,12 @@ export class UltimateModal {
             autoCloseTime: 15000, // Show for 15 seconds instead of 20
         });
     }
-
+    setupZoomPanFunctionality() {  
+        if (this.state.isZoomPanSetup) return;
+        this.setupMouseZoomPan();
+        this.setupTouchZoomPan();
+        this.state.isZoomPanSetup = true;
+    }
 
     resetMaximizeButton() {
         this.state.isMaximized = false;
@@ -335,7 +275,6 @@ export class UltimateModal {
         } else if (this.state.currentIndex >= this.state.images.length) {
             this.state.currentIndex = 0;
         }
-        this.resetZoom();
         this.updateModalContent();
         this.animateTransition(direction);
     }
@@ -498,50 +437,121 @@ export class UltimateModal {
         }
     }
 
+    setupHammerForZoomPan() {
+        if (!this.hammer) return;
+        
+        // Pinch to zoom
+        this.hammer.get('pinch').set({ enable: true });
+        this.hammer.on('pinchstart pinchmove', (e) => {
+            if (!this.elements.modalImage.hidden) {
+                e.preventDefault();
+                this.handlePinch(e);
+            }
+        });
+        
+        this.hammer.on('pinchend', () => {
+            this.finalizeZoom();
+        });
+    }
+
+    setupMouseZoomPan() {
+        // Mouse zoom
+        this.elements.modalImage.addEventListener('dblclick', (e) => {
+            if (this.state.isZoomed) {
+                this.resetZoom();
+            } else {
+                this.zoomImage(e);
+            }
+        });
+
+        // Mouse pan
+        this.elements.modalImage.addEventListener('mousedown', (e) => {
+            if (this.state.isZoomed) {
+                this.startPan(e);
+                document.addEventListener('mousemove', this.boundPanImage);
+                document.addEventListener('mouseup', this.boundEndPan);
+            }
+        });
+        
+        // Store bound functions for removal
+        this.boundPanImage = (e) => this.panImage(e);
+        this.boundEndPan = () => this.endPan();
+    }
+
+    setupTouchZoomPan() {
+        // Touch pan (for single finger, Hammer handles multi-touch)
+        this.elements.modalImage.addEventListener('touchstart', (e) => {
+            if (this.state.isZoomed && e.touches.length === 1) {
+                e.preventDefault();
+                this.startPan(e.touches[0]);
+            }
+        }, { passive: false });
+    }
+
+    handlePinch(e) {
+        if (e.type === 'pinchstart') {
+            this.state.pinchStart = {
+                scale: this.state.currentScale || 1,
+                centerX: e.center.x,
+                centerY: e.center.y
+            };
+            this.elements.modalImage.style.transition = 'none';
+        }
+        
+        const newScale = this.state.pinchStart.scale * e.scale;
+        this.state.currentScale = Math.max(1, Math.min(newScale, 5)); // Limit scale 1x to 5x
+        
+        // Calculate pan offset to zoom toward pinch center
+        const rect = this.elements.modalImage.getBoundingClientRect();
+        const centerX = e.center.x - rect.left;
+        const centerY = e.center.y - rect.top;
+        
+        this.state.panOffset.x = centerX - (centerX - this.state.panOffset.x) * (newScale / (this.state.currentScale || 1));
+        this.state.panOffset.y = centerY - (centerY - this.state.panOffset.y) * (newScale / (this.state.currentScale || 1));
+        
+        this.updateImageTransform();
+    }
+
+    finalizeZoom() {
+        if (this.state.currentScale <= 1.1) {
+            this.resetZoom();
+        } else {
+            this.state.isZoomed = true;
+            this.constrainPanning(); // Ensure we're within bounds
+        }
+        this.elements.modalImage.style.transition = 'transform 0.2s ease';
+    }
+
     zoomImage(e) {
-        if (this.state.isZoomed) return;
-
         this.state.isZoomed = true;
-        this.elements.modalImage.classList.add('zoomed');
-
-        // Center zoom on click position if possible
+        this.state.currentScale = 2; // Default zoom level
+        
         const rect = this.elements.modalImage.getBoundingClientRect();
         const clickX = e.clientX - rect.left;
         const clickY = e.clientY - rect.top;
-
-        // Calculate initial pan offset to center the click point
+        
+        // Center zoom on click position
         this.state.panOffset = {
-            x: (rect.width / 2 - clickX) * 2,
-            y: (rect.height / 2 - clickY) * 2
+            x: (rect.width / 2 - clickX) * (this.state.currentScale / 1),
+            y: (rect.height / 2 - clickY) * (this.state.currentScale / 1)
         };
-
+        
+        this.elements.modalImage.classList.add('zoomed');
         this.updateImageTransform();
+        this.constrainPanning(); // Immediately constrain after zoom
     }
-showZoomIndicator() {
-    let indicator = document.querySelector('.zoom-indicator');
-    if (!indicator) {
-        indicator = document.createElement('div');
-        indicator.className = 'zoom-indicator';
-        indicator.innerHTML = '<i class="fas fa-search-minus"></i>';
-        document.body.appendChild(indicator);
-    }
-    indicator.classList.add('visible');
-    
-    setTimeout(() => {
-        indicator.classList.remove('visible');
-    }, 2000);
-}
-    resetZoom() {
-        if (!this.state.isZoomed) return;
 
+    resetZoom() {
         this.state.isZoomed = false;
+        this.state.currentScale = 1;
         this.elements.modalImage.classList.remove('zoomed');
         this.state.panOffset = { x: 0, y: 0 };
-        this.elements.modalImage.style.transition = 'transform 0.25s ease';
-        setTimeout(() => {
-            this.elements.modalImage.style.transition = 'none';
-        }, 300);
+        this.elements.modalImage.style.transition = 'transform 0.3s ease';
         this.updateImageTransform();
+        
+        setTimeout(() => {
+            this.elements.modalImage.style.transition = '';
+        }, 300);
     }
 
     startPan(e) {
@@ -554,56 +564,60 @@ showZoomIndicator() {
     }
 
     panImage(e) {
-        if (!this.state.isZoomed) return;
-
-        this.elements.modalImage.style.cursor = 'grab';
-        this.elements.modalImage.style.transition = 'transform 0.25s ease'; // smooth after pan
-
+        this.elements.modalImage.style.cursor = 'grabbing';
+        
         this.state.panOffset = {
             x: e.clientX - this.state.panStart.x,
             y: e.clientY - this.state.panStart.y
         };
-
+        
+        this.constrainPanning(); // Constrain during pan, not just at end
         this.updateImageTransform();
     }
 
     endPan() {
-        if (!this.state.isZoomed) return;
-
         this.elements.modalImage.style.cursor = 'grab';
-        this.elements.modalImage.style.transition = 'transform 0.3s cubic-bezier(0.1, 0.6, 0.3, 1)';
-const inertiaFactor = 0.9;
-    this.state.panOffset.x *= inertiaFactor;
-    this.state.panOffset.y *= inertiaFactor;
-        // Constrain panning to image edges
-        this.constrainPan();
+        this.elements.modalImage.style.transition = 'transform 0.2s ease';
+        this.constrainPanning(); // Final constraint
+        
+        document.removeEventListener('mousemove', this.boundPanImage);
+        document.removeEventListener('mouseup', this.boundEndPan);
+    }
+
+    constrainPanning() {
+        if (!this.state.isZoomed) return;
+        
+        const img = this.elements.modalImage;
+        const scale = this.state.currentScale;
+        const containerWidth = img.clientWidth;
+        const containerHeight = img.clientHeight;
+        
+        // Calculate max pan based on current scale
+        const maxX = Math.max(0, (containerWidth * scale - containerWidth) / 2);
+        const maxY = Math.max(0, (containerHeight * scale - containerHeight) / 2);
+        
+        // Constrain panning with easing at edges
+        this.state.panOffset.x = this.easeConstraint(this.state.panOffset.x, -maxX, maxX);
+        this.state.panOffset.y = this.easeConstraint(this.state.panOffset.y, -maxY, maxY);
+        
         this.updateImageTransform();
     }
 
-    constrainPan() {
-        const img = this.elements.modalImage;
-    const containerWidth = img.clientWidth;
-    const containerHeight = img.clientHeight;
-    
-    // Calculate actual image dimensions at current zoom
-    const scaledWidth = img.naturalWidth * this.state.zoomLevel;
-    const scaledHeight = img.naturalHeight * this.state.zoomLevel;
-    
-    // Max panning should be half the difference between scaled and container dimensions
-    const maxX = Math.max(0, (scaledWidth - containerWidth) / 2);
-    const maxY = Math.max(0, (scaledHeight - containerHeight) / 2);
-    
-    this.state.panOffset.x = Math.max(-maxX, Math.min(maxX, this.state.panOffset.x));
-    this.state.panOffset.y = Math.max(-maxY, Math.min(maxY, this.state.panOffset.y));
-    
-    // Elastic effect when at edges
-    if (maxX === 0) this.state.panOffset.x = 0;
+    easeConstraint(value, min, max) {
+        if (value < min) {
+            // Ease when pulling beyond left/top edge
+            return min - (1 - Math.exp(-0.1 * (min - value)));
+        } else if (value > max) {
+            // Ease when pulling beyond right/bottom edge
+            return max + (1 - Math.exp(-0.1 * (value - max)));
+        }
+        return value;
     }
 
     updateImageTransform() {
-        this.elements.modalImage.style.transform = this.state.isZoomed
-            ? `scale(2) translate(${this.state.panOffset.x}px, ${this.state.panOffset.y}px)`
-            : 'scale(1) translate(0, 0)';
+        const scale = this.state.currentScale || 1;
+        this.elements.modalImage.style.transform = 
+            `scale(${scale}) translate(${this.state.panOffset.x}px, ${this.state.panOffset.y}px)`;
     }
 
     handleSocialShare(link) {
