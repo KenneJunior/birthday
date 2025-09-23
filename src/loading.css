@@ -71,7 +71,10 @@
     position: absolute;
     border-radius: var(--loading-border-radius);
 }
+a {
+text-decoration : none;
 
+}
 .loading-spinner::before {
     width: 100%;
     height: 100%;
