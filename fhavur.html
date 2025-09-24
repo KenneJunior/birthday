@@ -239,7 +239,7 @@ async function initializeProtectedPage() {
 
 function initializePageContent() {
     console.log('Protected content loaded successfully');
-document.querySelector('#protectedContent').classlist.remove('d-none');
+document.querySelector('#protectedContent').classList.remove('d-none');
  document.querySelectorAll('button, input').forEach(element => {
         element.disabled = false;
     });
