@@ -229,6 +229,7 @@ async function initializeProtectedPage() {
             // Hide loading with smooth transition
             setTimeout(hideLoading, 500);
             initializePageContent();
+document.getElementById('protectedContent').classList.remove('d-none');
         }
     } catch (error) {
         hideLoading();
@@ -239,7 +240,7 @@ async function initializeProtectedPage() {
 
 function initializePageContent() {
     console.log('Protected content loaded successfully');
-document.querySelector('#protectedContent').classList.remove('d-none');
+
  document.querySelectorAll('button, input').forEach(element => {
         element.disabled = false;
     });
