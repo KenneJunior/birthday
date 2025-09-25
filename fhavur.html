@@ -203,32 +203,46 @@
 <script src="auth-check.js"></script> 
 <script src="src/HBD.js" type="module"></script>
   <script>
-    function showLoading() {
+  // Function to display the loading screen
+function showLoading() {
     const loader = document.getElementById('loading');
-    loader.style.display = 'flex';
-    loader.classList.remove('fade-out');
+    if (loader) {
+        loader.style.display = 'flex';
+        loader.classList.remove('fade-out');
+    }
 }
 
+// Function to hide the loading screen with a fade-out effect
 function hideLoading() {
     const loader = document.getElementById('loading');
-    loader.classList.add('fade-out');
-    
-    // Remove after fade-out completes
-    setTimeout(() => {
-        loader.style.display = 'none';
-    }, 1000);
+    if (loader) {
+        loader.classList.add('fade-out');
+        // Hide completely after the animation (assuming fade-out is 1s)
+        setTimeout(() => {
+            loader.style.display = 'none';
+        }, 1000);
+    }
 }
 
+// Asynchronous function to initialize the protected page
 async function initializeProtectedPage() {
     showLoading();
-    
+
     try {
         const authResult = await setupAuthProtection();
         if (authResult.authenticated) {
-            // Hide loading with smooth transition
+            // Delay hiding loader for a smoother transition
             setTimeout(hideLoading, 500);
             initializePageContent();
-document.getElementById('protectedContent').classList.remove('d-none');
+            const protectedContent = document.getElementById('protectedContent');
+            if (protectedContent) {
+                protectedContent.classList.remove('d-none');
+            }
+        } else {
+            // Handle case where authentication succeeds but user is not authorized
+            hideLoading();
+            console.warn('Access denied: User not authenticated');
+            window.location.href = '/login';
         }
     } catch (error) {
         hideLoading();
@@ -237,13 +251,16 @@ document.getElementById('protectedContent').classList.remove('d-none');
     }
 }
 
+// Function to initialize page content after authentication
 function initializePageContent() {
     console.log('Protected content loaded successfully');
-
- document.querySelectorAll('button, input').forEach(element => {
+    // Enable all buttons and inputs that might have been disabled during loading
+    document.querySelectorAll('button, input').forEach(element => {
         element.disabled = false;
     });
 }
+
+// Check document ready state and initialize accordingly
 if (document.readyState === 'loading') {
     document.addEventListener('DOMContentLoaded', initializeProtectedPage);
 } else {
