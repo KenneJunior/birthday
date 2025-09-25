@@ -80,7 +80,7 @@ const Auth0Manager = (() => {
     const logout = () => {
         try {
             auth0.logout({
-                returnTo: Auth0Config.redirect_uri
+                returnTo: Auth0Config.redirect_uri+'/logOut.html'
             });
         } catch (error) {
             console.error('Auth0 logout failed:', error);
