@@ -40,6 +40,7 @@ export class UltimateModal {
      init() {
         this.generateGallery();
     }
+
      initHammerWhenReady() {
         if (typeof Hammer === 'undefined') {
             console.warn('Hammer.js not available. Touch gestures will be disabled.');
@@ -57,6 +58,7 @@ export class UltimateModal {
         
         checkContainer();
     }
+    
      setupHammer() {
         try {
             this.hammer = new Hammer(this.elements.modalContainer);
@@ -251,6 +253,7 @@ export class UltimateModal {
             autoCloseTime: 15000, // Show for 15 seconds instead of 20
         });
     }
+
     setupZoomPanFunctionality() {  
         if (this.state.isZoomPanSetup) return;
         this.setupMouseZoomPan();

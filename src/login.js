@@ -39,7 +39,6 @@ const PasswordConfig = {
  * Auth0 Manager - Handles Auth0 authentication
  */
 const Auth0Manager = (() => {
-    let auth0Client = null;
     let isAuthenticated = false;
     let userProfile = null;
 
@@ -84,7 +83,7 @@ const Auth0Manager = (() => {
             return true;
         } catch (error) {
             console.error('Auth0 initialization failed:', error);
-            _showNotification('Failed to initialize authentication system.', 'error');
+            _showNotification('Failed to initialize authentication system. Check your internet connection', 'error');
             return false;
         }
     };
@@ -195,25 +194,6 @@ const Auth0Manager = (() => {
         }, PasswordConfig.REDIRECT_DELAY);
     };
 
-    /**
-     * Displays a notification
-     * @param {string} message - Notification message
-     * @param {string} [type='info'] - Notification type (info, success, error, warning)
-    */
-    const _showNotification = (message, type = 'info') => {
-        const notification = document.getElementById('notification');
-        const notificationText = document.getElementById('notificationText');
-        
-        if (!notification || !notificationText) return;
-        
-        notificationText.textContent = message;
-        notification.className = `notification show ${type}`;
-        
-        setTimeout(() => {
-            notification.classList.remove('show');
-        }, PasswordConfig.NOTIFICATION_DURATION);
-    };
-
     // Public API
     return {
         init,
@@ -235,9 +215,12 @@ const PasswordManager = (() => {
         notificationTimeout: null,
         secureInputTimeout: null,
         redirectTimeout: null,
+        ismouseOnNotification:false,
+        isNotificationVisible:false
     };
 
     const dom = {};
+    let hammer = null;
 
     /**
      * Initialize the password manager
@@ -270,7 +253,10 @@ const PasswordManager = (() => {
         dom.loginForm = document.getElementById('loginForm');
         dom.passwordInput = document.getElementById('password');
         dom.toggleButton = document.getElementById('togglePassword');
-        dom.customerSupport = document.getElementById('contactSupport')
+        dom.customerSupport = document.getElementById('contactSupport');
+        dom.notificationCancelBtn = document.querySelector('.fa-times');
+        dom.notification = document.getElementById('notification')
+        hammer = new Hammer(dom.notification);
         
         if (!dom.loginForm || !dom.passwordInput || !dom.toggleButton) {
             throw new Error('Required DOM elements not found');
@@ -289,8 +275,23 @@ const PasswordManager = (() => {
         dom.passwordInput.addEventListener('focus', _handleInputFocus);
         dom.toggleButton.addEventListener('click', _togglePasswordVisibility);
         dom.toggleButton.addEventListener('keydown', _handleToggleKeydown);
-    };
+        dom.notification.addEventListener('mouseenter',()=>{state.ismouseOnNotification= true;});
+        dom.notification.addEventListener('mouseleave',()=>{state.ismouseOnNotification = false;})
+        dom.notificationCancelBtn.addEventListener('click',_hideNotification);
+        hammer.on('swipe',_hideNotification);
+        window.addEventListener('beforeunload', _hideNotification);
 
+    }
+
+    /**
+     * Hide notification immediately
+     */
+    const _hideNotification = () => {
+                const {notification} = dom;
+                if (notification) {
+                    notification.classList.remove('show');
+                }
+            }
     /**
      * Check if password exists in local storage
      */
@@ -364,6 +365,7 @@ const PasswordManager = (() => {
 const _validateInput = (input, isValid) => {
     input.classList.toggle('valid', isValid);
     input.classList.toggle('invalid', !isValid);
+    dom.passwordInput.classList.remove('focus');
   };
 /**
    * Validates and styles text element
@@ -457,8 +459,13 @@ const _validateInput = (input, isValid) => {
    * @param {string} message - Notification message
    * @param {string} [type='info'] - Notification type
    */
-    const _showNotification = (message , type = 'info') => {
-        const notification = document.getElementById('notification');
+     const _showNotification = async(message , type = 'info') => {
+        if(state.isNotificationVisible){
+             _hideNotification();
+              await delay(200);
+        }
+        
+        const {notification} = dom;
         const notificationText = document.getElementById('notificationText');
         
         if (!notification || !notificationText) return;
@@ -470,10 +477,15 @@ const _validateInput = (input, isValid) => {
 
         notificationText.innerHTML =  `${icon} ${message}`;
         notification.className = `notification show ${type}`;
-        
-        state.notificationTimeout = setTimeout(() => {
+        state.isNotificationVisible = true;
+
+        state.notificationTimeout = setInterval(() => {
+            if(!state.ismouseOnNotification){
             notification.classList.remove('show');
+            state.isNotificationVisible = false;
+            }
         }, PasswordConfig.NOTIFICATION_DURATION);
+
     };
 
     /**
@@ -491,6 +503,9 @@ const _validateInput = (input, isValid) => {
     }
 }
 
+    const delay = (ms)=>{
+        return new Promise(resolve => setTimeout(resolve,ms));
+    }
     /**
      * Handle input blur
      */
@@ -505,6 +520,8 @@ const _validateInput = (input, isValid) => {
      */
     const _handleInputFocus = () => {
         dom.passwordInput.classList.add('focused');
+        dom.passwordInput.classList.remove('invalid');
+        dom.passwordInput.classList.remove('valid');
     };
 
     /** 
@@ -513,7 +530,7 @@ const _validateInput = (input, isValid) => {
     */
     const _handleSupport = () =>{    
             const phoneNumber = 237670852835
-            const message = encodeURIComponent('Hello! I have a question about your services.');
+            const message = encodeURIComponent('Hello! I have a question about how to use this app.');
             const whatsappUrl = `https://api.whatsapp.com/send?phone=${phoneNumber}&text=${message}`;
           const newWindow = window.open(whatsappUrl, 'whatsappWindow', 'width=500,height=600 ,noopener,noreferrer');
             if(!newWindow) {_showNotification('Popup was blocked!', 'error');}
