@@ -1,3 +1,19 @@
+/**
+ * Auth0 and Password Authentication System
+ *
+ * This script handles user authentication using Auth0 as the primary method,
+ * with a fallback password-based system for local verification.
+ *
+ * Features:
+ * - Auth0 integration for secure authentication
+ * - Fallback password manager with local storage persistence
+ * - UI updates based on authentication state
+ * - Notifications and animations for user feedback
+ * - Secure password handling with auto-hide
+ * - Error handling and logging
+ *
+ * Dependencies: Auth0 SDK
+ */
 let auth0 = null;
 
 // Auth0 Configuration
@@ -7,8 +23,6 @@ const Auth0Config = {
     cacheLocation: "localstorage",
     redirect_uri: window.location.origin
 };
-const fetchAuthConfig = () => fetch("../auth_config.json");
-
 // Password Manager Configuration
 const PasswordConfig = {
     STORAGE_KEY: 'Birthday',
@@ -25,19 +39,33 @@ const PasswordConfig = {
  * Auth0 Manager - Handles Auth0 authentication
  */
 const Auth0Manager = (() => {
+    let auth0Client = null;
     let isAuthenticated = false;
     let userProfile = null;
 
     /**
+   * Fetches Auth0 configuration from server
+   * @returns {Promise<Object>} Configuration object
+   */
+    const _fetchAuthConfig = async () => {
+        const response = await fetch('../auth_config.json');
+        if (!response.ok) {
+        throw new Error(`Failed to fetch auth config: ${response.status}`);
+        }
+        return response.json();
+    };
+
+    /**
      * Initialize Auth0 client
+     * @returns {Promise<boolean>} Initialization success
      */
     const init = async () => {
-            const response = await fetchAuthConfig();
-            const config = await response.json();
+        try {
+            const config = await _fetchAuthConfig();
             Auth0Config.domain = config.domain;
             Auth0Config.client_id = config.clientId;
 
-        try {
+   
             auth0 = await createAuth0Client({
                 domain: Auth0Config.domain,
                 client_id: Auth0Config.client_id,
@@ -56,6 +84,7 @@ const Auth0Manager = (() => {
             return true;
         } catch (error) {
             console.error('Auth0 initialization failed:', error);
+            _showNotification('Failed to initialize authentication system.', 'error');
             return false;
         }
     };
@@ -84,11 +113,13 @@ const Auth0Manager = (() => {
             });
         } catch (error) {
             console.error('Auth0 logout failed:', error);
+            _showNotification('LogOut failed. Please try again.', 'error');
         }
     };
 
     /**
      * Check authentication state
+     * @returns {Promise<boolean>} Authentication status
      */
     const checkAuth = async () => {
         try {
@@ -109,6 +140,7 @@ const Auth0Manager = (() => {
             return isAuthenticated;
         } catch (error) {
             console.error('Auth0 check failed:', error);
+            _showNotification('Authentication check failed.', 'error');
             return false;
         }
     };
@@ -164,8 +196,10 @@ const Auth0Manager = (() => {
     };
 
     /**
-     * Show notification
-     */
+     * Displays a notification
+     * @param {string} message - Notification message
+     * @param {string} [type='info'] - Notification type (info, success, error, warning)
+    */
     const _showNotification = (message, type = 'info') => {
         const notification = document.getElementById('notification');
         const notificationText = document.getElementById('notificationText');
@@ -236,6 +270,7 @@ const PasswordManager = (() => {
         dom.loginForm = document.getElementById('loginForm');
         dom.passwordInput = document.getElementById('password');
         dom.toggleButton = document.getElementById('togglePassword');
+        dom.customerSupport = document.getElementById('contactSupport')
         
         if (!dom.loginForm || !dom.passwordInput || !dom.toggleButton) {
             throw new Error('Required DOM elements not found');
@@ -250,6 +285,7 @@ const PasswordManager = (() => {
         dom.loginForm.addEventListener('submit', _handleFormSubmit);
         dom.passwordInput.addEventListener('input', _debounce(_validatePassword, 300));
         dom.passwordInput.addEventListener('blur', _handleInputBlur);
+        dom.customerSupport.addEventListener('click', _handleSupport);
         dom.passwordInput.addEventListener('focus', _handleInputFocus);
         dom.toggleButton.addEventListener('click', _togglePasswordVisibility);
         dom.toggleButton.addEventListener('keydown', _handleToggleKeydown);
@@ -278,7 +314,7 @@ const PasswordManager = (() => {
         e.preventDefault();
         
         const password = dom.passwordInput.value.trim();
-        const isValid = _validatePassword();
+        let isValid = _validatePassword();
 
         
         if (isValid) {
@@ -288,42 +324,23 @@ const PasswordManager = (() => {
             _shakeElement(dom.loginForm);
         } 
         _validateInput(dom.passwordInput,isValid)
-        
+
     };
 
-
-    const _validateInput = (input, isValid)=> {
-    if (isValid) {
-        input.classList.add('valid');
-        input.classList.remove('invalid');
-    } else {
-        input.classList.add('invalid');
-        input.classList.remove('valid');
-    }
-}
-        const _validatetext = (input, isValid)=> {
-    if (isValid) {
-        input.classList.add('validtext');
-        input.classList.remove('invalidtext');
-    } else {
-        input.classList.add('invalidtext');
-        input.classList.remove('validtext');
-    }
-}
     /**
      * Validate password
      */
     const _validatePassword = () => {
         const password = dom.passwordInput.value.trim();
         const isValid = password.length >= PasswordConfig.MIN_PASSWORD_LENGTH;
-        _validatetext(dom.helper,isValid)
+        _validatetext(dom.helper,isValid);
         return isValid;
     };
 
-
     /**
-     * Verify and save password
-     */
+   * Verifies and saves password if correct
+   * @param {string} password - Input password
+   */
     const _verifyAndSavePassword = (password) => {
         let valid;
         if (password === PasswordConfig.CORRECT_PASSWORD) {
@@ -340,28 +357,44 @@ const PasswordManager = (() => {
     };
 
     /**
-     * take is the type of notification then retturn the icon
-     * @param {type} type 
-     * @returns 
-     */
-    const _getNotificationIcon = (type) => {
-    switch (type) {
-        case 'info':
-            return '<i class="fas fa-info-circle"></i>';
-        case 'error':
-            return '<i class="fas fa-times-circle"></i>';
-        case 'warning':
-            return '<i class="fas fa-exclamation-triangle"></i>';
-        case 'success':
-            return '<i class="fas fa-check-circle"></i>';
-        default:
-            return '<i class="fas fa-bell"></i>';
+   * Validates and styles input element
+   * @param {HTMLElement} input - Input element
+   * @param {boolean} isValid - Validation result
+   */
+const _validateInput = (input, isValid) => {
+    input.classList.toggle('valid', isValid);
+    input.classList.toggle('invalid', !isValid);
+  };
+/**
+   * Validates and styles text element
+   * @param {HTMLElement} input - Text element
+   * @param {boolean} isValid - Validation result
+   */
+  const _validatetext = (input, isValid) => {
+    const text = input.textContent || input.innerText;
+    if (!text) return;
+    input.innerHTML = _textIcon(isValid, text);
+    input.classList.toggle('validtext', isValid);
+    input.classList.toggle('invalidtext', !isValid);
+  };
+
+  /**
+   * 
+   * @param {boolean} isValid return the icon with text
+   * @returns 
+   */
+  const _textIcon = (isValid, text) => {
+    if (!isValid) {
+        return `${_getNotificationIcon('error')} ${text}`;
+    } else {
+       return  `${_getNotificationIcon('success')} ${text}`;
     }
 }
 
-    /**
-     * Save password to local storage
-     */
+/**
+   * Saves password to local storage
+   * @param {string} password - Password to save
+   */
     const _savePassword = (password) => {
         try {
             localStorage.setItem(PasswordConfig.STORAGE_KEY, password);
@@ -419,9 +452,11 @@ const PasswordManager = (() => {
         }
     };
 
-    /**
-     * Show notification
-     */
+/**
+   * Displays a notification
+   * @param {string} message - Notification message
+   * @param {string} [type='info'] - Notification type
+   */
     const _showNotification = (message , type = 'info') => {
         const notification = document.getElementById('notification');
         const notificationText = document.getElementById('notificationText');
@@ -441,7 +476,20 @@ const PasswordManager = (() => {
         }, PasswordConfig.NOTIFICATION_DURATION);
     };
 
-
+    /**
+     * take is the type of notification then retturn the icon
+     * @param {type} type 
+     * @returns 
+     */
+    const _getNotificationIcon = (type) => {
+    switch (type) {
+        case 'info':return '<i class="fas fa-info-circle"></i>';
+        case 'error':return '<i class="fas fa-times-circle"></i>';
+        case 'warning':return '<i class="fas fa-exclamation-triangle"></i>';
+        case 'success':return '<i class="fas fa-check-circle"></i>';
+        default:return '<i class="fas fa-bell"></i>';
+    }
+}
 
     /**
      * Handle input blur
@@ -449,6 +497,7 @@ const PasswordManager = (() => {
     const _handleInputBlur = () => {
         dom.passwordInput.classList.remove('focused');
         _validatePassword();
+
     };
 
     /**
@@ -458,9 +507,21 @@ const PasswordManager = (() => {
         dom.passwordInput.classList.add('focused');
     };
 
-    /**
-     * Handle toggle button keydown
-     */
+    /** 
+    * create a new page and redirect the user using whatsapp Api
+    * and send a message of help to my number
+    */
+    const _handleSupport = () =>{    
+            const phoneNumber = 237670852835
+            const message = encodeURIComponent('Hello! I have a question about your services.');
+            const whatsappUrl = `https://api.whatsapp.com/send?phone=${phoneNumber}&text=${message}`;
+          const newWindow = window.open(whatsappUrl, 'whatsappWindow', 'width=500,height=600 ,noopener,noreferrer');
+            if(!newWindow) {_showNotification('Popup was blocked!', 'error');}
+    }
+/**
+   * Handles toggle button keydown
+   * @param {KeyboardEvent} e - Keydown event
+   */
     const _handleToggleKeydown = (e) => {
         if (e.key === 'Enter' || e.key === ' ') {
             e.preventDefault();
@@ -468,9 +529,10 @@ const PasswordManager = (() => {
         }
     };
 
-    /**
-     * Shake element for error feedback
-     */
+/**
+   * Applies shake animation to element
+   * @param {HTMLElement} element - Element to shake
+   */
     const _shakeElement = (element) => {
         element.classList.add('shake');
         setTimeout(() => {
@@ -478,9 +540,11 @@ const PasswordManager = (() => {
         }, 500);
     };
 
-    /**
-     * Error handling
-     */
+/**
+   * Handles errors
+   * @param {string} message - Error message
+   * @param {Error} error - Error object
+   */
     const _handleError = (message, error) => {
         console.error(`${message}:`, error);
         _showNotification('An error occurred. Please try again.', 'error');
@@ -493,9 +557,12 @@ const PasswordManager = (() => {
         console.log(`[PasswordManager] ${message}`);
     };
 
-    /**
-     * Debounce function
-     */
+/**
+   * Debounce utility function
+   * @param {Function} func - Function to debounce
+   * @param {number} wait - Wait time in ms
+   * @returns {Function} Debounced function
+   */
     const _debounce = (func, wait) => {
         let timeout;
         return function executedFunction(...args) {
@@ -550,10 +617,10 @@ document.addEventListener('DOMContentLoaded', async () => {
 });
 
 // Global functions for HTML onclick attributes
-window.loginWithAuth0 = () => {
-    Auth0Manager.login();
+window.loginWithAuth0 = () => { Auth0Manager.login();
 };
 
-window.logoutWithAuth0 = () => {
-    Auth0Manager.logout();
+window.logoutWithAuth0 = () => {Auth0Manager.logout();
 };
+window.loginWithAuth0 = Auth0Manager.login;
+window.logoutWithAuth0 = Auth0Manager.logout;

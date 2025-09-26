@@ -281,42 +281,14 @@
     </footer>
 <!-- Bootstrap JS Bundle with Popper -->
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-<script src="auth-check.js"></script>   
+<script src="https://cdn.auth0.com/js/auth0-spa-js/2.1.3/auth0-spa-js.production.js"></script>
+<script src="auth-check.js" typem = "module"></script>   
  <script src = "src/index.js"> </script>
   <script>
-    function showLoading() {
-            const loader = document.getElementById('loading');
-            if (loader) {
-                loader.style.display = 'flex';
-                loader.classList.remove('fade-out');
-            }
-        }
-
-        function hideLoading() {
-            const loader = document.getElementById('loading');
-            if (loader) {
-                loader.classList.add('fade-out');
-                setTimeout(() => {
-                    loader.style.display = 'none';
-                }, 300);
-            }
-        }
-
-        // Initialize page content after authentication
-        function initializePageContent() {
-            console.log('Protected content loaded successfully');
-            
-            // Enable interactive elements
-            document.querySelectorAll('button, input, a').forEach(element => {
-                element.style.pointerEvents = 'auto';
-            });
-            
-        }
-
         // Main authentication and initialization flow
         async function initializeProtectedPage() {
+            updateLoadingText('Verifying access please wait');
             showLoading();
-            
             try {
                 const authResult = await setupAuthProtection();
                 
@@ -344,11 +316,11 @@
             }
         }
         function initializePageContent() {
-        console.log('Protected content loaded successfully');
-            document.querySelectorAll('button, input').forEach(element => {
-            element.disabled = false;
-        });
-}
+            console.log('Protected content loaded successfully');
+                document.querySelectorAll('button, input').forEach(element => {
+                element.disabled = false;
+            });
+        }
 if (document.readyState === 'loading') {
     document.addEventListener('DOMContentLoaded', initializeProtectedPage);
 } else {

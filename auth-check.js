@@ -1,4 +1,9 @@
 
+/**
+ * Authentication Configuration
+ * Defines constants for authentication behavior and storage
+ */
+
 // Configuration
 const AuthConfig = {
     PASSWORD_KEY: 'Birthday',
@@ -14,7 +19,8 @@ let authCheckInitialized = false;
 let auth0Available = false;
 
 /**
- * Initialize authentication system
+ * Initializes the authentication system
+ * @returns {Promise<boolean>} True if initialization succeeded, false otherwise
  */
 async function initAuthCheck() {
     if (authCheckInitialized) return true;
@@ -42,7 +48,8 @@ async function initAuthCheck() {
 }
 
 /**
- * Check if user is authenticated using any method
+ * Checks if the user is authenticated using available methods
+ * @returns {Promise<Object>} Authentication result object
  */
 async function checkAuthentication() {
     try {
@@ -75,7 +82,11 @@ async function checkAuthentication() {
 }
 
 /**
- * Require authentication - redirect if not authenticated
+ * Requires authentication, redirecting to login if necessary
+ * @param {Object} [options={}] - Configuration options
+ * @param {number} [options.retryCount=0] - Current retry attempt
+ * @param {boolean} [options.silent=false] - Suppress console logs
+ * @returns {Promise<Object>} Authentication result
  */
 async function requireAuth(options = {}) {
     const {
@@ -131,13 +142,18 @@ async function requireAuth(options = {}) {
 /**
  * Show loading animation
  */
-function showLoadingAnimation() {
-    const loadingEl = document.getElementById('loading');
-    if (loadingEl) {
-        loadingEl.style.display = 'flex';
-    }
-}
+    function showLoading() {
+            const loader = document.getElementById('loading');
+            if (loader) {
+                loader.style.display = 'flex';
+                loader.classList.remove('fade-out');
+            }
+        }
 
+ /**
+ * Updates the loading text while preserving animations
+ * @param {string} text - New loading text
+ */
 function updateLoadingText(text) {
     const textEl = document.querySelector('.loading-text');
     if (textEl) {
@@ -150,15 +166,16 @@ function updateLoadingText(text) {
 /**
  * Hide loading animation
  */
-function hideLoadingAnimation() {
-    const loadingEl = document.getElementById('loading');
-    if (loadingEl) {
-        loadingEl.classList.add('fade-out');
-        setTimeout(() => {
-            loadingEl.style.display = 'none';
-        }, 300);
-    }
-}
+        function hideLoading() {
+            const loader = document.getElementById('loading');
+            if (loader) {
+                loader.classList.add('fade-out');
+                setTimeout(() => {
+                    loader.classList.add ('d-none');
+                }, 3000);
+            }
+        }
+
 /**
  * Logout user from all authentication methods
  */
@@ -190,7 +207,8 @@ async function logout() {
 }
 
 /**
- * Get authentication status
+ * Checks for session timeout and handles expiration
+ * @private
  */
 async function getAuthStatus() {
     return await checkAuthentication();
@@ -215,14 +233,17 @@ function _checkSessionTimeout() {
 }
 
 /**
- * Update last activity timestamp
+ * Updates the last activity timestamp
+ * @private
  */
 function _updateLastActivity() {
     localStorage.setItem('lastActivityTime', Date.now().toString());
 }
 
 /**
- * Get stored return URL or default
+ * Retrieves stored return URL or default
+ * @param {string} [defaultUrl='/'] - Fallback URL
+ * @returns {string} Return URL
  */
 function getReturnUrl(defaultUrl = '/') {
     return sessionStorage.getItem('returnUrl') || defaultUrl;
@@ -260,7 +281,8 @@ function setupActivityTracking() {
 }
 
 /**
- * Initialize and set up authentication system
+ * Sets up complete authentication protection
+ * @returns {Promise<Object>} Authentication result
  */
 async function setupAuthProtection() {
     // Initialize auth check
@@ -278,6 +300,9 @@ async function setupAuthProtection() {
 // Export functions for use in other modules
 if (typeof module !== 'undefined' && module.exports) {
     module.exports = {
+        showLoading,
+        hideLoading,
+        updateLoadingText,
         initAuthCheck,
         checkAuthentication,
         requireAuth,
