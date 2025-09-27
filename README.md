@@ -2,7 +2,7 @@
 
 [![Netlify Status](https://api.netlify.com/api/v1/badges/5962aebc-777a-4637-b46c-1d4c4c332043/deploy-status)](https://app.netlify.com/projects/fhavur/deploys)
 ![Vercel](https://img.shields.io/badge/deployed%20on-Vercel-black?logo=vercel)
-![Made with Love](https://img.shields.io/badge/❤️ made%20with-love-red)
+![Made with Love](https://img.shields.io/badge/❤️-made%20with-love-red)
 ![Happy Birthday](https://img.shields.io/badge/🎂-Happy%20Birthday-pink)
 ![Party Mode](https://img.shields.io/badge/🥳-Party%20Time-purple)
 ![Special Gift](https://img.shields.io/badge/🎁-Gift%20Inside-green)
