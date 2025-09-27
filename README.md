@@ -51,6 +51,12 @@ A beautifully crafted, interactive web experience featuring a birthday celebrati
     - Google Fonts (Montserrat, Dancing Script, Pacifico)
     - hammer js 
 
+
+## 📊 Repo Stats
+![GitHub stars](https://img.shields.io/github/stars/kennejunior/birthday?style=social)
+![GitHub forks](https://img.shields.io/github/forks/kennejunior/birthday?style=social)
+![GitHub issues](https://img.shields.io/github/issues/kenndjunior/ birthday)
+
 ## 📁 Project Structure
 
 ``` text
