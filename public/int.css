@@ -462,6 +462,11 @@ h1::after {
 .photo-thumbnail:hover img {
     transform: scale(1.1);
 }
+a {
+    text-decoration: none;
+    color: inherit;
+
+}
 
 /* ========== SOCIAL SHARE ========== */
 .social-share {
@@ -472,9 +477,9 @@ h1::after {
 }
 
 .social-share a {
-    width: calc(50px * var(--zoom-factor));
-    height: calc(50px * var(--zoom-factor));
-    font-size: calc(1.8rem * var(--zoom-factor));
+    width: calc(70px * var(--zoom-factor));
+    height: calc(70px * var(--zoom-factor));
+    font-size: calc(3rem * var(--zoom-factor));
     border-radius: 50%;
     display: flex;
     align-items: center;
@@ -499,6 +504,7 @@ h1::after {
 
 .social-share a:hover::before {
     width: 100%;
+
 }
 
 .social-share a:hover {
@@ -1057,12 +1063,15 @@ h1::after {
 }
 .open-modal-btn {
     background: linear-gradient(135deg, var(--pink-medium), var(--lilac));
+    position: relative;
     color: white;
     border: none;
     padding: 15px 30px;
     font-size: 18px;
     border-radius: 30px;
     cursor: pointer;
+    overflow: hidden;
+    will-change: tranform;
     transition: var(--transition);
     box-shadow: 0 5px 15px rgba(219, 112, 147, 0.4);
     font-family: 'Montserrat', sans-serif;

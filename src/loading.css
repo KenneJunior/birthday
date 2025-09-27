@@ -44,6 +44,7 @@
     will-change: opacity, transform;
     transform: translateZ(0); /* Hardware acceleration */
     opacity: 1;
+    cursor: wait;
 }
 
 .loading-container[aria-hidden="true"] {

@@ -3,10 +3,11 @@
 <head>
     <meta charset="UTF-8">
     <title>Hey There Beautiful</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
 </head>
 <link rel="stylesheet" href="fhav.css">
 <link rel = "stylesheet" href="../../src/loading.css"/>
-
 
 <script type="application/ld+json">
     {
@@ -166,7 +167,7 @@
         <div class="interactive"></div>
     </div>
 </div>
-<div class="particles-container" aria-hidden="true">
+<div class="particles-container" hidden aria-hidden="true">
     <canvas id="particles-canvas" role="presentation"></canvas>
 </div>
 
@@ -177,22 +178,6 @@
     <script src="../../auth-check.js"></script> 
 
   <script>
-    function showLoading() {
-    const loader = document.getElementById('loading');
-    loader.style.display = 'flex';
-    loader.classList.remove('fade-out');
-}
-
-function hideLoading() {
-    const loader = document.getElementById('loading');
-    loader.classList.add('fade-out');
-    
-    // Remove after fade-out completes
-    setTimeout(() => {
-        loader.style.display = 'none';
-    }, 300);
-}
-
 async function initializeProtectedPage() {
     showLoading();
     

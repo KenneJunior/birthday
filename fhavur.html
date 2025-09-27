@@ -88,8 +88,9 @@
         </button>
 
         <address class="signature animate__animated animate__fadeIn">
-            With all my love,<br>
-            <span>Your Secret Admirer</span>
+            <a href="fhavur/confession.html"> With all my love,<br>
+                Your Secret Admirer
+            </a>
         </address>
         <button class="btn-celebrate animate__animated animate__pulse animate__infinite" id="celebrateBtn"
                 aria-label="Celebrate birthday">
@@ -202,41 +203,22 @@
 <script src="auth-check.js"></script> 
 <script src="src/HBD.js" type="module"></script>
   <script>
-  // Function to display the loading screen
-function showLoading() {
-    const loader = document.getElementById('loading');
-    if (loader) {
-        loader.style.display = 'flex';
-        loader.classList.remove('fade-out');
-    }
-}
-
-// Function to hide the loading screen with a fade-out effect
-function hideLoading() {
-    const loader = document.getElementById('loading');
-    if (loader) {
-        loader.classList.add('fade-out');
-        // Hide completely after the animation (assuming fade-out is 1s)
-        setTimeout(() => {
-            loader.style.display = 'none';
-        }, 1000);
-    }
-}
-
 // Asynchronous function to initialize the protected page
 async function initializeProtectedPage() {
+    updateLoadingText('Yeah I know again😏... Just a moment 😅😊');
     showLoading();
 
     try {
         const authResult = await setupAuthProtection();
         if (authResult.authenticated) {
             // Delay hiding loader for a smoother transition
-            setTimeout(hideLoading, 500);
+
             initializePageContent();
             const protectedContent = document.getElementById('protectedContent');
             if (protectedContent) {
                 protectedContent.classList.remove('d-none');
-            }
+            } 
+            setTimeout(hideLoading, 1000);
         } else {
             // Handle case where authentication succeeds but user is not authorized
             hideLoading();
