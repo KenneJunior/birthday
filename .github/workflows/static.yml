@@ -13,8 +13,6 @@ on:
       - '**.png'
       - '**.jpg'
       - '**.svg'
-    paths-ignore:
-      - 'docs/**'
   pull_request:
     branches:
       - main
