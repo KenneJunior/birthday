@@ -1,43 +1,246 @@
-# Simple workflow for deploying static content to GitHub Pages
-name: Deploy static content to Pages
+# Advanced Workflow for Deploying Static Content to GitHub Pages
+name: Deploy Static Content to GitHub Pages
 
+# Triggers the workflow on push, pull request, or manual dispatch
 on:
-  # Runs on pushes targeting the default branch
   push:
-    branches: ["main"]
-
-  # Allows you to run this workflow manually from the Actions tab
+    branches: 
+      - main
+      - master
+    paths:
+      - '**.html'
+      - '**.css'
+      - '**.js'
+      - '**.png'
+      - '**.jpg'
+      - '**.svg'
+      - '!docs/**'  # Ignore documentation changes
+  pull_request:
+    branches:
+      - main
+      - master
+    paths:
+      - '**.html'
+      - '**.css'
+      - '**.js'
+      - '**.png'
+      - '**.jpg'
+      - '**.svg'
   workflow_dispatch:
+    inputs:
+      environment:
+        description: 'Target environment for deployment'
+        required: false
+        default: 'production'
 
-# Sets permissions of the GITHUB_TOKEN to allow deployment to GitHub Pages
+# Environment variables available to all jobs and steps
+env:
+  NODE_VERSION: 20.8  # Specify Node.js version
+  CACHE_VERSION: v1   # Cache versioning for busting
+  ARTIFACT_NAME: github-pages
+  OUTPUT_PATH: ./dist
+
+# Permissions for GitHub token
 permissions:
   contents: read
   pages: write
   id-token: write
+  pull-requests: write  # Allow commenting on PRs
+  checks: write         # Allow updating check statuses
 
-# Allow only one concurrent deployment, skipping runs queued between the run in-progress and latest queued.
-# However, do NOT cancel in-progress runs as we want to allow these production deployments to complete.
+# Concurrency to prevent simultaneous deployments
 concurrency:
-  group: "pages"
-  cancel-in-progress: false
+  group: ${{ github.workflow }}-${{ github.event_name }}-${{ github.ref }}
+  cancel-in-progress: true  # Cancel in-progress runs for the same branch
 
 jobs:
-  # Single deploy job since we're just deploying
+  # Job for building and validating static content
+  build:
+    runs-on: ubuntu-latest
+    environment: 
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0  # Full history for changelog generation
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'npm'
+
+      - name: Cache Dependencies
+        uses: actions/cache@v4
+        id: cache
+        with:
+          path: ~/.npm
+          key: ${{ runner.os }}-npm-${{ env.CACHE_VERSION }}-${{ hashFiles('**/package-lock.json') }}
+          restore-keys: |
+            ${{ runner.os }}-npm-${{ env.CACHE_VERSION }}-
+
+      - name: Install Dependencies
+        run: npm ci
+        if: steps.cache.outputs.cache-hit != 'true'
+
+      - name: Run Linting
+        run: npm run lint
+        continue-on-error: true  # Allow build to continue even if linting fails
+
+      - name: Build Static Content
+        env:
+          BASE_URL: ${{ github.event_name == 'pull_request' && format('https://pr-{0}.github.io/{1}/', github.event.number, github.repository) || github.event.deployment.payload.web_url }}
+        run: npm run build
+        continue-on-error: false
+
+      - name: Run Tests
+        run: npm run test
+        continue-on-error: true  # Tests are informational for PRs
+
+      - name: Upload Build Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: ${{ env.ARTIFACT_NAME }}
+          path: ${{ env.OUTPUT_PATH }}
+          retention-days: 5
+          if-no-files-found: error
+
+      # Optional: Validate HTML with W3C validator
+      - name: Validate HTML
+        uses: w3c/validator-action@v1
+        with:
+          path: ${{ env.OUTPUT_PATH }}
+          fail-on-error: false
+        continue-on-error: true
+
+      # Optional: Generate Lighthouse Report for PRs
+      - name: Run Lighthouse CI
+        if: github.event_name == 'pull_request'
+        uses: treosh/lighthouse-ci-action@v10
+        with:
+          urls: |
+            ${{ env.OUTPUT_PATH }}/index.html
+          uploadArtifacts: true
+          temporaryPublicStorage: true
+
+      # Comment Lighthouse results on PR
+      - name: Comment Lighthouse Report
+        if: github.event_name == 'pull_request'
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const fs = require('fs');
+            const report = JSON.parse(fs.readFileSync(process.env.GITHUB_WORKSPACE + '/.lighthouseci/lhr-0.json'));
+            const summary = `Lighthouse Scores:\n- Performance: ${report.categories.performance.score * 100}\n- Accessibility: ${report.categories.accessibility.score * 100}\n- Best Practices: ${report.categories['best-practices'].score * 100}\n- SEO: ${report.categories.seo.score * 100}`;
+            await github.rest.issues.createComment({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: context.issue.number,
+              body: summary
+            });
+
+  # Job for deploying to GitHub Pages
   deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    if: github.event_name == 'push' || github.event_name == 'workflow_dispatch'
     environment:
       name: github-pages
       url: ${{ steps.deployment.outputs.page_url }}
-    runs-on: ubuntu-latest
     steps:
-      - name: Checkout
-        uses: actions/checkout@v4
+      - name: Download Build Artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: ${{ env.ARTIFACT_NAME }}
+          path: ${{ env.OUTPUT_PATH }}
+
       - name: Setup Pages
         uses: actions/configure-pages@v5
-      - name: Upload artifact
+        with:
+          static_site_generator: other
+          enablement: true
+
+      - name: Upload Pages Artifact
         uses: actions/upload-pages-artifact@v3
         with:
-          # Upload entire repository
-          path: '.'
+          path: ${{ env.OUTPUT_PATH }}
+
       - name: Deploy to GitHub Pages
         id: deployment
         uses: actions/deploy-pages@v4
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      # Notify on successful deployment
+      - name: Notify Deployment Success
+        if: success()
+        uses: actions/github-script@v7
+        with:
+          script: |
+            await github.rest.repos.createCommitStatus({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              sha: context.sha,
+              state: 'success',
+              target_url: '${{ steps.deployment.outputs.page_url }}',
+              description: 'Successfully deployed to GitHub Pages',
+              context: 'github-pages-deployment'
+            });
+
+      # Notify on failure
+      - name: Notify Deployment Failure
+        if: failure()
+        uses: actions/github-script@v7
+        with:
+          script: |
+            await github.rest.repos.createCommitStatus({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              sha: context.sha,
+              state: 'failure',
+              description: 'Failed to deploy to GitHub Pages',
+              context: 'github-pages-deployment'
+            });
+
+  # Optional: PR Preview Deployment
+  deploy-preview:
+    needs: build
+    if: github.event_name == 'pull_request'
+    runs-on: ubuntu-latest
+    environment:
+      name: pr-preview
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - name: Download Build Artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: ${{ env.ARTIFACT_NAME }}
+          path: ${{ env.OUTPUT_PATH }}
+
+      - name: Setup Pages
+        uses: actions/configure-pages@v5
+
+      - name: Upload Pages Artifact
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: ${{ env.OUTPUT_PATH }}
+
+      - name: Deploy PR Preview to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          preview: true
+
+      - name: Comment PR with Preview URL
+        uses: actions/github-script@v7
+        with:
+          script: |
+            await github.rest.issues.createComment({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: context.issue.number,
+              body: `🎉 Preview deployed! View it here: ${{ steps.deployment.outputs.page_url }}`
+            });
