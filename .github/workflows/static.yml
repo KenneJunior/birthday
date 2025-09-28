@@ -35,7 +35,7 @@ on:
 
 # Environment variables available to all jobs and steps
 env:
-  NODE_VERSION: 20.8  # Specify Node.js version
+  NODE_VERSION: 20.19.5  # Specify Node.js version
   CACHE_VERSION: v1   # Cache versioning for busting
   ARTIFACT_NAME: github-pages
   OUTPUT_PATH: ./dist
