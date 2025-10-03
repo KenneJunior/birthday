@@ -1,3 +1,4 @@
+import Hammer from "hammerjs";
 /**
  * Auth0 and Password Authentication System
  *
@@ -83,7 +84,7 @@ const Auth0Manager = (() => {
             return true;
         } catch (error) {
             console.error('Auth0 initialization failed:', error);
-            _showNotification('Failed to initialize authentication system. Check your internet connection', 'error');
+            PasswordManager.showNotification('Failed to initialize authentication system. Check your internet connection', 'error');
             return false;
         }
     };
@@ -255,7 +256,7 @@ const PasswordManager = (() => {
         dom.toggleButton = document.getElementById('togglePassword');
         dom.customerSupport = document.getElementById('contactSupport');
         dom.notificationCancelBtn = document.querySelector('.fa-times');
-        dom.notification = document.getElementById('notification')
+        dom.notification = document.getElementById('notification');
         hammer = new Hammer(dom.notification);
         
         if (!dom.loginForm || !dom.passwordInput || !dom.toggleButton) {
@@ -464,8 +465,10 @@ const _validateInput = (input, isValid) => {
              _hideNotification();
               await delay(200);
         }
-        
-        const {notification} = dom;
+         let {notification} = dom;
+        if(!notification)
+            notification = document.getElementById('notification');
+       
         const notificationText = document.getElementById('notificationText');
         
         if (!notification || !notificationText) return;
@@ -594,7 +597,8 @@ const _validateInput = (input, isValid) => {
 
     // Public API
     return {
-        init
+        init,
+        showNotification: _showNotification
     };
 })();
 

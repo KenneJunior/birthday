@@ -108,7 +108,7 @@ document.addEventListener('DOMContentLoaded', () => {
         }, 10000);
     }
 
-    /*function setupGrowButtonEventListeners() {
+    function setupGrowButtonEventListeners() {
         elements.growButton.addEventListener('mousedown', startGrowing);
         elements.growButton.addEventListener('touchstart', startGrowing);
 
@@ -138,7 +138,7 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         });
     }
-*/
+
     function startGrowing(e) {
         e.preventDefault();
         state.growButton.currentScale = 1;
@@ -312,16 +312,18 @@ document.addEventListener('DOMContentLoaded', () => {
 
         // Click effects
         document.addEventListener('mousedown', (e) => {
-            if (!e.target.closest('.btn-celebrate, .modal-container, .photo-thumbnail, .social-share a, .social-share button')) {
+            if (!e.target.closest(' .modal-container, img,  a,  button')) {
                 startGrowingHeart(e);
             }
         });
 
         document.addEventListener('touchstart', (e) => {
-            if (!e.target.closest('.btn-celebrate, .modal-container, .photo-thumbnail, .social-share a, .social-share button')) {
+            if (!e.target.closest(' .modal-container, img,  a,  button')) {
                 startGrowingHeart(e.touches[0]);
             }
         });
+
+        setupGrowButtonEventListeners();
 
         document.addEventListener('mouseup', releaseGrowingHeart);
         document.addEventListener('touchend', releaseGrowingHeart);

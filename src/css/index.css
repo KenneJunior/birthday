@@ -537,11 +537,7 @@ a{
         font-size: 1.1rem;
     }
     
-    .image-container,
-    .image-placeholder,
-    .birthday-image {
-        min-height: 300px; 
-    }
+   
 }
 @media (max-width: 400px) {
     .birthday-title {
@@ -566,12 +562,20 @@ a{
     iframe {
         height: 220px;
     }
-    
-    .image-container,
-    .image-placeholder,
-    .birthday-image {
-        min-height: 250px; 
+
+    .image-container{
+        display: none;
     }
+    
+  .content-section{
+    background-image: url('../public/profile_pic.jpg') !important;
+    background-size: cover !important;
+    background-position: center !important;
+    background-repeat: no-repeat !important;
+    color: white !important;
+    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.5) !important;
+}
+
 }
 
 
