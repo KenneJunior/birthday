@@ -88,6 +88,7 @@ body {
     height: 100%;
     position: relative;
     overflow: hidden;
+    min-height: 42rem;
     isolation: isolate;
 }
 
@@ -149,6 +150,7 @@ body {
     transition: var(--transition);
     position: absolute;
     top: 0;
+    border-radius: var(--radius-xl);
     left: 0;
     z-index: 1;
     cursor: pointer;
@@ -462,6 +464,9 @@ a{
     .birthday-wishes {
         font-size: 1.8rem;
     }
+    .image-container {
+        min-height: 57rem;
+    }
 }
 
 @media (max-width: 768px) {
@@ -505,11 +510,8 @@ a{
     iframe {
         height: 300px;
     }
-    
-    .image-container,
-    .image-placeholder,
-    .birthday-image {
-        min-height: 530px; 
+    .image-container {
+        min-height: 47rem;
     }
 }
 
@@ -536,8 +538,16 @@ a{
         height: 40px;
         font-size: 1.1rem;
     }
-    
+    .image-container{
+        min-height: 35rem;
+    }
    
+}
+
+@media (max-width: 500px) {
+    .image-container {
+        min-height: 33rem;
+    }
 }
 @media (max-width: 400px) {
     .birthday-title {
@@ -568,13 +578,18 @@ a{
     }
     
   .content-section{
-    background-image: url('../../public/profile_pic.jpg') !important;
+    background-image: url('../../public/pics/profile_pic.jpg') !important;
     background-size: cover !important;
     background-position: center !important;
     background-repeat: no-repeat !important;
     color: white !important;
     text-shadow: 0 2px 4px rgba(0, 0, 0, 0.5) !important;
 }
+    .birthday-message{
+        backdrop-filter: blur(15px);
+        border-radius: 2rem;
+        --webkit-backdrop-filter: blur(15px);
+    }
 
 }
 

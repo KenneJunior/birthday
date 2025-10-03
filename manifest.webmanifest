@@ -60,14 +60,24 @@
     {
       "src": "public/screenshot.svg",
       "sizes": "1200x630",
-      "type": "image/svg+xml",
-      "form_factor":"narrow"
-    },
+      "type": "image/svg+xml"
+        },
     {
       "src": "public/screenshot.svg",
       "sizes": "1200x630",
       "type": "image/svg+xml",
       "form_factor":"wide"
+    },
+        {
+      "src": "public/pics/screenshot1.jpg",
+      "sizes": "1200x630",
+      "type": "image/svg+xml",
+      "form_factor":"wide"
+    },
+            {
+      "src": "public/pics/screenshot1.jpg",
+      "sizes": "1200x630",
+      "type": "image/svg+xml"
     }
   ],
   "shortcuts": [

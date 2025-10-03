@@ -42,6 +42,7 @@
       "data-type":"image",
       "thumb": "public/pics/thumbnails/profile_pic.jpg"
     },
+
     {
       "thumb": "public/pics/thumbnails/img6.PNG",
       "alt": "Under sun adey, Under rain .... 🤣🤣",
@@ -59,6 +60,12 @@
       "alt": "Ok whats happening here 🤣🤣🤣",
       "data-type":"video",
       "video-src":"public/vid/video3.mp4"
+    },
+    {
+      "src": "public/pics/screenshot1.jpg",
+      "thumb": "public/pics/thumbnails/screenshot1.jpg",
+      "alt": "screenshot of the app",
+      "data-type":"image"
     }
   ]
 }
