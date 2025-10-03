@@ -4,11 +4,11 @@ import fs from 'fs/promises';
 async function generateIcons() {
 
   const fetchIcon = async () => {
-    return await fs.readFile('public/icon/apple_svg/icon_512X512.svg', 'utf8');
+    return await fs.readFile('public/icon/apple/svg/icon_512X512.svg', 'utf8');
     };
   const baseSvg = await fetchIcon();
   const sizes = [
-    { name: 'apple-splash-screen', size: 512 },
+    { name: 'apple-touch-icon-512x512', size: 512 },
     /*{ name: 'apple-touch-icon-167x167', size: 167 },
     { name: 'apple-touch-icon-152x152', size: 152 },
     { name: 'apple-touch-icon-120x120', size: 120 },
@@ -18,7 +18,7 @@ async function generateIcons() {
 
   for (const { name, size } of sizes) {
     await sharp(Buffer.from(baseSvg))
-      //.resize(size, size)
+      /**.resize(size, size)*/
       .png()
       .toFile(`public/icon/${name}.png`);
     
