@@ -1,4 +1,3 @@
-import Hammer from "hammerjs";
 /**
  * Auth0 and Password Authentication System
  *
