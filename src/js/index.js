@@ -697,7 +697,7 @@ class BirthdayApp {
      */
     startApp() {
         // Load image
-        this.modules.imageLoader.loadImage('public/pics/tata.jpg')
+        this.modules.imageLoader.loadImage('public/pics/profile_pic.jpg')
             .catch(error => {
                 console.warn('Image loading failed:', error);
             });
