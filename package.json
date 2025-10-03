@@ -11,5 +11,8 @@
   "devDependencies": {
     "vite": "^7.1.0",
     "vite-plugin-qrcode": "^0.3.0"
+  },
+  "dependencies": {
+    "hammerjs": "^2.0.8"
   }
 }

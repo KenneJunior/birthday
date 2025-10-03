@@ -135,11 +135,10 @@ document.addEventListener('DOMContentLoaded', () => {
     const init = () => {
         addEventListeners();
         initAnimation();
-
         // Add loaded class to body for CSS transitions
         setTimeout(() => {
             document.body.classList.add('loaded');
-        }, 100);
+        }, 1000);
     };
 
     // Clean up function

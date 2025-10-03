@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<link rel="stylesheet" href="https://www.w3schools.com/w3css/4/w3.css">
+<link rel="stylesheet" href="date.css">
+<body>
+<noscript>
+    This experience uses a little JavaScript magic. Please enable JavaScript to see the animation and question.
+</noscript>
+
+
+<!-- Background gradient + gooey blobs (purely decorative) -->
+<div class="gradient-bg" aria-hidden="true">
+    <!-- Subtle noise overlay for texture -->
+    <svg class="noiseBg" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" preserveAspectRatio="none">
+        <filter id="noiseFilterBg">
+            <feTurbulence type="fractalNoise" baseFrequency="0.6" stitchTiles="stitch" />
+        </filter>
+        <rect width="100%" height="100%" filter="url(#noiseFilterBg)" />
+    </svg>
+
+
+    <!-- Goo filter used by the blurred gradient blobs -->
+    <svg class="svgBlur" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+        <defs>
+            <filter id="goo">
+                <feGaussianBlur in="SourceGraphic" stdDeviation="10" result="blur" />
+                <feColorMatrix in="blur" mode="matrix" values="1 0 0 0 0 0 1 0 0 0 0 0 1 0 0 0 0 0 18 -8" result="goo" />
+                <feBlend in="SourceGraphic" in2="goo" />
+            </filter>
+        </defs>
+    </svg>
+
+
+    <div class="gradients-container">
+        <div class="g1"></div>
+        <div class="g2"></div>
+        <div class="g3"></div>
+        <div class="g4"></div>
+        <div class="g5"></div>
+        <div class="interactive" role="presentation"></div>
+    </div>
+</div>
+
+
+<main id="app" aria-label="Interactive date proposal">
+    <!-- Intro / magnetic card -->
+    <section class="card" id="proposalCard" aria-describedby="intro-text">
+        <!-- fine-grain noise over the card -->
+        <svg class="noise" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" preserveAspectRatio="none" aria-hidden="true">
+            <filter id="noiseFilter">
+                <feTurbulence type="fractalNoise" baseFrequency="0.85" numOctaves="6" stitchTiles="stitch" />
+            </filter>
+            <rect width="100%" height="100%" filter="url(#noiseFilter)" />
+        </svg>
+
+
+        <div class="content">
+            <h1 class="headline">Hey, Beautiful 🌸</h1>
+            <p id="intro-text">I’ve been meaning to ask you something…</p>
+            <button id="heartBtn" class="heart-btn" type="button" aria-label="Open the question">💖</button>
+        </div>
+    </section>
+
+
+    <!-- The actual question (initially hidden) -->
+    <section class="proposal hidden" id="proposalText" aria-live="polite" aria-atomic="true">
+        <h1 class="question">Would you go on a date with me?</h1>
+        <div class="options" role="group" aria-label="Answer choices">
+            <button id="yesBtn" class="btn yes" type="button" aria-label="Yes">Yes 😍</button>
+            <button id="maybeBtn" class="btn maybe" type="button" aria-label="Maybe">Maybe 🤭</button>
+        </div>
+    </section>
+</main>
+
+
+<!-- Confetti/particles get mounted here by JS -->
+<div id="confetti-root" aria-hidden="true"></div>
+
+
+<!-- Step 3 will bring the interactivity in date.js -->
+<script defer src="date.js"></script>
+</body>
+</html>

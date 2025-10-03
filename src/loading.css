@@ -1,0 +1,215 @@
+/* ===== Professional Loading Spinner =====
+   Modern, accessible, performant loading animation with theming support.
+   Features: CSS variables for easy customization, smooth animations,
+   dark mode, reduced motion, responsive design.
+*/
+
+/* CSS Custom Properties for Theming */
+:root {
+    --loading-bg-light: rgba(255, 255, 255, 0.96);
+    --loading-bg-dark: rgba(17, 24, 39, 0.96);
+    --loading-text-light: #1f2937;
+    --loading-text-dark: #f9fafb;
+    --loading-spinner-primary: #3b82f6;
+    --loading-spinner-secondary: #8b5cf6;
+    --loading-dots-primary: #3b82f6;
+    --loading-border-radius: 50%;
+    --loading-spinner-size: 96px;
+    --loading-text-size: 18px;
+    --loading-blur: 12px;
+    --loading-transition: 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+[data-theme="dark"] {
+    --loading-bg-light: var(--loading-bg-dark);
+    --loading-text-light: var(--loading-text-dark);
+    --loading-spinner-primary: #60a5fa;
+    --loading-dots-primary: #60a5fa;
+}
+
+.loading-container {
+    position: fixed;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    background: var(--loading-bg-light);
+    display: none;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    z-index: 9999;
+    -webkit-backdrop-filter: blur(var(--loading-blur));
+    backdrop-filter: blur(var(--loading-blur));
+    transition: opacity var(--loading-transition), transform var(--loading-transition);
+    will-change: opacity, transform;
+    transform: translateZ(0); /* Hardware acceleration */
+    opacity: 1;
+    cursor: wait;
+}
+
+.loading-container[aria-hidden="true"] {
+    opacity: 0;
+    transform: scale(0.95);
+    pointer-events: none;
+}
+
+.d-none {
+    display: none !important;
+}
+
+.loading-spinner {
+    width: var(--loading-spinner-size);
+    height: var(--loading-spinner-size);
+    position: relative;
+    margin-bottom: 1.5rem;
+    display: grid;
+    place-items: center;
+}
+
+.loading-spinner::before,
+.loading-spinner::after {
+    content: '';
+    position: absolute;
+    border-radius: var(--loading-border-radius);
+}
+a {
+text-decoration : none;
+
+}
+.loading-spinner::before {
+    width: 100%;
+    height: 100%;
+    border: 3px solid transparent;
+    border-top-color: var(--loading-spinner-primary);
+    border-top-style: solid;
+    animation: spin 1s cubic-bezier(0.4, 0, 0.2, 1) infinite;
+    will-change: transform;
+}
+
+.loading-spinner::after {
+    inset: 0.25rem;
+    width: calc(100% - 0.5rem);
+    height: calc(100% - 0.5rem);
+    background: conic-gradient(from 0deg, transparent 0deg, var(--loading-spinner-secondary) 360deg);
+    opacity: 0.1;
+    animation: spin 2s linear infinite reverse;
+}
+
+.loading-text {
+    margin-top: 1rem;
+    color: var(--loading-text-light);
+    font-size: var(--loading-text-size);
+    font-weight: 500;
+    letter-spacing: 0.025em;
+    font-family: system-ui, -apple-system, sans-serif;
+    text-align: center;
+    line-height: 1.4;
+}
+
+.loading-dots {
+    display: inline-flex;
+    align-items: center;
+    margin-left: 0.375rem;
+    vertical-align: middle;
+}
+
+.loading-dots span {
+    display: block;
+    height: 0.625rem;
+    width: 0.625rem;
+    background: var(--loading-dots-primary);
+    border-radius: 50%;
+    margin: 0 0.125rem;
+    animation: wave 1.4s ease-in-out infinite;
+    will-change: transform;
+}
+
+.loading-dots span:nth-child(1) { animation-delay: -0.48s; }
+.loading-dots span:nth-child(2) { animation-delay: -0.24s; }
+.loading-dots span:nth-child(3) { animation-delay: 0s; }
+
+@keyframes spin {
+    to { transform: rotate(360deg); }
+}
+
+@keyframes wave {
+    0%, 100% {
+        transform: translateY(0);
+        opacity: 0.4;
+    }
+    50% {
+        transform: translateY(-0.375rem);
+        opacity: 1;
+    }
+}
+
+/* Accessibility: Reduced Motion */
+@media (prefers-reduced-motion: reduce) {
+    .loading-spinner::before,
+    .loading-spinner::after,
+    .loading-dots span {
+        animation: none;
+    }
+    
+    .loading-dots span:nth-child(1) { opacity: 0.3; }
+    .loading-dots span:nth-child(2) { opacity: 0.6; }
+    .loading-dots span:nth-child(3) { opacity: 1; }
+    
+    .loading-container {
+        transition: none;
+    }
+}
+
+/* Dark Mode (Fallback for prefers-color-scheme) */
+@media (prefers-color-scheme: dark) {
+    :root {
+        --loading-bg-light: var(--loading-bg-dark);
+        --loading-text-light: var(--loading-text-dark);
+        --loading-spinner-primary: #60a5fa;
+        --loading-dots-primary: #60a5fa;
+    }
+}
+
+/* Responsive Design */
+@media (max-width: 640px) {
+    :root {
+        --loading-spinner-size: 80px;
+        --loading-text-size: 16px;
+    }
+    
+    .loading-dots span {
+        height: 0.5rem;
+        width: 0.5rem;
+        margin: 0 0.1rem;
+    }
+}
+
+@media (max-width: 480px) {
+    :root {
+        --loading-spinner-size: 72px;
+        --loading-text-size: 14px;
+    }
+    
+    .loading-text {
+        padding: 0 1rem;
+    }
+}
+
+/* High Contrast Mode */
+@media (prefers-contrast: high) {
+    :root {
+        --loading-bg-light: rgba(255, 255, 255, 0.98);
+        --loading-text-light: #000;
+    }
+    
+    .loading-spinner::before {
+        border-width: 4px;
+    }
+}
+
+/* Print Styles (Hide loading) */
+@media print {
+    .loading-container {
+        display: none !important;
+    }
+}

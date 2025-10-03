@@ -1,18 +1,23 @@
+import {Notification} from "./notification.js";
 export class UltimateModal {
 
     constructor() {
         this.elements = {
             modal: document.getElementById('imageModal'),
+            modalContainer: document.querySelector('.modal-container'),
+            openModalBtn: document.getElementById('modal_open'),
             modalImage: document.querySelector('.modal-image'),
             modalVideo: document.querySelector('.modal-video'),
             profileImage: document.querySelector('#profile_pic'),
             profileImageContainer: document.querySelector('#profile_image'),
             closeButton: document.querySelector('.modal-close'),
+            maximizeModalBtn: document.querySelector('.modal-maximize'),
             prevButton: document.querySelector('.modal-prev'),
             nextButton: document.querySelector('.modal-next'),
             counter: document.querySelector('.modal-counter'),
             thumbnails: document.querySelectorAll('.photo-thumbnail'),
-            socialLinks: document.querySelectorAll('.modal-social a')
+            socialLinks: document.querySelectorAll('.modal-social a'),
+            profile_pic: document.querySelector('.image-container'),
         };
 
         this.state = {
@@ -20,13 +25,85 @@ export class UltimateModal {
             images: [],
             videos: [],
             isZoomed: false,
+            isZoomPanSetup :false,
+            isMaximized:  false,
+            isFullscreen: false,
             transitionStyle: 'slide-up', // Can be 'zoom-in', 'fade-in', or 'slide-up'
             panStart: { x: 0, y: 0 },
             panOffset: { x: 0, y: 0 }
         };
+
+        this.hammer = null;
+        this.initHammerWhenReady();
     }
+
      init() {
         this.generateGallery();
+    }
+
+     initHammerWhenReady() {
+        if (typeof Hammer === 'undefined') {
+            console.warn('Hammer.js not available. Touch gestures will be disabled.');
+            return;
+        }
+
+        // Wait for modal container to be available
+        const checkContainer = () => {
+            if (this.elements.modalContainer) {
+                this.setupHammer();
+            } else {
+                setTimeout(checkContainer, 100);
+            }
+        };
+        
+        checkContainer();
+    }
+    
+     setupHammer() {
+        try {
+            this.hammer = new Hammer(this.elements.modalContainer);
+            
+            this.hammer.get('swipe').set({ 
+                direction: Hammer.DIRECTION_ALL,
+                threshold: 10,
+                velocity: 0.3
+            });
+            
+            this.hammer.get('pinch').set({ enable: true });
+            this.hammer.get('pan').set({ direction: Hammer.DIRECTION_ALL });
+            
+            // Set up event handlers
+            this.hammer.on('swipeleft', (event) => {
+                event.preventDefault();
+                this.navigate(1);
+            });
+            
+            this.hammer.on('swiperight', (event) => {
+                event.preventDefault();
+                this.navigate(-1);
+            });
+            
+            this.hammer.on('swipeup', (event) => {
+                event.preventDefault();
+                this.closeModal();
+            });
+            
+            this.hammer.on('swipedown', (event) => {
+                event.preventDefault();
+                this.closeModal();
+            });
+            
+            
+            this.hammer.on('doubletap', (event) => {
+                event.preventDefault();
+                this.toggleFullscreen();
+            });
+
+            this.setupHammerForZoomPan();
+                        
+        } catch (error) {
+            console.error('Failed to initialize Hammer.js:', error);
+        }
     }
 
     cacheImages() {
@@ -35,10 +112,11 @@ export class UltimateModal {
             src: thumb.querySelector('img').src,
             alt: thumb.querySelector('img').alt
         }));
-        this.state.videos = [{src:'vid1.mp4'},
-                            {src:'vid2.mp4'},
-                            {src:'vid3.mp4'}];
-
+        this.state.videos = [
+            { src: 'vid1.mp4' },
+            { src: 'vid2.mp4' },
+            { src: 'vid3.mp4' }
+        ];
     }
 
     setupEventListeners() {
@@ -46,17 +124,26 @@ export class UltimateModal {
         this.elements.thumbnails.forEach((thumb, index) => {
             thumb.addEventListener('click', () => this.openModal(index));
         });
-        const {length: profile_index} = this.elements.thumbnails;
+        
+        const { length: profile_index } = this.elements.thumbnails;
         this.elements.profileImage.addEventListener('click', () => this.openModal(profile_index));
+
+        this.elements.maximizeModalBtn.addEventListener('click', () => this.toggleMaximize());
+        this.elements.openModalBtn.addEventListener('click', () => this.openModal(0));
 
         // Modal controls
         this.elements.closeButton.addEventListener('click', () => this.closeModal());
         this.elements.prevButton.addEventListener('click', () => this.navigate(-1));
         this.elements.nextButton.addEventListener('click', () => this.navigate(1));
 
+        // Remove the conflicting swipe event listener
+        // this.elements.modalContainer.addEventListener('swipe', () => this.closeModal());
+
+        this.elements.profile_pic.addEventListener('click', () => this.HTU());
+        
         // Keyboard navigation
         document.addEventListener('keydown', (e) => {
-            if (!this.elements.modal.open) return;
+            if (!this.elements.modal.classList.contains('active')) return;
 
             switch(e.key) {
                 case 'Escape':
@@ -68,66 +155,20 @@ export class UltimateModal {
                 case 'ArrowRight':
                     this.navigate(1);
                     break;
+                case 'f':
+                case 'F':
+                    this.toggleFullscreen();
+                    break;
             }
         });
 
-        // Zoom/Pan functionality
-        this.elements.modalImage.addEventListener('click', (e) => {
-            if (this.state.isZoomed) {
-                this.resetZoom();
-            } else {
-                // Only zoom if not clicking on navigation areas
-                const rect = this.elements.modalImage.getBoundingClientRect();
-                const clickX = e.clientX - rect.left;
-                const clickY = e.clientY - rect.top;
+        this.setupZoomPanFunctionality();
 
-                // Check if click is within central area (not near edges)
-                if (clickX > 50 && clickX < rect.width - 50 &&
-                    clickY > 50 && clickY < rect.height - 50) {
-                    this.zoomImage(e);
-                }
-            }
-        });
 
-        // Pan functionality
-        this.elements.modalImage.addEventListener('mousedown', (e) => {
-            if (this.state.isZoomed) {
-                this.startPan(e);
-            }
-        });
-
-        document.addEventListener('mousemove', (e) => {
-            if (this.state.isZoomed) {
-                this.panImage(e);
-            }
-        });
-
-        document.addEventListener('mouseup', () => {
-            if (this.state.isZoomed) {
-                this.endPan();
-            }
-        });
-
-        // Touch events
-        this.elements.modalImage.addEventListener('touchstart', (e) => {
-            if (e.touches.length === 1 && this.state.isZoomed) {
-                e.preventDefault();
-                this.startPan(e.touches[0]);
-            }
-        }, { passive: false });
-
-        document.addEventListener('touchmove', (e) => {
-            if (e.touches.length === 1 && this.state.isZoomed) {
-                e.preventDefault();
-                this.panImage(e.touches[0]);
-            }
-        }, { passive: false });
-
-        document.addEventListener('touchend', () => {
-            if (this.state.isZoomed) {
-                this.endPan();
-            }
-        }, { passive: true });
+        // Handle fullscreen change events
+        document.addEventListener('fullscreenchange', ()=> this.handleFullscreenChange());
+        document.addEventListener('webkitfullscreenchange',()=> this.handleFullscreenChange());
+        document.addEventListener('msfullscreenchange',()=> this.handleFullscreenChange());
 
     }
 
@@ -143,23 +184,92 @@ export class UltimateModal {
     openModal(index) {
         this.state.currentIndex = index;
         this.updateModalContent();
-        this.elements.modal.showModal();
         document.body.style.overflow = 'hidden';
         this.elements.modal.classList.add('active');
-        this.resetZoom();
         this.activeThumbnail();
+        
+        // Re-initialize Hammer if needed when modal opens
+        if (!this.hammer && typeof Hammer !== 'undefined') {
+            this.setupHammer();
+        }
+        this.resetZoom();
+        this.resetMaximizeButton();
+        if (!this.state.isZoomPanSetup){
+            this.setupZoomPanFunctionality();
+        }
     }
 
     closeModal() {
-        this.elements.modal.close();
+        if (this.state.isFullscreen) {
+            this.exitFullscreen();
+        }
         document.body.style.overflow = '';
-        if (!this.elements.modalVideo.hidden) {this.elements.modalVideo.pause()}
+        if (!this.elements.modalVideo.hidden) { 
+            this.elements.modalVideo.pause(); 
+        }
         this.elements.modal.classList.remove('active');
         this.elements.thumbnails[this.state.currentIndex].classList.remove('active');
     }
 
+    toggleMaximize() {
+        if (this.state.isMaximized) {
+            this.elements.modal.classList.remove('fullscreen');
+            this.elements.maximizeModalBtn.innerHTML = '<i class="fas fa-expand"></i>';
+            this.elements.maximizeModalBtn.setAttribute('aria-label', 'Maximize modal');
+            if (this.state.isFullscreen) {
+                this.exitFullscreen();
+            }
+        } else {
+            this.elements.modal.classList.add('fullscreen');
+            this.elements.maximizeModalBtn.innerHTML = '<i class="fas fa-compress"></i>';
+            this.elements.maximizeModalBtn.setAttribute('aria-label', 'Minimize modal');
+        }
+        //this.toggleFullscreen();
+        this.state.isMaximized = !this.state.isMaximized;
+    }
+
+    HTU(){
+        new Notification().setupEventListeners().toggleViewDetails(false).showNotification('info', {
+            title: '📖 How to Use This Gallery',
+            message: `
+            <div style="line-height: 1.6;">
+                <p>Welcome to the image gallery! Here's how to navigate:</p>
+                <ul style="margin: 10px 0; padding-left: 20px;">
+                    <li>🖱️ <strong>Click</strong> on any thumbnail to open the image viewer</li>
+                    <li>⬅️ ➡️ Use <strong>arrow keys</strong> or navigation buttons to browse images</li>
+                    <li>🔍 <strong>Click</strong> on an open image to zoom in/out</li>
+                    <li>👆 <strong>Drag</strong> to pan around zoomed images</li>
+                    <li>📱 Use <strong>social media icons</strong> to share images</li>
+                    <li>🖼️ Press <strong>'F'</strong> or use the maximize button for fullscreen</li>
+                    <li>❌ Press <strong>ESC</strong> or click the X to close the viewer</li>
+                    <li>👆 <strong>click</strong> outside a box to create an emoji <strong>press and hold</strong> make the emoji bigger</li>
+                    <li>📷 Click the profile image anytime to see these instructions again</li>
+                </ul>
+                <p style="margin-top: 10px; font-style: italic;">Enjoy exploring this page 🥰💕💘!</p>
+            </div>
+        `,
+            icon: 'fas fa-info-circle',
+            useHTML: true,
+            autoCloseTime: 15000, // Show for 15 seconds instead of 20
+        });
+    }
+
+    setupZoomPanFunctionality() {  
+        if (this.state.isZoomPanSetup) return;
+        this.setupMouseZoomPan();
+        this.setupTouchZoomPan();
+        this.state.isZoomPanSetup = true;
+    }
+
+    resetMaximizeButton() {
+        this.state.isMaximized = false;
+        this.elements.maximizeModalBtn.innerHTML = '<i class="fas fa-expand"></i>';
+        this.elements.maximizeModalBtn.setAttribute('aria-label', 'Maximize modal');
+    }
+
     navigate(direction) {
-        this.resetZoom();
+
+        if (!this.elements.modalVideo.hidden) {this.elements.modalVideo.pause()}
         this.state.currentIndex += direction;
 
         // Circular navigation
@@ -168,7 +278,6 @@ export class UltimateModal {
         } else if (this.state.currentIndex >= this.state.images.length) {
             this.state.currentIndex = 0;
         }
-
         this.updateModalContent();
         this.animateTransition(direction);
     }
@@ -200,6 +309,63 @@ export class UltimateModal {
         const thumbnail = this.elements.thumbnails[this.state.currentIndex];
         if (thumbnail) {
             thumbnail.classList.add('active');
+        }
+    }
+
+    toggleFullscreen(){
+        if (!this.state.isFullscreen) {
+            this.enterFullscreen();
+        }else{
+            this.exitFullscreen()
+        }
+    }
+
+    enterFullscreen() {
+        if (this.elements.modalContainer.requestFullscreen) {
+            this.elements.modalContainer.requestFullscreen();
+        } else if (this.elements.modalContainer.webkitRequestFullscreen) {
+            this.elements.modalContainer.webkitRequestFullscreen();
+        } else if (this.elements.modalContainer.msRequestFullscreen) {
+            this.elements.modalContainer.msRequestFullscreen();
+        }
+
+        this.state.isFullscreen = true;
+        this.elements.maximizeModalBtn.innerHTML = '<i class="fas fa-compress"></i>';
+        this.elements.maximizeModalBtn.setAttribute('aria-label', 'Exit fullscreen');
+
+        // Add a class for custom fullscreen styling
+        this.elements.modal.classList.add('fullscreen');
+    }
+
+    // Exit fullscreen
+     exitFullscreen() {
+        if (document.exitFullscreen) {
+            document.exitFullscreen();
+        } else if (document.webkitExitFullscreen) {
+            document.webkitExitFullscreen();
+        } else if (document.msExitFullscreen) {
+            document.msExitFullscreen();
+        }
+
+        this.state.isFullscreen = false;
+        this.elements.maximizeModalBtn.innerHTML = '<i class="fas fa-expand"></i>';
+        this.elements.maximizeModalBtn.setAttribute('aria-label', 'Enter fullscreen');
+
+        // Remove the custom fullscreen styling
+        this.elements.modal.classList.remove('fullscreen');
+    }
+
+    handleFullscreenChange() {
+        const fullscreenElement = document.fullscreenElement ||
+            document.webkitFullscreenElement ||
+            document.msFullscreenElement;
+
+        if (!fullscreenElement) {
+            // We exited fullscreen
+            this.state.isFullscreen = false;
+            this.elements.maximizeModalBtn.innerHTML = '<i class="fas fa-expand"></i>';
+            this.elements.maximizeModalBtn.setAttribute('aria-label', 'Enter fullscreen');
+            this.elements.modal.classList.remove('fullscreen');
         }
     }
 
@@ -274,37 +440,121 @@ export class UltimateModal {
         }
     }
 
-    zoomImage(e) {
-        if (this.state.isZoomed) return;
+    setupHammerForZoomPan() {
+        if (!this.hammer) return;
+        
+        // Pinch to zoom
+        this.hammer.get('pinch').set({ enable: true });
+        this.hammer.on('pinchstart pinchmove', (e) => {
+            if (!this.elements.modalImage.hidden) {
+                e.preventDefault();
+                this.handlePinch(e);
+            }
+        });
+        
+        this.hammer.on('pinchend', () => {
+            this.finalizeZoom();
+        });
+    }
 
-        this.state.isZoomed = true;
-        this.elements.modalImage.classList.add('zoomed');
+    setupMouseZoomPan() {
+        // Mouse zoom
+        this.elements.modalImage.addEventListener('dblclick', (e) => {
+            if (this.state.isZoomed) {
+                this.resetZoom();
+            } else {
+                this.zoomImage(e);
+            }
+        });
 
-        // Center zoom on click position if possible
+        // Mouse pan
+        this.elements.modalImage.addEventListener('mousedown', (e) => {
+            if (this.state.isZoomed) {
+                this.startPan(e);
+                document.addEventListener('mousemove', this.boundPanImage);
+                document.addEventListener('mouseup', this.boundEndPan);
+            }
+        });
+        
+        // Store bound functions for removal
+        this.boundPanImage = (e) => this.panImage(e);
+        this.boundEndPan = () => this.endPan();
+    }
+
+    setupTouchZoomPan() {
+        // Touch pan (for single finger, Hammer handles multi-touch)
+        this.elements.modalImage.addEventListener('touchstart', (e) => {
+            if (this.state.isZoomed && e.touches.length === 1) {
+                e.preventDefault();
+                this.startPan(e.touches[0]);
+            }
+        }, { passive: false });
+    }
+
+    handlePinch(e) {
+        if (e.type === 'pinchstart') {
+            this.state.pinchStart = {
+                scale: this.state.currentScale || 1,
+                centerX: e.center.x,
+                centerY: e.center.y
+            };
+            this.elements.modalImage.style.transition = 'none';
+        }
+        
+        const newScale = this.state.pinchStart.scale * e.scale;
+        this.state.currentScale = Math.max(1, Math.min(newScale, 5)); // Limit scale 1x to 5x
+        
+        // Calculate pan offset to zoom toward pinch center
         const rect = this.elements.modalImage.getBoundingClientRect();
-        const clickX = e.clientX - rect.left;
-        const clickY = e.clientY - rect.top;
-
-        // Calculate initial pan offset to center the click point
-        this.state.panOffset = {
-            x: (rect.width / 2 - clickX) * 2,
-            y: (rect.height / 2 - clickY) * 2
-        };
-
+        const centerX = e.center.x - rect.left;
+        const centerY = e.center.y - rect.top;
+        
+        this.state.panOffset.x = centerX - (centerX - this.state.panOffset.x) * (newScale / (this.state.currentScale || 1));
+        this.state.panOffset.y = centerY - (centerY - this.state.panOffset.y) * (newScale / (this.state.currentScale || 1));
+        
         this.updateImageTransform();
     }
 
-    resetZoom() {
-        if (!this.state.isZoomed) return;
+    finalizeZoom() {
+        if (this.state.currentScale <= 1.1) {
+            this.resetZoom();
+        } else {
+            this.state.isZoomed = true;
+            this.constrainPanning(); // Ensure we're within bounds
+        }
+        this.elements.modalImage.style.transition = 'transform 0.2s ease';
+    }
 
+    zoomImage(e) {
+        this.state.isZoomed = true;
+        this.state.currentScale = 2; // Default zoom level
+        
+        const rect = this.elements.modalImage.getBoundingClientRect();
+        const clickX = e.clientX - rect.left;
+        const clickY = e.clientY - rect.top;
+        
+        // Center zoom on click position
+        this.state.panOffset = {
+            x: (rect.width / 2 - clickX) * (this.state.currentScale / 1),
+            y: (rect.height / 2 - clickY) * (this.state.currentScale / 1)
+        };
+        
+        this.elements.modalImage.classList.add('zoomed');
+        this.updateImageTransform();
+        this.constrainPanning(); // Immediately constrain after zoom
+    }
+
+    resetZoom() {
         this.state.isZoomed = false;
+        this.state.currentScale = 1;
         this.elements.modalImage.classList.remove('zoomed');
         this.state.panOffset = { x: 0, y: 0 };
-        this.elements.modalImage.style.transition = 'transform 0.25s ease';
-        setTimeout(() => {
-            this.elements.modalImage.style.transition = 'none';
-        }, 300);
+        this.elements.modalImage.style.transition = 'transform 0.3s ease';
         this.updateImageTransform();
+        
+        setTimeout(() => {
+            this.elements.modalImage.style.transition = '';
+        }, 300);
     }
 
     startPan(e) {
@@ -317,48 +567,60 @@ export class UltimateModal {
     }
 
     panImage(e) {
-        if (!this.state.isZoomed) return;
-
-        this.elements.modalImage.style.cursor = 'grab';
-        this.elements.modalImage.style.transition = 'transform 0.25s ease'; // smooth after pan
-
+        this.elements.modalImage.style.cursor = 'grabbing';
+        
         this.state.panOffset = {
             x: e.clientX - this.state.panStart.x,
             y: e.clientY - this.state.panStart.y
         };
-
+        
+        this.constrainPanning(); // Constrain during pan, not just at end
         this.updateImageTransform();
     }
 
     endPan() {
-        if (!this.state.isZoomed) return;
-
         this.elements.modalImage.style.cursor = 'grab';
-        this.elements.modalImage.style.transition = 'transform 0.25s ease';
+        this.elements.modalImage.style.transition = 'transform 0.2s ease';
+        this.constrainPanning(); // Final constraint
+        
+        document.removeEventListener('mousemove', this.boundPanImage);
+        document.removeEventListener('mouseup', this.boundEndPan);
+    }
 
-        // Constrain panning to image edges
+    constrainPanning() {
+        if (!this.state.isZoomed) return;
+        
         const img = this.elements.modalImage;
-        const naturalWidth = img.naturalWidth;
-        const naturalHeight = img.naturalHeight;
-        const scale = 2;
-
+        const scale = this.state.currentScale;
         const containerWidth = img.clientWidth;
         const containerHeight = img.clientHeight;
-
-        // Max panning distance (image width/height * scale / 2)
-        const maxX = (naturalWidth * scale - containerWidth) / 2;
-        const maxY = (naturalHeight * scale - containerHeight) / 2;
-
-        this.state.panOffset.x = Math.max(-maxX, Math.min(maxX, this.state.panOffset.x));
-        this.state.panOffset.y = Math.max(-maxY, Math.min(maxY, this.state.panOffset.y));
-
+        
+        // Calculate max pan based on current scale
+        const maxX = Math.max(0, (containerWidth * scale - containerWidth) / 2);
+        const maxY = Math.max(0, (containerHeight * scale - containerHeight) / 2);
+        
+        // Constrain panning with easing at edges
+        this.state.panOffset.x = this.easeConstraint(this.state.panOffset.x, -maxX, maxX);
+        this.state.panOffset.y = this.easeConstraint(this.state.panOffset.y, -maxY, maxY);
+        
         this.updateImageTransform();
     }
 
+    easeConstraint(value, min, max) {
+        if (value < min) {
+            // Ease when pulling beyond left/top edge
+            return min - (1 - Math.exp(-0.1 * (min - value)));
+        } else if (value > max) {
+            // Ease when pulling beyond right/bottom edge
+            return max + (1 - Math.exp(-0.1 * (value - max)));
+        }
+        return value;
+    }
+
     updateImageTransform() {
-        this.elements.modalImage.style.transform = this.state.isZoomed
-            ? `scale(2) translate(${this.state.panOffset.x}px, ${this.state.panOffset.y}px)`
-            : 'scale(1) translate(0, 0)';
+        const scale = this.state.currentScale || 1;
+        this.elements.modalImage.style.transform = 
+            `scale(${scale}) translate(${this.state.panOffset.x}px, ${this.state.panOffset.y}px)`;
     }
 
     handleSocialShare(link) {
@@ -414,7 +676,7 @@ export class UltimateModal {
 
     async loadImageData(){
         try {
-            const response = await fetch('\imagesDIR.json');
+            const response = await fetch('public/imagesDIR.json');
             if (!response.ok) {
                 throw new Error('Network response was not ok');
             }

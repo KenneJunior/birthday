@@ -1,0 +1,246 @@
+<!DOCTYPE html>
+<html lang="en" class="no-js">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Beautiful interactive gradient experience with animated background">
+    <meta name="keywords" content="interactive, gradient, animation, web design, creative">
+    <meta name="author" content="Junior">
+    <meta name="theme-color" content="#08100F">
+
+    <!-- Open Graph / Social Media -->
+    <meta property="og:title" content="Interactive Greeting Experience">
+    <meta property="og:description" content="A beautiful interactive greeting with animated gradient background">
+    <meta property="og:type" content="website">
+    <meta property="og:image" content="https://example.com/preview.jpg">
+    
+
+    <title>Interactive Greeting | Creative Experience</title>
+
+    <!-- Preload critical resources -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="preload" href="https://fonts.googleapis.com/css?family=Montserrat:400,700&display=swap" as="style" onload="this.onload=null;this.rel='stylesheet'">
+    <noscript>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Montserrat:400,700&display=swap">
+    </noscript>
+    <!-- CSS -->
+    <link rel="stylesheet" href="../src/Date/date.css">
+    <!-- Favicon & App Icons -->
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>✨</text></svg>">
+    <link rel="apple-touch-icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>✨</text></svg>">
+    <link rel="manifest" href="manifest.json">
+    <link rel = "stylesheet" href="../src/loading.css"/>
+
+
+    <!-- Structured Data -->
+    <script type="application/ld+json">
+        {
+            "@context": "https://schema.org",
+            "@type": "CreativeWork",
+            "name": "Interactive Greeting Experience",
+            "description": "A beautiful interactive greeting with animated gradient background",
+            "author": {
+                "@type": "Person",
+                "name": "Junior"
+            },
+            "creator": {
+                "@type": "Person",
+                "name": "Junior"
+            }
+        }
+    </script>
+</head>
+<body>
+    <div class="loading-container" id="loading">
+    <div class="loading-spinner">
+        <div class="loading-spinner-inner"></div>
+    </div>
+    <div class="loading-text">
+        Verifying access
+        <span class="loading-dots">
+            <span></span>
+            <span></span>
+            <span></span>
+        </span>
+    </div>
+</div>
+  
+
+<!-- Custom cursor for enhanced experience -->
+<div class="cursor-follower" aria-hidden="true">
+    <div class="cursor-inner"></div>
+    <div class="cursor-outer"></div>
+</div>
+
+
+<!-- Main content -->
+<main id="main-content" class="main-content" id="protectedContent" role="main">
+    <article class="card" role="article" aria-labelledby="greeting-heading">
+        <div class="card-inner">
+            <!-- Visual effects -->
+            <div class="card-effects">
+                <svg viewBox="0 0 100% 100%" xmlns='http://www.w3.org/2000/svg' class="noise" aria-hidden="true">
+                    <filter id='noiseFilter'>
+                        <feTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='6' stitchTiles='stitch' />
+                    </filter>
+                    <rect width='100%' height='100%' preserveAspectRatio="xMidYMid meet" filter='url(#noiseFilter)' />
+                </svg>
+                <div class="card-shine" aria-hidden="true"></div>
+                <div class="card-glare" aria-hidden="true"></div>
+            </div>
+
+            <!-- Content section -->
+            <div class="content">
+                <header class="content-header">
+                    <h1 id="greeting-heading" class="greeting-title">
+                        <span class="title-word">Hello Princess</span>
+                        <span class="title-punctuation">!</span>
+                    </h1>
+                    <div class="decoration-line" aria-hidden="true"></div>
+                </header>
+
+                <div class="message-content">
+                    <p class="message-text">
+                    Okay… so here’s the thing. I don’t want to mess up what we already have by letting my crazy thoughts take over. 😅<br>
+                        But let’s be real what you’re already guessing is exactly what I’m about to say. 🙈<br>
+                        you can hit that Continue button and see the question that’s been making my heart race lately. 💕
+                </div>
+
+                <footer class="content-footer">
+                    <div class="interaction-buttons">
+                        <button class="cta-button primary" onclick="window.location.href='missus/fhav.html'" id = "continue" aria-label="Continue to next experience">
+                            <span class="button-text" >Continue</span>
+                            <span class="button-icon" aria-hidden="true">
+                                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                        <path d="M5 12H19M19 12L12 5M19 12L12 19" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                                    </svg>
+                                </span>
+                            </a>
+                        </button>
+                        <button class="cta-button primary" onclick="window.history.back()" aria-label="Turn back to the home page">
+                                <span class="button-text" >Turn Back</span>
+                                <span class="button-icon" aria-hidden="true">
+                                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                        <path d="M5 12H19M19 12L12 5M19 12L12 19" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                                    </svg>
+                                </span>
+                            </a>
+                        </button>
+
+                    </div>
+
+                    <div class="social-links" aria-label="Social media links">
+                        <a href="#" class="social-link" aria-label="Twitter profile">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                <path d="M23 3.01006C22.0424 3.68553 20.9821 4.20217 19.86 4.54006C19.2577 3.84757 18.4573 3.35675 17.567 3.13398C16.6767 2.91122 15.7395 2.96725 14.8821 3.29451C14.0247 3.62177 13.2884 4.20446 12.773 4.96377C12.2575 5.72309 11.9877 6.62239 12 7.54006V8.54006C10.2426 8.58562 8.50127 8.19587 6.93101 7.4055C5.36074 6.61513 4.01032 5.44869 3 4.01006C3 4.01006 -1 13.0101 8 17.0101C5.94053 18.408 3.48716 19.109 1 19.0101C10 24.0101 21 19.0101 21 7.51006C20.9991 7.23151 20.9723 6.95365 20.92 6.68006C21.9406 5.67355 22.6608 4.40277 23 3.01006Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                            </svg>
+                        </a>
+                        <a href="#" class="social-link" aria-label="GitHub profile">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                <path d="M9 19C4 20.5 4 16.5 2 16M16 22V18.13C16.0375 17.6532 15.9731 17.1738 15.811 16.7238C15.6489 16.2738 15.3929 15.8634 15.06 15.52C18.2 15.17 21.5 13.98 21.5 8.52C21.4997 7.12383 20.9627 5.7812 20 4.77C20.4559 3.54851 20.4236 2.19835 19.91 1C19.91 1 18.73 0.65 16 2.48C13.708 1.85882 11.292 1.85882 9 2.48C6.27 0.65 5.09 1 5.09 1C4.57638 2.19835 4.54414 3.54851 5 4.77C4.03013 5.7887 3.49252 7.14346 3.5 8.55C3.5 13.97 6.8 15.16 9.94 15.55C9.611 15.89 9.35726 16.2954 9.19531 16.7399C9.03335 17.1844 8.96681 17.6581 9 18.13V22" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                            </svg>
+                        </a>
+                        <a href="#" class="social-link" aria-label="LinkedIn profile">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                <path d="M16 8C17.5913 8 19.1174 8.63214 20.2426 9.75736C21.3679 10.8826 22 12.4087 22 14V21H18V14C18 13.4696 17.7893 12.9609 17.4142 12.5858C17.0391 12.2107 16.5304 12 16 12C15.4696 12 14.9609 12.2107 14.5858 12.5858C14.2107 12.9609 14 13.4696 14 14V21H10V14C10 12.4087 10.6321 10.8826 11.7574 9.75736C12.8826 8.63214 14.4087 8 16 8Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                                <path d="M6 9H2V21H6V9Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                                <path d="M4 6C5.10457 6 6 5.10457 6 4C6 2.89543 5.10457 2 4 2C2.89543 2 2 2.89543 2 4C2 5.10457 2.89543 6 4 6Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                            </svg>
+                        </a>
+                    </div>
+                </footer>
+            </div>
+        </div>
+    </article>
+</main>
+
+<!-- Background section -->
+<div class="gradient-bg" aria-hidden="true">
+    <!-- Background noise effect -->
+    <svg viewBox="0 0 100vw 100vw" xmlns='http://www.w3.org/2000/svg' class="noiseBg">
+        <filter id='noiseFilterBg'>
+            <feTurbulence type='fractalNoise' baseFrequency='0.6' stitchTiles='stitch' />
+        </filter>
+        <rect width='100%' height='100%' preserveAspectRatio="xMidYMid meet" filter='url(#noiseFilterBg)' />
+    </svg>
+
+    <!-- SVG filter for gooey effect -->
+    <svg xmlns="http://www.w3.org/2000/svg" class="svgBlur">
+        <defs>
+            <filter id="goo">
+                <feGaussianBlur in="SourceGraphic" stdDeviation="10" result="blur" />
+                <feColorMatrix in="blur" mode="matrix" values="1 0 0 0 0  0 1 0 0 0  0 0 1 0 0  0 0 0 18 -8" result="goo" />
+                <feBlend in="SourceGraphic" in2="goo" />
+            </filter>
+        </defs>
+    </svg>
+
+    <!-- Gradient containers -->
+    <div class="gradients-container">
+        <div class="g1" role="presentation"></div>
+        <div class="g2" role="presentation"></div>
+        <div class="g3" role="presentation"></div>
+        <div class="g4" role="presentation"></div>
+        <div class="g5" role="presentation"></div>
+        <div class="interactive" role="presentation"></div>
+    </div>
+</div>
+
+<!-- Particle effects container -->
+<div class="particles-container" aria-hidden="true">
+    <canvas id="particles-canvas" role="presentation"></canvas>
+</div>
+<!-- Audio element for optional sound effects -->
+<audio id="hover-sound" preload="auto">
+    <source src="public/public_Ruth-B_-Dandelions-(TopGhanaMusic.Com).mp3" type="audio/mpeg">
+</audio>
+
+<!-- JavaScript -->
+<script src="../src/Date/date.js"></script>
+<script src="../auth-check.js"></script> 
+
+  <script>
+    // Loading screen management
+async function initializeProtectedPage() {
+    showLoading();
+    
+    try {
+        const authResult = await setupAuthProtection();
+        if (authResult.authenticated) {
+            // Hide loading with smooth transition
+            setTimeout(hideLoading, 500);
+            initializePageContent();
+        }
+    } catch (error) {
+        hideLoading();
+        console.error('Authentication failed:', error);
+        window.location.href = '/login';
+    }
+}
+
+function initializePageContent() {
+    console.log('Protected content loaded successfully');
+        document.querySelectorAll('button, input').forEach(element => {
+        element.disabled = false;
+    });
+}
+if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', initializeProtectedPage);
+} else {
+    initializeProtectedPage();
+}
+  </script>
+<script>
+    // Remove no-js class and add js class
+    document.documentElement.classList.remove('no-js');
+    document.documentElement.classList.add('js');
+
+    // Initialize theme based on user preference
+    if (localStorage.getItem('theme') === 'dark' ||
+        (window.matchMedia('(prefers-color-scheme: dark)').matches && !localStorage.getItem('theme'))) {
+        document.documentElement.setAttribute('data-theme', 'dark');
+    }
+</script>
+</body>
+</html>

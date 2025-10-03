@@ -1,39 +1,43 @@
 {
   "images": [
     {
-      "src": "/img1.jpg",
+      "src": "public/img1.jpg",
       "alt": "Happy memory 1"
     },
     {
-      "src": "/img2.jpg",
+      "src": "public/img2.jpg",
       "alt": "Happy memory 2"
     },
     {
-      "src": "/img3.jpg",
+      "src": "public/img3.jpg",
       "alt": "Happy memory 3"
     },
     {
-      "src": "/img4.jpg",
+      "src": "public/img4.jpg",
       "alt": "Happy memory 4"
     },
     {
-      "src": "/img5.jpg",
+      "src": "public/img5.jpg",
       "alt": "Happy memory 5"
     },
     {
-      "src": "profile_pic.jpg",
+        "src": "public/tata.jpg",
+        "alt": "Happy memory 5"
+    },
+    {
+      "src": "public/profile_pic.jpg",
       "alt": "Happy memory 5"
     },
     {
-      "src": "/img6.PNG",
+      "src": "public/img6.PNG",
       "alt": "Happy memory 6"
     },
     {
-      "src": "/img7.PNG",
+      "src": "public/img7.PNG",
       "alt": "Happy memory 7"
     },
     {
-      "src": "/img8.PNG",
+      "src": "public/img8.PNG",
       "alt": "Happy memory 8"
     }
   ]
