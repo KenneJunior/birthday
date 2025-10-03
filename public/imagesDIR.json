@@ -1,44 +1,64 @@
 {
-  "images": [
+  "media": [
     {
-      "src": "public/img1.jpg",
-      "alt": "Happy memory 1"
+      "src": "public/pics/img1.jpg",
+      "thumb": "public/pics/thumbnails/img1.jpg",
+      "alt": "Proud Bamenda pikin 😅😅",
+      "data-type":"image"
     },
     {
-      "src": "public/img2.jpg",
-      "alt": "Happy memory 2"
+      "src": "public/pics/img2.jpg",
+      "thumb": "public/pics/thumbnails/img2.jpg",
+      "alt": "Miss Bamenda 😹😹",
+      "data-type":"image"
     },
     {
-      "src": "public/img3.jpg",
-      "alt": "Happy memory 3"
+      "src": "public/pics/img3.jpg",
+      "thumb": "public/pics/thumbnails/img3.jpg",
+      "alt": "andriod Generation and phone 🙃😆",
+      "data-type":"image"
     },
     {
-      "src": "public/img4.jpg",
-      "alt": "Happy memory 4"
+      "src": "public/pics/img4.jpg",
+      "thumb": "public/pics/thumbnails/img4.jpg",
+      "alt": "when you where learning how to ngess 🤣🤣",
+      "data-type":"image"
     },
     {
-      "src": "public/img5.jpg",
-      "alt": "Happy memory 5"
+      "src": "public/pics/img5.jpg",
+      "thumb": "public/pics/thumbnails/img5.jpg",
+      "alt": " smile smile smile 😁😊",
+      "data-type":"image"
     },
     {
-        "src": "public/tata.jpg",
-        "alt": "Happy memory 5"
+        "src": "public/pics/tata.jpg",
+        "thumb": "public/pics/thumbnails/tata.jpg",
+        "alt": "Happy memory 5",
+        "data-type":"image"
     },
     {
-      "src": "public/profile_pic.jpg",
-      "alt": "Happy memory 5"
+      "src": "public/pics/profile_pic.jpg",
+      "alt": "awwww wu is my princess 🤣🤣",
+      "data-type":"image",
+      "thumb": "public/pics/thumbnails/profile_pic.jpg"
     },
     {
-      "src": "public/img6.PNG",
-      "alt": "Happy memory 6"
+      "thumb": "public/pics/thumbnails/img6.PNG",
+      "alt": "Under sun adey, Under rain .... 🤣🤣",
+      "data-type":"video",
+      "video-src":"public/vid/video1.mp4"
     },
     {
-      "src": "public/img7.PNG",
-      "alt": "Happy memory 7"
+      "thumb": "public/pics/thumbnails/img7.PNG",
+      "alt": "fine child 😘😘",
+      "data-type":"video",
+      "video-src":"public/vid/video2.mp4"
     },
     {
-      "src": "public/img8.PNG",
-      "alt": "Happy memory 8"
+      "thumb": "public/pics/thumbnails/img8.PNG",
+      "alt": "Ok whats happening here 🤣🤣🤣",
+      "data-type":"video",
+      "video-src":"public/vid/video3.mp4"
     }
   ]
 }

@@ -48,9 +48,9 @@ const Auth0Manager = (() => {
    * @returns {Promise<Object>} Configuration object
    */
     const _fetchAuthConfig = async () => {
-        const response = await fetch('../auth_config.json');
+        const response = await fetch('public/auth_config.json');
         if (!response.ok) {
-        throw new Error(`Failed to fetch auth config: ${response.status}`);
+            throw new Error(`Failed to fetch auth config: ${response.status}`);
         }
         return response.json();
     };
@@ -84,7 +84,7 @@ const Auth0Manager = (() => {
             return true;
         } catch (error) {
             console.error('Auth0 initialization failed:', error);
-            PasswordManager.showNotification('Failed to initialize authentication system. Check your internet connection', 'error');
+            await PasswordManager.showNotification('Failed to initialize authentication system. Check your internet connection', 'warning');
             return false;
         }
     };
@@ -99,21 +99,21 @@ const Auth0Manager = (() => {
             });
         } catch (error) {
             console.error('Auth0 login failed:', error);
-            _showNotification('Authentication failed. Please try again.', 'error');
+            await PasswordManager.showNotification('Authentication failed. Please try again.', 'error');
         }
     };
 
     /**
      * Handle logout
      */
-    const logout = () => {
+    const logout = async () => {
         try {
             auth0.logout({
                 returnTo: Auth0Config.redirect_uri+'/logOut.html'
             });
         } catch (error) {
             console.error('Auth0 logout failed:', error);
-            _showNotification('LogOut failed. Please try again.', 'error');
+            await PasswordManager.showNotification('LogOut failed. Please try again.', 'error');
         }
     };
 

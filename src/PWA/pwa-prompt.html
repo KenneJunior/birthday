@@ -1,0 +1,267 @@
+<pwa-prompt id="pwa-prompt" class="pwa-prompt" role="dialog" aria-labelledby="pwa-prompt-title" aria-modal="true"
+            hidden>
+    <div class="pwa-prompt__backdrop" data-dismiss="pwa-prompt"></div>
+    <div class="pwa-prompt__container">
+        <!-- Header Section -->
+        <header class="pwa-prompt__header">
+            <div class="pwa-prompt__badge" aria-hidden="true">
+                <img src="../../public/icon/apple/svg/icon_96X96.svg" alt="The icon of the app" width="72" height="72">
+            </div>
+
+            <div class="pwa-prompt__title-group">
+                <h1 id="pwa-prompt-title" class="pwa-prompt__title">
+                    Install App
+                </h1>
+                <p class="pwa-prompt__subtitle">
+                    Get the full experience with your app
+                </p>
+            </div>
+        </header>
+
+        <!-- Platform-specific content will be injected here -->
+        <section class="pwa-prompt__content" id="pwa-prompt-content">
+            <!-- Content injected by JavaScript based on platform -->
+        </section>
+
+        <footer class="pwa-prompt__actions" id="pwa-prompt-actions">
+            <!-- Actions injected by JavaScript based on platform -->
+        </footer>
+        <!-- Close Button -->
+        <button type="button"
+                class="pwa-prompt__close"
+                data-dismiss="pwa-prompt"
+                aria-label="Close installation prompt">
+            <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
+                <path d="M15 5L5 15M5 5L15 15" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+            </svg>
+        </button>
+    </div>
+</pwa-prompt>
+<!-- Android PWA Prompt Template -->
+<template id="pwa-prompt-android-template">
+    <div class="pwa-prompt__content">
+        <div class="pwa-prompt__hero">
+            <div class="pwa-prompt__app-icon">
+                <img src="public/icon/andriod_svg/icon_96X96.svg" width="75" height="75" alt="The icon of the app">
+            </div>
+            <h3 class="pwa-prompt__app-name"></h3>
+            <p class="pwa-prompt__app-description">Install the app for better experience</p>
+        </div>
+        <div class="pwa-prompt__benefits">
+            <div class="benefits-grid">
+                <div class="benefit-item">
+                    <div class="benefit-icon">🚀</div>
+                    <div class="benefit-content">
+                        <h4>Fast Loading</h4>
+                        <p>Instant startup without browser delays</p>
+                    </div>
+                </div>
+                <div class="benefit-item">
+                    <div class="benefit-icon">📱</div>
+                    <div class="benefit-content">
+                        <h4>Home Screen Access</h4>
+                        <p>Quick launch like a native app</p>
+                    </div>
+                </div>
+                <div class="benefit-item">
+                    <div class="benefit-icon">🔒</div>
+                    <div class="benefit-content">
+                        <h4>Offline Ready</h4>
+                        <p>Works without internet connection</p>
+                    </div>
+                </div>
+                <div class="benefit-item">
+                    <div class="benefit-icon">📲</div>
+                    <div class="benefit-content">
+                        <h4>Push Notifications</h4>
+                        <p>Stay updated with important alerts</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="pwa-prompt__install-hint">
+            <div class="install-hint__content">
+                <svg class="install-hint__icon" viewBox="0 0 24 24" fill="none">
+                    <path d="M12 2C6.48 2 2 6.48 2 12C2 17.52 6.48 22 12 22C17.52 22 22 17.52 22 12C22 6.48 17.52 2 12 2ZM13 17H11V15H13V17ZM13 13H11V7H13V13Z" fill="currentColor"/>
+                </svg>
+                <p>Tap "Install" below to add this app to your home screen</p>
+            </div>
+        </div>
+    </div>
+</template>
+
+<!-- Android PWA Prompt Actions -->
+<template id="pwa-prompt-android-actions">
+    <button type="button" class="btn btn--secondary" data-action="remind-later">
+        <svg class="btn__icon" viewBox="0 0 16 16" fill="none">
+            <path d="M8 13C10.7614 13 13 10.7614 13 8C13 5.23858 10.7614 3 8 3C5.23858 3 3 5.23858 3 8C3 10.7614 5.23858 13 8 13Z" stroke="currentColor" stroke-width="1.5"/>
+            <path d="M8 5V8L10 10" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+        </svg>
+        <span class="btn__text">Maybe Later</span>
+    </button>
+    <button type="button" class="btn btn--primary" data-action="install">
+        <svg class="btn__icon" viewBox="0 0 16 16" fill="none">
+            <path d="M8 1V15M8 15L3 10M8 15L13 10" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+        <span class="btn__text">Install App</span>
+    </button>
+</template>
+
+<!-- Default PWA Prompt Template -->
+<template id="pwa-prompt-default-template">
+    <div class="pwa-prompt__content">
+        <div class="pwa-prompt__hero">
+            <div class="pwa-prompt__app-icon">
+                <img src="public/icon/andriod_svg/icon_96X96.svg" width="75" height="75" alt="The icon of the app">
+            </div>
+            <h3 class="pwa-prompt__app-name"></h3>
+            <p class="pwa-prompt__app-description">Add to your home screen for quick access</p>
+        </div>
+        <div class="pwa-prompt__universal-steps">
+            <h4 class="universal-steps__title">How to install:</h4>
+            <div class="browser-tips">
+                <div class="browser-tip" data-browser="chrome">
+                    <div class="browser-icon">🌐</div>
+                    <div class="browser-content">
+                        <h5>Chrome / Edge</h5>
+                        <p>Click <strong>⋮</strong> → "Install App" or "Add to Home Screen"</p>
+                    </div>
+                </div>
+                <div class="browser-tip" data-browser="firefox">
+                    <div class="browser-icon">🦊</div>
+                    <div class="browser-content">
+                        <h5>Firefox</h5>
+                        <p>Click <strong>☰</strong> → "Install" or "Add to Home Screen"</p>
+                    </div>
+                </div>
+                <div class="browser-tip" data-browser="safari">
+                    <div class="browser-icon">🧭</div>
+                    <div class="browser-content">
+                        <h5>Safari (Mac)</h5>
+                        <p>Click <strong>File</strong> → "Add to Dock" or "Add to Home Screen"</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="pwa-prompt__features">
+            <div class="features-grid">
+                <div class="feature-tag">
+                    <span class="feature-tag__icon">⚡</span>
+                    <span class="feature-tag__text">Fast</span>
+                </div>
+                <div class="feature-tag">
+                    <span class="feature-tag__icon">💾</span>
+                    <span class="feature-tag__text">Offline</span>
+                </div>
+                <div class="feature-tag">
+                    <span class="feature-tag__icon">🔔</span>
+                    <span class="feature-tag__text">Notifications</span>
+                </div>
+                <div class="feature-tag">
+                    <span class="feature-tag__icon">📱</span>
+                    <span class="feature-tag__text">App-like</span>
+                </div>
+            </div>
+        </div>
+    </div>
+</template>
+
+<!-- Default PWA Prompt Actions -->
+<template id="pwa-prompt-default-actions">
+    <button type="button" class="btn btn--secondary" data-action="remind-later">
+        <svg class="btn__icon" viewBox="0 0 16 16" fill="none">
+            <path d="M8 13C10.7614 13 13 10.7614 13 8C13 5.23858 10.7614 3 8 3C5.23858 3 3 5.23858 3 8C3 10.7614 5.23858 13 8 13Z" stroke="currentColor" stroke-width="1.5"/>
+            <path d="M8 5V8L10 10" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+        </svg>
+        <span class="btn__text">Not Now</span>
+    </button>
+    <button type="button" class="btn btn--primary" data-action="understand">
+        <svg class="btn__icon" viewBox="0 0 16 16" fill="none">
+            <path d="M13 5L6 12L3 9" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+        <span class="btn__text">Show Me How</span>
+    </button>
+</template>
+
+<!-- iOS PWA Prompt Template -->
+<template id="pwa-prompt-ios-template">
+    <div class="pwa-prompt__content">
+        <div class="pwa-content__steps">
+            <div class="step mt-3" data-step="1">
+                <div class="step__indicator">
+                    <span class="step__number">1</span>
+                    <div class="step__connector"></div>
+                </div>
+                <div class="step__content">
+                    <h3 class="step__title">Tap Share</h3>
+                    <p class="step__description">Open the share menu from your browser</p>
+                    <div class="step__visual">
+                        <div class="ios-share-button">
+                            <span class="ios-share-icon">
+                                <img src="public/icon/apple/svg/share-apple-com.svg" alt="apple share icon"
+                                     width="62"
+                                     height="62">
+                            </span>
+                            <div class="ios-ui-element">
+                                <div class="ios-ui-bar">
+                                    <div class="ios-ui-dot"></div>
+                                    <div class="ios-ui-dot"></div>
+                                    <div class="ios-ui-dot"></div>
+                                </div>
+                                <span class="ios-ui-text">Share</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="step" data-step="2">
+                <div class="step__indicator">
+                    <span class="step__number">2</span>
+                    <div class="step__connector"></div>
+                </div>
+                <div class="step__content">
+                    <h3 class="step__title">Add to Home Screen</h3>
+                    <p class="step__description">Scroll down and tap "Add to Home Screen"</p>
+                    <div class="step__visual">
+                        <div class="ios-menu-item">
+                            <div class="ios-menu-icon">＋</div>
+                            <div class="ios-menu-content">
+                                <div class="ios-menu-text">Add to Home Screen</div>
+                                <div class="ios-menu-subtitle">Install this website as an app</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="step" data-step="3">
+                <div class="step__indicator">
+                    <span class="step__number">3</span>
+                </div>
+                <div class="step__content">
+                    <h3 class="step__title">Confirm Installation</h3>
+                    <p class="step__description">Tap "Add" to complete the process</p>
+                    <div class="step__visual">
+                        <div class="ios-confirm-button">Add</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</template>
+
+<!-- iOS PWA Prompt Actions -->
+<template id="pwa-prompt-ios-actions">
+    <button type="button" class="btn btn--secondary" data-action="remind-later" aria-label="Remind me later">
+        <svg class="btn__icon" viewBox="0 0 16 16" fill="none">
+            <path d="M8 13C10.7614 13 13 10.7614 13 8C13 5.23858 10.7614 3 8 3C5.23858 3 3 5.23858 3 8C3 10.7614 5.23858 13 8 13Z" stroke="currentColor" stroke-width="1.5"/>
+            <path d="M8 5V8L10 10" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+        </svg>
+        <span class="btn__text">Remind Later</span>
+    </button>
+    <button type="button" class="btn btn--primary" data-action="understand" aria-label="I understand how to install">
+        <span class="btn__text">Got It!</span>
+        <svg class="btn__icon" viewBox="0 0 16 16" fill="none">
+            <path d="M13 5L6 12L3 9" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+    </button>
+</template>

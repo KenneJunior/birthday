@@ -1,4 +1,5 @@
 import {Notification} from "./notification.js";
+import Hammer from "hammerjs";
 export class UltimateModal {
 
     constructor() {
@@ -15,15 +16,13 @@ export class UltimateModal {
             prevButton: document.querySelector('.modal-prev'),
             nextButton: document.querySelector('.modal-next'),
             counter: document.querySelector('.modal-counter'),
-            thumbnails: document.querySelectorAll('.photo-thumbnail'),
             socialLinks: document.querySelectorAll('.modal-social a'),
             profile_pic: document.querySelector('.image-container'),
         };
 
         this.state = {
             currentIndex: 0,
-            images: [],
-            videos: [],
+            media: [],
             isZoomed: false,
             isZoomPanSetup :false,
             isMaximized:  false,
@@ -106,17 +105,14 @@ export class UltimateModal {
         }
     }
 
-    cacheImages() {
-        this.elements.thumbnails = document.querySelectorAll('.photo-thumbnail');
-        this.state.images = Array.from(this.elements.thumbnails).map(thumb => ({
-            src: thumb.querySelector('img').src,
-            alt: thumb.querySelector('img').alt
+    cacheImages(mediaData) {
+     this.elements.thumbnails = document.querySelectorAll('.photo-thumbnail');
+        this.state.media =mediaData.media.map(thumb => ({
+            src: thumb.src,
+            alt: thumb.alt,
+            data_type: thumb['data-type'],
+            vidSrc: thumb['video-src']
         }));
-        this.state.videos = [
-            { src: 'vid1.mp4' },
-            { src: 'vid2.mp4' },
-            { src: 'vid3.mp4' }
-        ];
     }
 
     setupEventListeners() {
@@ -183,11 +179,10 @@ export class UltimateModal {
 
     openModal(index) {
         this.state.currentIndex = index;
-        this.updateModalContent();
         document.body.style.overflow = 'hidden';
         this.elements.modal.classList.add('active');
-        this.activeThumbnail();
-        
+         this.updateModalContent();
+
         // Re-initialize Hammer if needed when modal opens
         if (!this.hammer && typeof Hammer !== 'undefined') {
             this.setupHammer();
@@ -274,8 +269,8 @@ export class UltimateModal {
 
         // Circular navigation
         if (this.state.currentIndex < 0) {
-            this.state.currentIndex = this.state.images.length - 1;
-        } else if (this.state.currentIndex >= this.state.images.length) {
+            this.state.currentIndex = this.state.media.length - 1;
+        } else if (this.state.currentIndex >= this.state.media.length) {
             this.state.currentIndex = 0;
         }
         this.updateModalContent();
@@ -283,23 +278,41 @@ export class UltimateModal {
     }
 
     updateModalContent() {
-        let src;
-        let alt = this.state.images[this.state.currentIndex].alt;
-        if (this.state.images.length > this.state.currentIndex + this.state.videos.length) {
-            src = this.state.images[this.state.currentIndex].src;
-            this.elements.modalImage.src = src;
-            this.elements.modalImage.alt = alt;
-            this.elements.modalVideo.hidden = true;
-            this.elements.modalImage.hidden = false;
-        }else {
-            this.elements.modalVideo.src = src = window.location.origin +'/'+ this.state.videos[(this.state.currentIndex+this.state.videos.length) - (this.state.images.length )].src;
-            this.elements.modalVideo.hidden = false;
-            this.elements.modalImage.hidden = true ;
-            this.elements.modalVideo.play();
-        }
-        this.elements.counter.textContent = `${this.state.currentIndex + 1}/${this.state.images.length}`;
+        const current = this.state.media[this.state.currentIndex];
+        this.elements.modalImage.src = '';
+        this.elements.modalVideo.src = '';
+        this._setMediaContent(current);
+        this.elements.counter.textContent = `${this.state.currentIndex + 1}/${this.state.media.length}`;
         this.activeThumbnail();
-        this.updateSocialLinks(src, alt);
+        this.updateSocialLinks(current);
+    }
+
+    /**
+     * Sets the modal content to image or video mode based on data_type
+     * @param {Object} mediaObj - The image or video object from state.images
+     */
+    _setMediaContent(mediaObj) {
+        const alt = mediaObj.alt;
+        if (mediaObj.data_type === 'image') {
+            this._showImage(mediaObj.src, alt);
+        } else if (mediaObj.data_type === 'video') {
+            this._showVideo( mediaObj.vidSrc,alt);
+        }
+    }
+
+    _showImage(src, alt) {
+        this.elements.modalImage.src = src;
+        this.elements.modalImage.alt = alt;
+        this.elements.modalVideo.hidden = true;
+        this.elements.modalImage.hidden = false;
+    }
+
+    _showVideo(src, alt) {
+        this.elements.modalVideo.src = src;
+        this.elements.modalVideo.alt = alt;
+        this.elements.modalVideo.hidden = false;
+        this.elements.modalImage.hidden = true;
+        this.elements.modalVideo.play();
     }
 
     activeThumbnail() {
@@ -369,17 +382,18 @@ export class UltimateModal {
         }
     }
 
-    createGalleryFigure(imgData, index){
+    createGalleryFigure(mediaData, index){
         const figure = document.createElement('figure');
         figure.className = 'photo-thumbnail';
         figure.style.animationDelay = `${index * 5.1}s`;
 
         const img = document.createElement('img');
-        img.src = imgData.src;
-        img.alt = imgData.alt;
+        img.src = mediaData.thumb;
+        img.alt = mediaData.alt;
         img.loading = 'lazy';
         img.width = 80;
         img.height = 80;
+        figure.setAttribute('data-type',`${mediaData["data-type"] || 'image'}`);
         figure.appendChild(img);
 
         return figure;
@@ -387,20 +401,23 @@ export class UltimateModal {
 
     async generateGallery() {
         const galleryContainer = document.getElementById('photo-gallery');
-        const imageData = await this.loadImageData();
-        imageData.images.forEach((imgData, index) => {
-            const figure = this.createGalleryFigure(imgData, index);
+        const mediaData = await this.loadMediaData();
+        mediaData.media.forEach((mediaData, index) => {
+            const figure = this.createGalleryFigure(mediaData, index);
             galleryContainer.appendChild(figure);
         });
-        this.cacheImages();
+        this.cacheImages(mediaData);
         this.setupEventListeners();
         this.setupSocialSharing();
     }
 
-    updateSocialLinks(imageUrl, description) {
+    updateSocialLinks(current) {
         const encodedUrl = encodeURIComponent(window.location.href);
-        const encodedDesc = encodeURIComponent(description);
-        const encodedImage = encodeURIComponent(imageUrl);
+        const encodedDesc = encodeURIComponent(current.alt);
+        const encodedImage = ()=>{
+           const  url = current.data_type === 'image' ? current.src : current.vidSrc;
+            return encodeURIComponent(url)
+        }
 
         document.querySelector('.share-facebook').href =
             `https://www.facebook.com/sharer/sharer.php?u=${encodedUrl}`;
@@ -674,15 +691,15 @@ export class UltimateModal {
         }, 2000);
     }
 
-    async loadImageData(){
+    async loadMediaData(){
         try {
             const response = await fetch('public/imagesDIR.json');
             if (!response.ok) {
                 throw new Error('Network response was not ok');
             }
-            const imageData = await response.json();
-            console.log(imageData);
-            return imageData;
+            const mediaData = await response.json();
+            console.log(mediaData);
+            return mediaData;
         } catch (error) {
             console.error('Error loading JSON:', error);
         }

@@ -462,6 +462,7 @@ input[type="text"]::placeholder {
 
 .btn-secondary:hover {
     background: var(--border-light);
+    color:var(--text-primary);
     transform: translateY(-2px);
 }
 
@@ -574,6 +575,11 @@ input[type="text"]::placeholder {
 .notification.info {
     background-color: rgba(4, 113, 255, 50%); 
 }
+
+.notification.warning {
+    background-color: rgba(243, 224, 10, 0.5);
+}
+
 .notification-text {
     font-size: 0.875rem; 
     line-height: 1.5;

@@ -1,0 +1,88 @@
+{
+  "name": "Fhavur's site",
+  "short_name": "Fhavur 😍😘",
+  "description": "A beautiful late Birthday site made for my princess Fhavur",
+
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#1a0f15",
+  "theme_color": "#db707a",
+  "orientation": "portrait-primary",
+  "scope": "/",
+  "id": "/",
+  "lang": "en",
+  "categories": ["entertainment", "social"],
+  "icons": [
+    {
+      "src":"public/icon/andriod_svg/icon_96X96.svg",
+      "sizes": "72x72",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "public/icon/andriod_svg/icon_96X96.svg",
+      "sizes": "96x96",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "public/icon/andriod_svg/icon_128X128.svg",
+      "sizes": "128x128",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "public/icon/apple/svg/icon_144X144.svg",
+      "sizes": "144x144",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "public/icon/andriod_svg/icon_168X168.svg",
+      "sizes": "168x168",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "public/icon/andriod_svg/icon_192X192.svg",
+      "sizes": "192x192",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "public/icon/andriod_svg/icon_512X512.svg",
+      "sizes": "512x512",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ],
+  "screenshots": [
+    {
+      "src": "public/screenshot.svg",
+      "sizes": "1200x630",
+      "type": "image/svg+xml",
+      "form_factor":"narrow"
+    },
+    {
+      "src": "public/screenshot.svg",
+      "sizes": "1200x630",
+      "type": "image/svg+xml",
+      "form_factor":"wide"
+    }
+  ],
+  "shortcuts": [
+    {
+      "name": "Birthday Memories",
+      "short_name": "Memories",
+      "description": "your Memories",
+      "url": "fhavur",
+      "icons": [
+        {
+          "src": "data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iOTYiIGhlaWdodD0iOTYiIHZpZXdCb3g9IjAgMCA5NiA5NiIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KPGNpcmNsZSBjeD0iNDgiIGN5PSI0OCIgcj0iNDgiIGZpbGw9IiNkYjcwN2EiLz4KPHBhdGggZD0iTTQ4IDMyVjY0TTMyIDQ4SDY0IiBzdHJva2U9IndoaXRlIiBzdHJva2Utd2lkdGg9IjgiIHN0cm9rZS1saW5lY2FwPSJyb3VuZCIvPgo8L3N2Zz4=",
+          "sizes": "96x96",
+          "type": "image/svg+xml"
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,1064 @@
+/* ==========================================================================
+   PWA PROMPT COMPONENT - ENHANCED
+   ========================================================================== */
+
+.pwa-prompt {
+    /* Layout */
+    position: fixed;
+    inset: 0;
+    z-index: var(--z-modal);
+
+    /* Flexbox for centering */
+    display: flex;
+    align-items: flex-end;
+    justify-content: center;
+    padding: var(--space-md);
+
+    /* Mobile-first responsive behavior */
+    @media (min-width: 480px) {
+        align-items: center;
+    }
+
+    /* Ensure proper stacking context */
+    isolation: isolate;
+}
+
+/* Backdrop with performance considerations */
+.pwa-prompt__backdrop {
+    position: absolute;
+    inset: 0;
+    background: var(--color-backdrop);
+
+    /* Backdrop filter with fallback */
+    @supports (backdrop-filter: blur(8px)) or (-webkit-backdrop-filter: blur(8px)) {
+        -webkit-backdrop-filter: blur(8px);
+        backdrop-filter: blur(8px);
+    }
+
+    /* Fallback for browsers without backdrop-filter */
+    @supports not (backdrop-filter: blur(8px)) {
+        background: rgba(0, 0, 0, 0.6);
+    }
+
+    animation: backdrop-fade-in var(--transition-base);
+    will-change: opacity; /* Performance hint */
+}
+
+/* Main container with enhanced styling */
+.pwa-prompt__container {
+    /* Layout & Sizing */
+    position: relative;
+    width: 100%;
+    max-width: min(440px, 95vw);
+    max-height: min(85vh, 650px);
+
+    /* Visual Design */
+    background: var(--color-surface-elevated);
+    border-radius: var(--radius-xl);
+    box-shadow:
+            var(--shadow-lg),
+            0 0 0 1px var(--color-border-light); /* Subtle border */
+
+    /* Animation */
+    animation: slide-up var(--transition-slow) cubic-bezier(0.16, 1, 0.3, 1);
+    overflow: hidden;
+
+    /* Performance */
+    will-change: transform, opacity;
+
+    /* Enhanced mobile experience */
+    @media (min-width: 480px) {
+        border-radius: var(--radius-lg);
+        animation-name: scale-in;
+    }
+
+    /* Large screen adjustments */
+    @media (min-width: 768px) {
+        max-width: 440px;
+    }
+}
+/* PWA Prompt Content - Main content container */
+.pwa-prompt__content {
+    background: var(--color-surface);
+
+    /* Ensure proper scrolling if content overflows */
+    max-height: 400px;
+    overflow-y: auto;
+
+    /* Custom scrollbar for webkit browsers */
+    &::-webkit-scrollbar {
+        width: 4px;
+    }
+
+    &::-webkit-scrollbar-track {
+        background: var(--color-surface-elevated);
+    }
+
+    &::-webkit-scrollbar-thumb {
+        background: var(--color-border);
+        border-radius: 2px;
+    }
+
+    &::-webkit-scrollbar-thumb:hover {
+        background: var(--color-text-tertiary);
+    }
+}
+
+
+/* ==========================================================================
+   HEADER SECTION
+   ========================================================================== */
+
+.pwa-prompt__header {
+    display: flex;
+    align-items: flex-start;
+    gap: var(--space-md);
+    padding: var(--space-xl);
+    background: var(--color-surface);
+    border-bottom: 1px solid var(--color-border-light);
+
+    /* Enhanced spacing for mobile */
+    @media (max-width: 480px) {
+        padding: var(--space-lg);
+    }
+}
+
+.pwa-prompt__badge {
+    /* Sizing & Layout */
+    flex-shrink: 0;
+    width: 3rem;
+    height: 3rem;
+
+    /* Visual Design */
+    background: linear-gradient(135deg, var(--color-primary), var(--color-primary-dark));
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow-sm);
+    color: var(--color-text-inverse);
+
+    /* Content Alignment */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    /* Animation */
+    transition: transform var(--transition-fast);
+
+    &:hover {
+        transform: scale(1.05);
+    }
+}
+
+.pwa-prompt__icon {
+    width: 1.5rem;
+    height: 1.5rem;
+}
+
+.pwa-prompt__title-group {
+    flex: 1;
+    min-width: 0; /* Prevent text overflow */
+}
+
+.pwa-prompt__title {
+    font-size: var(--font-size-xl);
+    font-weight: var(--font-weight-bold);
+    color: var(--color-text-primary);
+    margin: 0 0 var(--space-xs);
+    line-height: 1.2;
+    letter-spacing: -0.02em; /* Improved readability */
+}
+
+.pwa-prompt__subtitle {
+    font-size: var(--font-size-sm);
+    color: var(--color-text-secondary);
+    margin: 0;
+    line-height: 1.4;
+}
+
+/* ==========================================================================
+   CONTENT SECTIONS - PLATFORM SPECIFIC
+   ========================================================================== */
+
+/* Hero Section - Used in Android & Default */
+.pwa-prompt__hero {
+    text-align: center;
+    padding: var(--space-xl) var(--space-xl) var(--space-lg);
+    background: linear-gradient(135deg,
+    var(--color-surface) 0%,
+    var(--color-surface-elevated) 100%);
+    border-radius: var(--radius-lg);
+    margin: var(--space-lg);
+
+    @media (max-width: 480px) {
+        margin: var(--space-md);
+        padding: var(--space-lg) var(--space-lg) var(--space-md);
+    }
+}
+
+.pwa-prompt__app-icon {
+    width: 4rem;
+    height: 4rem;
+    margin: 0 auto var(--space-md);
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow-md);
+
+    /* Smooth scaling */
+    transition: transform var(--transition-base);
+
+    &:hover {
+        transform: scale(1.05);
+    }
+}
+
+.pwa-prompt__app-name {
+    font-size: var(--font-size-lg);
+    font-weight: var(--font-weight-bold);
+    color: var(--color-text-primary);
+    margin: 0 0 var(--space-xs);
+}
+
+.pwa-prompt__app-description {
+    font-size: var(--font-size-sm);
+    color: var(--color-text-secondary);
+    margin: 0;
+    line-height: 1.4;
+}
+
+/* Benefits Grid - Android */
+.pwa-prompt__benefits {
+    margin: 0 var(--space-xl) var(--space-xl);
+}
+
+.benefits-grid {
+    display: grid;
+    gap: var(--space-md);
+
+    @media (min-width: 480px) {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+
+.benefit-item {
+    display: flex;
+    align-items: flex-start;
+    gap: var(--space-md);
+    padding: var(--space-md);
+    background: var(--color-surface-elevated);
+    border: 1px solid var(--color-border-light);
+    border-radius: var(--radius-md);
+    transition: all var(--transition-fast);
+
+    &:hover {
+        transform: translateY(-2px);
+        box-shadow: var(--shadow-sm);
+        border-color: var(--color-primary-light);
+    }
+}
+
+.benefit-icon {
+    font-size: 1.5rem;
+    flex-shrink: 0;
+    width: 2.5rem;
+    height: 2.5rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: var(--color-surface);
+    border-radius: var(--radius-md);
+}
+
+.benefit-content {
+    flex: 1;
+    min-width: 0; /* Prevent text overflow in flex container */
+}
+
+.benefit-content h4 {
+    font-size: var(--font-size-base);
+    font-weight: var(--font-weight-semibold);
+    color: var(--color-text-primary);
+    margin: 0 0 var(--space-xs);
+    line-height: 1.2;
+}
+
+.benefit-content p {
+    font-size: var(--font-size-sm);
+    color: var(--color-text-secondary);
+    margin: 0;
+    line-height: 1.4;
+}
+
+/*
+/* Install Hint - Android */
+.pwa-prompt__install-hint {
+    background: linear-gradient(135deg, var(--color-primary), var(--color-primary-dark));
+    color: var(--color-text-inverse);
+    border-radius: var(--radius-md);
+    padding: var(--space-md);
+    margin: var(--space-lg) var(--space-xl);
+    animation: pulse-subtle 3s ease-in-out infinite;
+}
+
+.install-hint__content {
+    display: flex;
+    align-items: flex-start;
+    gap: var(--space-sm);
+}
+
+.install-hint__icon {
+    width: 1.25rem;
+    height: 1.25rem;
+    flex-shrink: 0;
+    margin-top: 0.125rem;
+}
+
+.install-hint__content p {
+    margin: 0;
+    font-size: var(--font-size-sm);
+    font-weight: var(--font-weight-medium);
+    line-height: 1.4;
+}
+
+/* Universal Steps - Default Platform */
+.pwa-prompt__universal-steps {
+    margin: var(--space-xl);
+}
+
+.universal-steps__title {
+    font-size: var(--font-size-base);
+    font-weight: var(--font-weight-semibold);
+    color: var(--color-text-primary);
+    margin: 0 0 var(--space-md);
+    text-align: center;
+    letter-spacing: -0.01em;
+
+}
+
+.browser-tips {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-sm);
+}
+
+.browser-tip {
+    display: flex;
+    align-items: flex-start;
+    gap: var(--space-md);
+    padding: var(--space-md);
+    background: var(--color-surface-elevated);
+    border: 1px solid var(--color-border-light);
+    border-radius: var(--radius-md);
+    transition: all var(--transition-fast);
+
+    &:hover {
+        transform: translateX(4px);
+        border-color: var(--color-primary-light);
+    }
+}
+/* Browser Content - Enhanced typography for browser tips */
+.browser-content {
+    flex: 1;
+    min-width: 0; /* Prevent flex item overflow */
+}
+
+.browser-icon {
+    font-size: 1.25rem;
+    flex-shrink: 0;
+    width: 2rem;
+    height: 2rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: var(--color-surface);
+    border-radius: var(--radius-sm);
+}
+
+.browser-content h5 {
+    font-size: var(--font-size-sm);
+    font-weight: var(--font-weight-semibold);
+    color: var(--color-text-primary);
+    margin: 0 0 var(--space-xs);
+    line-height: 1.2;
+}
+
+.browser-content p {
+    font-size: var(--font-size-sm);
+    color: var(--color-text-secondary);
+    margin: 0;
+    line-height: 1.4;
+}
+
+/* Features Grid - Default Platform */
+.pwa-prompt__features {
+    margin: var(--space-lg) var(--space-xl);
+}
+
+.features-grid {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-sm);
+    justify-content: center;
+}
+
+.feature-tag {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-xs);
+    padding: var(--space-xs) var(--space-sm);
+    background: var(--color-surface-elevated);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-full);
+    font-size: var(--font-size-sm);
+    color: var(--color-text-secondary);
+    transition: all var(--transition-fast);
+
+    &:hover {
+        background: var(--color-primary);
+        color: var(--color-text-inverse);
+        border-color: var(--color-primary);
+        transform: translateY(-1px);
+    }
+}
+
+.feature-tag__icon {
+    font-size: 0.875em;
+}
+
+/* Feature Tag text alignment */
+.feature-tag__text {
+    font-weight: var(--font-weight-medium);
+    white-space: nowrap;
+}
+
+/* ==========================================================================
+   STEPS COMPONENT - ENHANCED
+   ========================================================================== */
+
+.pwa-prompt__steps {
+    padding: var(--space-xl);
+    background: var(--color-surface);
+
+    @media (max-width: 480px) {
+        padding: var(--space-lg);
+    }
+}
+
+.step {
+    display: grid;
+    grid-template-columns: auto 1fr;
+    gap: var(--space-md);
+    margin-bottom: var(--space-xl);
+
+    &:last-child {
+        margin-bottom: 0;
+    }
+}
+
+.step__indicator {
+    display: flex;
+    flex-direction: column;
+    margin-left: var(--space-sm);
+    align-items: center;
+}
+
+.step__number {
+    /* Sizing & Layout */
+    width: 2rem;
+    height: 2rem;
+    flex-shrink: 0;
+
+    /* Visual Design */
+    background: var(--color-primary);
+    color: var(--color-text-inverse);
+    border-radius: var(--radius-full);
+    box-shadow: var(--shadow-sm);
+
+    /* Typography */
+    font-size: var(--font-size-sm);
+    font-weight: var(--font-weight-semibold);
+
+    /* Content Alignment */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    /* Positioning */
+    position: relative;
+    z-index: 1;
+
+    /* Animation */
+    transition: all var(--transition-fast);
+
+    &:hover {
+        transform: scale(1.1);
+        box-shadow: var(--shadow-md);
+    }
+}
+
+.step__connector {
+    flex: 1;
+    width: 2px;
+
+    background: linear-gradient(
+            to bottom,
+            var(--color-primary) 0%,
+            var(--color-border) 70%,
+            transparent 100%
+    );
+    margin: var(--space-xs) 0;
+    opacity: 0.6;
+}
+
+.step:last-child .step__connector {
+    display: none;
+}
+
+.step__content {
+    min-width: 0;
+    padding-bottom: var(--space-lg);
+}
+
+.step__title {
+    font-size: var(--font-size-base);
+    font-weight: var(--font-weight-semibold);
+    color: var(--color-text-primary);
+    margin: 0 0 var(--space-xs);
+}
+
+.step__description {
+    font-size: var(--font-size-sm);
+    color: var(--color-text-secondary);
+    margin: 0 0 var(--space-md);
+    line-height: 1.4;
+}
+
+.step__visual {
+    display: flex;
+    gap: var(--space-sm);
+    align-items: center;
+    flex-wrap: wrap;
+}
+.pwa-prompt__steps {
+    padding: var(--space-xl);
+    background: var(--color-surface);
+
+    @media (max-width: 480px) {
+        padding: var(--space-lg);
+    }
+}
+
+/* ==========================================================================
+   UI ELEMENTS - ENHANCED
+   ========================================================================== */
+
+/* iOS-style UI elements with improved interactions */
+.ios-share-button,
+.ios-menu-item,
+.ios-confirm-button {
+    padding: var(--space-sm) var(--space-md);
+    background: var(--color-surface-elevated);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-md);
+    font-size: var(--font-size-sm);
+    color: var(--color-text-primary);
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-sm);
+    box-shadow: var(--shadow-sm);
+    transition: all var(--transition-fast);
+    cursor: pointer;
+    user-select: none;
+    --webkit-user-select:none;
+
+    &:hover {
+        background: var(--color-primary);
+        color: var(--color-text-inverse);
+        border-color: var(--color-primary);
+        transform: translateY(-2px);
+        box-shadow: var(--shadow-md);
+    }
+
+    &:active {
+        transform: translateY(0);
+    }
+}
+
+.ios-confirm-button {
+    background: var(--color-primary);
+    color: var(--color-text-inverse);
+    border-color: var(--color-primary);
+    font-weight: var(--font-weight-semibold);
+    min-width: 60px;
+    text-align: center;
+    border: none;
+
+    &:hover {
+        background: var(--color-primary-dark);
+        border-color: var(--color-primary-dark);
+    }
+}
+
+/* Enhanced iOS UI Components */
+.ios-ui-element {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-sm);
+    padding: var(--space-sm) var(--space-md);
+    background: var(--color-surface-elevated);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-full);
+    font-size: var(--font-size-sm);
+    color: var(--color-text-primary);
+    transition: all var(--transition-fast);
+
+    &:hover {
+        transform: translateY(-1px);
+        box-shadow: var(--shadow-sm);
+    }
+}
+
+.ios-ui-bar {
+    display: flex;
+    gap: 2px;
+}
+
+.ios-ui-dot {
+    width: 3px;
+    height: 3px;
+    background: currentColor;
+    border-radius: 50%;
+}
+
+.ios-menu-item {
+    display: flex;
+    align-items: center;
+    gap: var(--space-md);
+    padding: var(--space-md);
+    background: var(--color-surface-elevated);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-md);
+    max-width: 200px;
+    transition: all var(--transition-fast);
+
+    &:hover {
+        transform: translateX(4px);
+        border-color: var(--color-primary-light);
+    }
+}
+
+.ios-menu-icon {
+    width: 1.5rem;
+    height: 1.5rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.25rem;
+    font-weight: var(--font-weight-bold);
+    color: var(--color-primary);
+}
+
+.ios-menu-content {
+    flex: 1;
+}
+
+.ios-menu-title {
+    font-size: var(--font-size-sm);
+    font-weight: var(--font-weight-semibold);
+    color: var(--color-text-primary);
+    margin: 0;
+}
+
+.ios-menu-subtitle {
+    font-size: var(--font-size-xs);
+    color: var(--color-text-secondary);
+    margin: 0;
+}
+
+.ios-confirm-ui {
+    display: flex;
+    justify-content: flex-end;
+    padding: var(--space-sm);
+}
+/* iOS UI Text - Text labels in iOS-style UI elements */
+.ios-ui-text {
+    font-size: var(--font-size-sm);
+    font-weight: var(--font-weight-medium);
+    color: var(--color-text-primary);
+}
+
+/* iOS Menu Text - Text content in iOS menu items */
+.ios-menu-text {
+    font-size: var(--font-size-sm);
+    font-weight: var(--font-weight-semibold);
+    color: var(--color-text-primary);
+    margin: 0;
+}
+
+/* ==========================================================================
+   ACTIONS & BUTTONS - ENHANCED
+   ========================================================================== */
+
+.pwa-prompt__actions {
+    display: flex;
+    gap: var(--space-sm);
+    padding: var(--space-lg) var(--space-xl);
+    background: var(--color-surface);
+    border-top: 1px solid var(--color-border-light);
+
+    @media (max-width: 480px) {
+        padding: var(--space-md);
+        flex-direction: column-reverse; /* Better mobile UX */
+    }
+}
+
+/* Enhanced Button Component with Ripple Effect */
+.btn {
+    /* Layout & Sizing */
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: var(--space-sm);
+    padding: var(--space-md) var(--space-lg);
+
+    /* Visual Design */
+    border: 2px solid transparent;
+    border-radius: var(--radius-md);
+    font-size: var(--font-size-base);
+    font-weight: var(--font-weight-semibold);
+    text-decoration: none;
+    cursor: pointer;
+    font-family: inherit;
+    flex: 1;
+
+    /* Animation & Interaction */
+    transition: all var(--transition-fast);
+    position: relative;
+    overflow: hidden;
+
+    /* Ripple Effect */
+    &::before {
+        content: '';
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        width: 0;
+        height: 0;
+        border-radius: 50%;
+        background: currentColor;
+        opacity: 0;
+        transform: translate(-50%, -50%);
+        transition: width 0.3s, height 0.3s, opacity 0.3s;
+    }
+
+    &:active::before {
+        width: 100px;
+        height: 100px;
+        opacity: 0.1;
+    }
+
+    /* Focus Management */
+    &:focus-visible {
+        outline: 2px solid var(--color-primary);
+        outline-offset: 2px;
+    }
+}
+
+.btn--primary {
+    background: var(--color-primary);
+    color: var(--color-text-inverse);
+    border-color: var(--color-primary);
+
+    &:hover,
+    &:focus-visible {
+        background: var(--color-primary-dark);
+        border-color: var(--color-primary-dark);
+        transform: translateY(-1px);
+        box-shadow: var(--shadow-md);
+    }
+
+    &:active {
+        transform: translateY(0);
+    }
+}
+
+.btn--secondary {
+    background: transparent;
+    border-color: var(--color-border);
+
+    &:hover,
+    &:focus-visible {
+       color: var(--color-text-primary);
+
+        background: var(--color-surface-elevated);
+        border-color: var(--color-text-tertiary);
+        transform: translateY(-1px);
+    }
+}
+
+.btn__icon {
+    width: 1rem;
+    height: 1rem;
+    transition: transform var(--transition-fast);
+}
+
+.btn:hover .btn__icon {
+    transform: scale(1.1);
+}
+
+/* Button Text - Ensures proper text alignment and truncation */
+.btn__text {
+    flex: 1;
+    text-align: center;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+/* ==========================================================================
+   CLOSE BUTTON - ENHANCED
+   ========================================================================== */
+
+.pwa-prompt__close {
+    /* Positioning */
+    position: absolute;
+    top: var(--space-lg);
+    right: var(--space-lg);
+
+    /* Sizing */
+    width: 2.5rem;
+    height: 2.5rem;
+
+    /* Visual Design */
+    border: none;
+    background: var(--color-surface-elevated);
+    border-radius: var(--radius-full);
+    color: var(--color-text-secondary);
+    box-shadow: var(--shadow-sm);
+
+    /* Content Alignment */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    /* Interaction */
+    cursor: pointer;
+    transition: all var(--transition-fast);
+
+    &:hover,
+    &:focus-visible {
+        background: var(--color-surface);
+        color: var(--color-text-primary);
+        transform: scale(1.1);
+        box-shadow: var(--shadow-md);
+    }
+
+    &:active {
+        transform: scale(0.95);
+    }
+
+    /* Focus indicator */
+    &:focus-visible {
+        outline: 2px solid var(--color-primary);
+        outline-offset: 2px;
+    }
+}
+
+/* ==========================================================================
+   ANIMATIONS & TRANSITIONS
+   ========================================================================== */
+
+@keyframes backdrop-fade-in {
+    from {
+        opacity: 0;
+    }
+    to {
+        opacity: 1;
+    }
+}
+
+@keyframes slide-up {
+    from {
+        opacity: 0;
+        transform: translateY(100%);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@keyframes scale-in {
+    from {
+        opacity: 0;
+        transform: scale(0.95) translateY(20px);
+    }
+    to {
+        opacity: 1;
+        transform: scale(1) translateY(0);
+    }
+}
+
+@keyframes pulse-subtle {
+    0%, 100% {
+        opacity: 1;
+    }
+    50% {
+        opacity: 0.95;
+    }
+}
+
+/* Exit Animations with enhanced timing */
+.pwa-prompt[aria-hidden="true"] .pwa-prompt__backdrop {
+    animation: backdrop-fade-in var(--transition-base) reverse;
+}
+
+.pwa-prompt[aria-hidden="true"] .pwa-prompt__container {
+    animation: slide-up var(--transition-slow) cubic-bezier(0.16, 1, 0.3, 1) reverse;
+
+    @media (min-width: 480px) {
+        animation-name: scale-in;
+        animation-direction: reverse;
+    }
+}
+
+/* ==========================================================================
+   UTILITY CLASSES & STATES
+   ========================================================================== */
+
+/* Focus Management */
+.pwa-prompt:not([hidden]) {
+    display: flex;
+}
+
+/* Exiting state for smooth transitions */
+.pwa-prompt--exiting {
+    pointer-events: none;
+}
+
+/* Ensure proper box sizing */
+.pwa-prompt * {
+    box-sizing: border-box;
+}
+.mt-3{
+    margin-top: var(--space-sm);
+}
+
+/* Utility class for zero padding */
+.p-0 {
+    padding: 0 !important;
+}
+.fw-5{
+    font-weight: bold !important;
+}
+strong {
+    font-weight: bold !important;
+    color: var(--color-text-primary);
+}
+/* ==========================================================================
+   ACCESSIBILITY ENHANCEMENTS
+   ========================================================================== */
+
+/* High contrast mode support */
+@media (prefers-contrast: high) {
+    .pwa-prompt__container {
+        border: 2px solid var(--color-text-primary);
+    }
+
+    .step__connector {
+        background: var(--color-text-primary);
+    }
+
+    .benefit-item,
+    .browser-tip {
+        border-width: 2px;
+    }
+}
+
+/* Reduced motion support */
+@media (prefers-reduced-motion: reduce) {
+    .pwa-prompt__container,
+    .pwa-prompt__backdrop,
+    .btn,
+    .pwa-prompt__close,
+    .benefit-item,
+    .browser-tip,
+    .feature-tag,
+    .ios-ui-element,
+    .ios-menu-item {
+        animation: none !important;
+        transition: none !important;
+    }
+
+    .step__number:hover,
+    .btn:hover,
+    .pwa-prompt__close:hover {
+        transform: none !important;
+    }
+}
+
+/* Dark mode specific enhancements */
+@media (prefers-color-scheme: dark) {
+    .pwa-prompt__install-hint {
+        background: linear-gradient(135deg, var(--color-primary-dark), var(--color-primary));
+    }
+
+    .benefit-item:hover,
+    .browser-tip:hover {
+        border-color: var(--color-primary);
+    }
+}
+
+/* Print styles - hide prompt when printing */
+@media print {
+    .pwa-prompt {
+        display: none !important;
+    }
+}
+
+/* ==========================================================================
+   PERFORMANCE OPTIMIZATIONS
+   ========================================================================== */
+
+/* Containment for better performance */
+.pwa-prompt__container {
+    contain: layout style paint;
+}
+
+/* Hardware acceleration for animations */
+.pwa-prompt__backdrop,
+.pwa-prompt__container {
+    transform: translateZ(0);
+}
+
+/* ==========================================================================
+   RESPONSIVE ENHANCEMENTS
+   ========================================================================== */
+
+/* Small mobile devices */
+@media (max-width: 360px) {
+    .pwa-prompt {
+        padding: var(--space-sm);
+    }
+
+    .pwa-prompt__header,
+    .pwa-prompt__steps,
+    .pwa-prompt__actions {
+        padding: var(--space-md);
+    }
+
+    .benefits-grid {
+        grid-template-columns: 1fr;
+    }
+}
+
+/* Tablet and desktop */
+@media (min-width: 768px) {
+    .pwa-prompt__container {
+        max-height: 80vh;
+    }
+}
+
+/* Large desktop */
+@media (min-width: 1200px) {
+    .pwa-prompt__container {
+        max-width: 480px;
+    }
+}

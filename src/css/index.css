@@ -568,7 +568,7 @@ a{
     }
     
   .content-section{
-    background-image: url('../public/profile_pic.jpg') !important;
+    background-image: url('../../public/profile_pic.jpg') !important;
     background-size: cover !important;
     background-position: center !important;
     background-repeat: no-repeat !important;

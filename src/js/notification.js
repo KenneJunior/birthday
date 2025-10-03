@@ -69,7 +69,7 @@ export class Notification {
         }
 
         // Check if essential elements exist
-        if (!this.element.notification || !this.element.showBtn) {
+        if (!this.element.notification || !this.element.progress) {
             console.error('Essential notification elements not found');
             return;
         }
