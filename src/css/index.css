@@ -586,13 +586,35 @@ a{
     text-shadow: 0 2px 4px rgba(0, 0, 0, 0.5) !important;
 }
     .birthday-message{
+        -webkit-backdrop-filter: blur(15px);
         backdrop-filter: blur(15px);
         border-radius: 2rem;
-        --webkit-backdrop-filter: blur(15px);
     }
 
 }
 
+/*change the container max-height when the device is in portrait mode*/
+@media(max-width:950px) and (orientation: landscape) {
+    .image-container {
+       display: none !important;
+    }
+    .content-section{
+        background-image: url('../../public/pics/profile_pic.jpg') !important;
+        background-size: cover !important;
+        background-position: center -15.5rem !important;
+        background-repeat: no-repeat !important;
+        color: white !important;
+        text-shadow: 0 2px 4px rgba(0, 0, 0, 0.5) !important;
+    }
+    .birthday-message{ 
+        -webkit-backdrop-filter: blur(15px);
+        backdrop-filter: blur(15px);
+        border-radius: 2rem;
+    }
+    .share-title{
+        color: var(--bs-dark) !important;
+    }
+}
 
 /* ===== Accessibility ===== */
 @media (prefers-reduced-motion: reduce) {

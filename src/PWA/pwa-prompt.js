@@ -15,7 +15,7 @@ class PWAPrompt extends  HTMLElement {
       remindDuration: 24 * 60 * 60 * 1000, // 1 day
       showDelay: 3000,
       minSessionTime: 10000, // 10 seconds
-      maxDisplayCount: 3
+      maxDisplayCount: 5
     };
 
     // State
@@ -211,7 +211,7 @@ class PWAPrompt extends  HTMLElement {
 
     //query the data-action install button
     const installBtn = document.querySelector('[data-action="install"]');
-    installBtn.addEventListener('click',this.triggerInstallation.bind(this));
+    installBtn?.addEventListener('click',this.triggerInstallation.bind(this));
 
     // Visibility changes
     document.addEventListener('visibilitychange', this.handleVisibilityChange.bind(this));

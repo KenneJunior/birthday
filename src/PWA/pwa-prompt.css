@@ -447,6 +447,10 @@
     gap: var(--space-md);
     margin-bottom: var(--space-xl);
 
+    &:first-of-type {
+        grid-column-gap: var(--space-md);
+        grid-template-columns: 1fr;
+    }
     &:last-child {
         margin-bottom: 0;
     }
@@ -512,8 +516,14 @@
 }
 
 .step__content {
+    width: 100%;
     min-width: 0;
     padding-bottom: var(--space-lg);
+
+    &:first-of-type {
+        text-align: center;
+
+    }
 }
 
 .step__title {
