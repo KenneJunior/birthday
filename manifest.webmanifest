@@ -77,7 +77,12 @@
             {
       "src": "public/pics/screenshot1.jpg",
       "sizes": "1200x630",
+<<<<<<< HEAD
       "type": "image/svg+xml"
+=======
+      "type": "image/svg+xml",
+      "form_factor":"narrow"
+>>>>>>> 5e1283af5f4ef5507d8120471720488750369319
     }
   ],
   "shortcuts": [
