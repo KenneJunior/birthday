@@ -2,7 +2,6 @@
   "name": "Fhavur's site",
   "short_name": "Fhavur 😍😘",
   "description": "A beautiful late Birthday site made for my princess Fhavur",
-
   "start_url": "/",
   "display": "standalone",
   "background_color": "#1a0f15",
@@ -78,11 +77,35 @@
       "url": "fhavur",
       "icons": [
         {
-          "src": "data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iOTYiIGhlaWdodD0iOTYiIHZpZXdCb3g9IjAgMCA5NiA5NiIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KPGNpcmNsZSBjeD0iNDgiIGN5PSI0OCIgcj0iNDgiIGZpbGw9IiNkYjcwN2EiLz4KPHBhdGggZD0iTTQ4IDMyVjY0TTMyIDQ4SDY0IiBzdHJva2U9IndoaXRlIiBzdHJva2Utd2lkdGg9IjgiIHN0cm9rZS1saW5lY2FwPSJyb3VuZCIvPgo8L3N2Zz4=",
+          "src": "public/icon/shortcut/memories.svg",
           "sizes": "96x96",
           "type": "image/svg+xml"
         }
       ]
-    }
+    },
+    {
+      "name":"confession message",
+      "short_name":"confession",
+      "url":"fhavur/confession.html",
+      "icons":[
+                {
+          "src": "public/icon/shortcut/confession.svg",
+          "sizes": "96x96",
+          "type": "image/svg+xml"
+        }
+      ]
+    },
+    {
+      "name":"Out for A date ?",
+      "short_name":"Date",
+      "url":"fhavur/missus/fhav.html",
+      "icons":[
+                {
+          "src": "public/icon/shortcut/ask_out.svg",
+          "sizes": "96x96",
+          "type": "image/svg+xml"
+        }
+  ]
+}
   ]
 }

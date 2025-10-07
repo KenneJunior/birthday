@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="utf-8"?>
+<svg width="96" height="96" viewBox="0 0 96 96" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <radialGradient gradientUnits="userSpaceOnUse" cx="47.783" cy="44.691" r="47.924" id="gradient-1">
+      <stop offset="0" style="stop-color: rgb(92.941% 56.078% 65.882%)"/>
+      <stop offset="1" style="stop-color: rgb(61.312% 27.468% 37.776%)"/>
+    </radialGradient>
+    <linearGradient gradientUnits="userSpaceOnUse" x1="47.737" y1="21.587" x2="47.737" y2="44" id="gradient-0">
+      <stop offset="0" style="stop-color: rgb(97.255% 78.431% 84.706%)"/>
+      <stop offset="1" style="stop-color: rgb(59.884% 42.985% 48.866%)"/>
+    </linearGradient>
+    <radialGradient gradientUnits="userSpaceOnUse" cx="66.764" cy="34.144" r="4" id="gradient-3">
+      <stop offset="0" style="stop-color: rgb(92.941% 56.078% 65.882%)"/>
+      <stop offset="1" style="stop-color: rgb(61.312% 27.468% 37.776%)"/>
+    </radialGradient>
+    <radialGradient gradientUnits="userSpaceOnUse" cx="56.836" cy="33.968" r="4" id="gradient-2">
+      <stop offset="0" style="stop-color: rgb(92.941% 56.078% 65.882%)"/>
+      <stop offset="1" style="stop-color: rgb(61.312% 27.468% 37.776%)"/>
+    </radialGradient>
+    <radialGradient gradientUnits="userSpaceOnUse" cx="47.434" cy="34.144" r="4" id="gradient-4">
+      <stop offset="0" style="stop-color: rgb(92.941% 56.078% 65.882%)"/>
+      <stop offset="1" style="stop-color: rgb(61.312% 27.468% 37.776%)"/>
+    </radialGradient>
+    <radialGradient gradientUnits="userSpaceOnUse" cx="51.068" cy="50.948" r="16.47" id="gradient-6">
+      <stop offset="0" style="stop-color: #bada55"/>
+      <stop offset="1" style="stop-color: #758d29"/>
+    </radialGradient>
+  </defs>
+  <rect x="-0.141" y="-2.838" width="95.847" height="95.059" rx="11" ry="11" style="stroke: rgb(0, 0, 0); transform-box: fill-box; transform-origin: 50% 50%; fill: url(&quot;#gradient-1&quot;); stroke-width: 0px;" transform="matrix(0.999962, -0.008694, 0.008694, 0.999962, 0.217495, 3.308501)"/>
+  <path d="M 22.01 46.282 C 22.01 42.807 26.299 39.99 31.592 39.99 L 63.532 39.99 C 68.824 39.99 73.114 42.807 73.114 46.282 L 73.114 71.451 C 73.114 74.926 68.824 77.743 63.532 77.743 L 31.592 77.743 C 26.299 77.743 22.01 74.926 22.01 71.451 L 22.01 46.282 Z" fill="white" style=""/>
+  <path d="M 22.01 31.193 C 22.01 25.887 26.33 21.587 31.658 21.587 L 63.817 21.587 C 69.145 21.587 73.465 25.887 73.465 31.193 L 73.465 44 L 22.01 44 L 22.01 31.193 Z" style="fill: url(&quot;#gradient-0&quot;);"/>
+  <circle cx="47.434" cy="34.144" r="4" style="fill: url(&quot;#gradient-4&quot;);"/>
+  <circle cx="56.836" cy="33.968" r="4" style="fill: url(&quot;#gradient-2&quot;);"/>
+  <circle cx="66.764" cy="34.144" r="4" style="fill: url(&quot;#gradient-3&quot;);"/>
+  <path d="M 34.598 50.948 L 67.537 50.948" stroke="#ed8fa8" stroke-width="3" stroke-linecap="round" style="fill: url(&quot;#gradient-6&quot;);"/>
+  <path d="M 35.124 56.948 L 51.124 56.948" stroke="#ed8fa8" stroke-width="3" stroke-linecap="round"/>
+  <path d="M 35.299 63.083 L 64.795 63.083" stroke="#ed8fa8" stroke-width="3" stroke-linecap="round" style=""/>
+</svg>

@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="utf-8"?>
+<svg width="512" height="512" viewBox="0 0 512 512" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Confession icon">
+  <defs>
+    <radialGradient gradientUnits="userSpaceOnUse" cx="256" cy="256" r="256" id="gradient-0">
+      <stop offset="0" style="stop-color: rgb(92.941% 56.078% 65.882%)"/>
+      <stop offset="1" style="stop-color: rgb(61.312% 27.468% 37.776%)"/>
+    </radialGradient>
+    <linearGradient gradientUnits="userSpaceOnUse" x1="169.856" y1="106.858" x2="169.856" y2="261.358" id="gradient-1">
+      <stop offset="0" style="stop-color: rgb(100% 37.255% 58.431%)"/>
+      <stop offset="1" style="stop-color: rgb(69.536% 0% 33.589%)"/>
+    </linearGradient>
+    <linearGradient gradientUnits="userSpaceOnUse" x1="141" y1="112" x2="141" y2="266.5" id="gradient-2">
+      <stop offset="0" style="stop-color: rgb(100% 0% 60%)"/>
+      <stop offset="1" style="stop-color: rgb(64.876% 0% 36.958%)"/>
+    </linearGradient>
+  </defs>
+  <rect width="512" height="512" rx="96" style="fill: url(&quot;#gradient-0&quot;);"/>
+  <g transform="matrix(1, 0, 0, 1, 104, 66.75)" fill="none" stroke="white" stroke-linecap="round" stroke-linejoin="round" stroke-width="20">
+    <path d="M104 154c-8-20-28-42-28-42s-18 18-18 40c0 34 46 86 72 110 6 6 16 6 22 0 26-24 72-76 72-110 0-22-18-40-18-40s-20 22-28 42" stroke="none" style="fill: url(&quot;#gradient-2&quot;);"/>
+    <path d="M 206.856 148.858 C 214.856 128.858 234.856 106.858 234.856 106.858 C 234.856 106.858 252.856 124.858 252.856 146.858 C 252.856 180.858 206.856 232.858 180.856 256.858 C 174.856 262.858 164.856 262.858 158.856 256.858 C 132.856 232.858 86.856 180.858 86.856 146.858 C 86.856 124.858 104.856 106.858 104.856 106.858 C 104.856 106.858 124.856 128.858 132.856 148.858" stroke="none" style="fill: url(&quot;#gradient-1&quot;);"/>
+    <path d="M 66.482 223.64 C 88.482 241.64 112.482 261.64 138.482 281.64 C 146.482 287.64 156.482 287.64 164.482 281.64 C 190.482 261.64 214.482 241.64 236.482 223.64" stroke-opacity="0.12"/>
+    <g transform="matrix(1, 0, 0, 1, 139.11644, -92.941223)" fill="white" stroke="none">
+      <rect x="9.603" width="24" height="78.589" rx="4" style="" y="121.888"/>
+      <rect x="-23.738" y="149.182" width="90.683" height="24" rx="4" style=""/>
+    </g>
+  </g>
+  <path d="M 272.022 238.889 C 259.573 238.889 247.125 246.526 247.125 257.978 C 247.125 269.433 272.143 283.673 272.143 283.673 C 272.143 283.673 296.918 269.433 296.918 257.978 C 296.918 246.526 284.47 238.889 272.022 238.889 Z" fill="#ffcfe0" style="stroke-width: 1; transform-origin: 272.022px 261.797px;" transform="matrix(0.999973, 0.007296, -0.007296, 0.999973, 0, 0)"/>
+  <path d="M 264.272 253.956 C 264.272 251.848 266.129 250.137 268.422 250.137 L 276.72 250.137 C 279.013 250.137 280.869 251.848 280.869 253.956 L 280.869 261.591 C 280.869 263.7 279.013 265.409 276.72 265.409 L 268.422 265.409 C 266.129 265.409 264.272 263.7 264.272 261.591 L 264.272 253.956 Z" fill="#ed8fa8" style="stroke-width: 1; transform-origin: 272.571px 261.591px;" transform="matrix(0.999973, 0.007296, -0.007296, 0.999973, 0, 0)"/>
+</svg>
