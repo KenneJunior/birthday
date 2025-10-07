@@ -1,5 +1,6 @@
 import {UltimateModal} from "./Modal.js";
 import {Notification} from "./notification.js";
+import {PlatformDetector} from "../PWA/pwa-prompt.js"
 
 document.addEventListener('DOMContentLoaded', () => {
     // DOM Elements
@@ -27,7 +28,7 @@ document.addEventListener('DOMContentLoaded', () => {
             growing: null,
             growInterval: null,
             maxSize: 100, // Maximum size in pixels
-            growthRate: 1 // Growth rate in pixels per interval
+            growthRate: 3 // Growth rate in pixels per interval
         },
         growButton : {
             growInterval :0,
@@ -36,7 +37,16 @@ document.addEventListener('DOMContentLoaded', () => {
             scaleIncrement : 0.02, // How much to grow per interval
             growSpeed : 50 // Milliseconds between growth increments
         },
-        animating: false
+        confetti : {
+            number : 100, // Number of confetti pieces
+            colors : ['#ff6b6b', '#ff8e53', '#ffd700', '#4caf50', '#2196f3', '#9c27b0', '#ff4081', '#00bcd4', '#8bc34a', '#ff5722', '#3e0909'],
+
+            interval:5000,
+            numberOfFloatingElement:16,
+             
+        },
+        animating: false,
+        cooldown:10000
     }
 
     // Constants
@@ -58,7 +68,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Initialize the application
     function init() {
-
+        platform();
         // Add tooltip styles
         const style = document.createElement('style');
         style.textContent = `
@@ -105,7 +115,21 @@ document.addEventListener('DOMContentLoaded', () => {
         setInterval(() => {
             triggerConfetti();
             createFloatingElements();
-        }, 10000);
+        }, state.cooldown);
+    }
+
+    function platform() {
+        const platform = PlatformDetector.detect();
+        if (platform === 'iOS' || platform === 'Android') {
+            state.confetti.numberOfFloatingElement = 8;
+            state.confetti.number = 50;
+            state.confetti.interval = 8000;
+            state.heart.growthRate = 2;
+            state.heart.maxSize = 80;
+            state.growButton.maxScale = 2.5;
+            state.cooldown = 15000;
+
+        }
     }
 
     function setupGrowButtonEventListeners() {
@@ -170,15 +194,8 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     function createFloatingElements() {
-        const symbols = [
-            {class: 'hearts', emoji: '❤️'},
-            {class: 'hearts', emoji: '💖'},
-            {class: 'stars', emoji: '✨'},
-            {class: 'stars', emoji: '🌟'},
-            {class: 'stars', emoji: '🎇'},
-            {class: 'flowers', emoji: '🌸'}
-        ];
-        const numElements = 16; // Number of floating elements to generate
+        const symbols = [ {class: 'hearts', emoji: '❤️'},{class: 'hearts', emoji: '💖'},{class: 'hearts', emoji: '💗'},{class: 'hearts', emoji: '💓'},{class: 'hearts', emoji: '💞'},{class: 'hearts', emoji: '💕'},{class: 'hearts', emoji: '💝'},{class: 'flowers', emoji: '🌷'},{class: 'flowers', emoji: '🌹'},{class: 'flowers', emoji: '🌺'},{class: 'flowers', emoji: '🌻'},{class: 'stars', emoji: '✨'},{class: 'stars', emoji: '🌟'},{class: 'stars', emoji: '🎇'},{class: 'flowers', emoji: '🌸'}];
+        const numElements =state.confetti.numberOfFloatingElement; // Number of floating elements to generate
 
         for (let i = 0; i < numElements; i++) {
             const randomSymbol = symbols[Math.floor(Math.random() * symbols.length)];
@@ -196,9 +213,18 @@ document.addEventListener('DOMContentLoaded', () => {
             // Random animation delay for staggered effect
             element.style.animationDelay = `${Math.random() * 3}s`;
 
-            setTimeout(e=>{
+            // Limit the number of floating elements to prevent memory leaks
+            const maxFloatingElements = 40;
+            const currentFloating = document.querySelectorAll('.floating');
+            if (currentFloating.length >= maxFloatingElements) {
+                // Remove oldest floating elements
+                for (let j = 0; j < currentFloating.length - maxFloatingElements + 1; j++) {
+                    currentFloating[j].remove();
+                }
+            }
+            setTimeout(() => {
                 element.remove();
-            },30000)
+            }, 30000);
             document.body.appendChild(element);
         }
     }
@@ -213,7 +239,7 @@ document.addEventListener('DOMContentLoaded', () => {
             });
 
             // Create additional confetti for burst effect
-            for (let i = 0; i < 100; i++) {
+            for (let i = 0; i < state.confetti.number ; i++) {
                 const extraConfetti = document.createElement('div');
                 extraConfetti.className = 'confetti extra-confetti';
                 extraConfetti.style.left = `${Math.random() * 100}%`;
@@ -226,26 +252,15 @@ document.addEventListener('DOMContentLoaded', () => {
                 // Remove extra confetti after animation
                 setTimeout(() => {
                     extraConfetti.remove();
-                }, 5000);
+                }, state.confetti.interval);
             }
 
-        }
+    }
 
     function getRandomColor() {
-            const colors = ['#ff6b6b',
-                '#ff8e53',
-                '#ffd700',
-                '#4caf50',
-                '#2196f3',
-                '#9c27b0',
-                '#ff4081',
-                '#00bcd4',
-                '#8bc34a',
-                '#ff5722',
-                '#3e0909'
-            ];
+            const {colors} = state.confetti;
             return colors[Math.floor(Math.random() * colors.length)];
-        }
+    }
 
     function animateName() {
         const nameElement = elements.nameElement;

@@ -1,5 +1,11 @@
 {
-  "domain": "dev-42q8t32ymoynngs3.us.auth0.com",
-  "clientId": "rhwOnqEEAZsJQ037JjkFBFugcu46Pn4o",
-  "cacheLocation":"localstorage"
+  "Auth": {
+    "domain": "dev-42q8t32ymoynngs3.us.auth0.com",
+    "clientId": "rhwOnqEEAZsJQ037JjkFBFugcu46Pn4o",
+    "cacheLocation": "localstorage"
+  },
+  "PasswordManager": {
+    "PASSWORD": "missusfhavur",
+    "STORAGE_KEY": "BirthdayAppPassword"
+  }
 }

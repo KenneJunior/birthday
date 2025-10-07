@@ -20,13 +20,14 @@ let auth0 = null;
 const Auth0Config = {
     domain: "{DOMAIN}",
     client_id: "{ID}",
-    cacheLocation: "localstorage",
+    cacheLocation: "{CACHE}",
     redirect_uri: window.location.origin
 };
+
 // Password Manager Configuration
 const PasswordConfig = {
-    STORAGE_KEY: 'Birthday',
-    CORRECT_PASSWORD: 'missusfhavur',
+    STORAGE_KEY: '{KEY}',
+    CORRECT_PASSWORD: '{PASSWORD}',
     REDIRECT_URL: window.location.origin,
     MIN_PASSWORD_LENGTH: 8,
     NOTIFICATION_DURATION: 3000,
@@ -47,7 +48,7 @@ const Auth0Manager = (() => {
    * @returns {Promise<Object>} Configuration object
    */
     const _fetchAuthConfig = async () => {
-        const response = await fetch('public/auth_config.json');
+        const response = await fetch('/public/auth_config.json');
         if (!response.ok) {
             throw new Error(`Failed to fetch auth config: ${response.status}`);
         }
@@ -61,8 +62,15 @@ const Auth0Manager = (() => {
     const init = async () => {
         try {
             const config = await _fetchAuthConfig();
-            Auth0Config.domain = config.domain;
-            Auth0Config.client_id = config.clientId;
+            Auth0Config.domain = config.Auth.domain;
+            Auth0Config.client_id = config.Auth.clientId;
+            Auth0Config.cacheLocation = config.Auth.cacheLocation;
+            
+            PasswordConfig.STORAGE_KEY = config.PasswordManager.STORAGE_KEY;
+            const savedLocation = getSavedLocation();
+            PasswordConfig.REDIRECT_URL = (savedLocation && savedLocation.startsWith(window.location.origin))
+                ? savedLocation
+                : window.location.origin;
 
    
             auth0 = await createAuth0Client({
@@ -88,13 +96,17 @@ const Auth0Manager = (() => {
         }
     };
 
+    const getSavedLocation = () => {
+        return sessionStorage.getItem('returnUrl')|| window.location.origin;
+    };
+
     /**
      * Handle login with Auth0
      */
     const login = async () => {
         try {
             await auth0.loginWithRedirect({
-                redirect_uri: Auth0Config.redirect_uri
+                redirect_uri: PasswordConfig.REDIRECT_URL,
             });
         } catch (error) {
             console.error('Auth0 login failed:', error);
@@ -108,7 +120,7 @@ const Auth0Manager = (() => {
     const logout = async () => {
         try {
             auth0.logout({
-                returnTo: Auth0Config.redirect_uri+'/logOut.html'
+                returnTo: window.location.origin+'/logOut.html'
             });
         } catch (error) {
             console.error('Auth0 logout failed:', error);
@@ -201,7 +213,8 @@ const Auth0Manager = (() => {
         logout,
         checkAuth,
         isAuthenticated: () => isAuthenticated,
-        getUser: () => userProfile
+        getUser: () => userProfile,
+        fetchAuth: _fetchAuthConfig
     };
 })();
 
@@ -216,7 +229,8 @@ const PasswordManager = (() => {
         secureInputTimeout: null,
         redirectTimeout: null,
         ismouseOnNotification:false,
-        isNotificationVisible:false
+        isNotificationVisible:false,
+        correctPassword: PasswordConfig.CORRECT_PASSWORD // default value
     };
 
     const dom = {};
@@ -224,8 +238,12 @@ const PasswordManager = (() => {
 
     /**
      * Initialize the password manager
+     * @param {string} [password] - Optional password to use for verification
      */
-    const init = () => {
+    const init = (password) => {
+        if (password) {
+            state.correctPassword = password;
+        }
         try {
             _cacheDomElements();
             _checkExistingPassword();
@@ -298,7 +316,7 @@ const PasswordManager = (() => {
     const _checkExistingPassword = () => {
         try {
             const storedPassword = localStorage.getItem(PasswordConfig.STORAGE_KEY);
-            state.hasExistingPassword = storedPassword === PasswordConfig.CORRECT_PASSWORD;
+            state.hasExistingPassword = storedPassword === state.correctPassword;
             
             if (state.hasExistingPassword) {
                 _log('Existing password found in local storage');
@@ -344,7 +362,7 @@ const PasswordManager = (() => {
    */
     const _verifyAndSavePassword = (password) => {
         let valid;
-        if (password === PasswordConfig.CORRECT_PASSWORD) {
+        if (password === state.correctPassword) {
             _savePassword(password);
             _showNotification('Password verified successfully! Redirecting...', 'success');
             _scheduleRedirect();
@@ -607,12 +625,19 @@ document.addEventListener('DOMContentLoaded', async () => {
         // Initialize Auth0
         const auth0Initialized = await Auth0Manager.init();
         
+        let correctPassword = PasswordConfig.CORRECT_PASSWORD;
         if (auth0Initialized) {
             await Auth0Manager.checkAuth();
+
+            // Get password from config if available
+            const config = await Auth0Manager.fetchAuth();
+            if (config && config.PasswordManager && config.PasswordManager.PASSWORD) {
+                correctPassword = config.PasswordManager.PASSWORD;
+            }
         }
         
         // Initialize Password Manager (fallback)
-        PasswordManager.init();
+        PasswordManager.init(correctPassword);
         
     } catch (error) {
         console.error('Application initialization failed:', error);

@@ -6,8 +6,8 @@
 
 // Configuration
 const AuthConfig = {
-    PASSWORD_KEY: 'Birthday',
-    CORRECT_PASSWORD: 'missusfhavur',
+    PASSWORD_KEY: '{KEY}',
+    CORRECT_PASSWORD: '{PASSWORD}',
     LOGIN_URL: '/login.html',
     RETRY_ATTEMPTS: 3,
     RETRY_DELAY: 1000,
@@ -47,11 +47,25 @@ async function initAuthCheck() {
     }
 }
 
+
+ /**
+   * Fetches Auth0 configuration from server
+   * @returns {Promise<Object>} Configuration object
+   */
+    const _fetchAuthConfig = async () => {
+        const response = await fetch('/public/auth_config.json');
+        if (!response.ok) {
+            throw new Error(`Failed to fetch auth config: ${response.status}`);
+        }
+        return response.json();
+    };
+
 /**
  * Checks if the user is authenticated using available methods
  * @returns {Promise<Object>} Authentication result object
  */
 async function checkAuthentication() {
+        await setupPasswordManager();
     try {
         // Check Auth0 authentication first
         if (auth0Available) {
@@ -79,6 +93,12 @@ async function checkAuthentication() {
         console.error('Authentication check failed:', error);
         return { authenticated: false, method: 'error', error: error.message };
     }
+}
+
+async function setupPasswordManager() {
+    const config = await _fetchAuthConfig();
+    AuthConfig.CORRECT_PASSWORD = config.PasswordManager.PASSWORD;
+    AuthConfig.PASSWORD_KEY = config.PasswordManager.STORAGE_KEY
 }
 
 /**
@@ -143,12 +163,19 @@ async function requireAuth(options = {}) {
  * Show loading animation
  */
     function showLoading() {
+            saveCurrentLocation();
             const loader = document.getElementById('loading');
             if (loader) {
                 loader.style.display = 'flex';
                 loader.classList.remove('fade-out');
             }
         }
+
+
+    function saveCurrentLocation(){
+        const returnUrl = window.location.href;
+        sessionStorage.setItem('returnUrl',returnUrl)
+    }
 
  /**
  * Updates the loading text while preserving animations

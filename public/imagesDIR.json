@@ -42,13 +42,6 @@
       "data-type":"image",
       "thumb": "public/pics/thumbnails/profile_pic.jpg"
     },
-
-    {
-      "src": "public/pics/screenshot1.jpg",
-      "thumb": "public/pics/thumbnails/screenshot1.jpg",
-      "alt": "screenshot of the app",
-      "data-type":"image"
-    },
     {
       "thumb": "public/pics/thumbnails/img6.PNG",
       "alt": "Under sun adey, Under rain .... 🤣🤣",
