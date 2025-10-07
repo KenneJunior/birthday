@@ -67,7 +67,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Initialize the application
     function init() {
-        platform();
+        detectlPatform();
         // Add tooltip styles
         const style = document.createElement('style');
         style.textContent = `
@@ -117,7 +117,7 @@ document.addEventListener('DOMContentLoaded', () => {
         }, state.cooldown);
     }
 
-    function platform() {
+    function detectlPatform() {
         const platform = PlatformDetector.detect();
         if (platform === 'iOS' || platform === 'Android') {
             state.confetti.numberOfFloatingElement = 8;
