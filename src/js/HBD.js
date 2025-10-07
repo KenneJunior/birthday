@@ -50,7 +50,6 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     // Constants
-    const HEART_COOLDOWN = 300; // ms between heart creations
     const EMOJIS = ['❤️', '💖', '💗', '💓', '💞', '🌸', '✨', '🎀', '💘', '💕', '💝'];
     const LETTER_ANIMATIONS = [
         'fadeInUp',
