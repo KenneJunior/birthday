@@ -8,5 +8,25 @@
     { "src": "/(.*)\\.html", "dest": "/$1.html" },
     { "src": "/(.*)", "dest": "/$1.html" },
     { "src": "/", "dest": "/index.html" }
+  ],
+  "headers": [
+    {
+      "source": "**/*.js",
+      "headers": [
+        {
+          "key": "Content-Type",
+          "value": "application/javascript; charset=utf-8"
+        }
+      ]
+    },
+    {
+      "source": "/src/js/**/*.js",
+      "headers": [
+        {
+          "key": "Content-Type",
+          "value": "application/javascript; charset=utf-8"
+        }
+      ]
+    }
   ]
 }
