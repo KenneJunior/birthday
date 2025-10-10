@@ -692,7 +692,7 @@ export class UltimateModal {
 
     async loadMediaData(){
         try {
-            const response = await fetch('public/imagesDIR.json');
+            const response = await fetch('/imagesDIR.json');
             if (!response.ok) {
                 throw new Error('Network response was not ok');
             }

@@ -48,7 +48,7 @@ const Auth0Manager = (() => {
    * @returns {Promise<Object>} Configuration object
    */
     const _fetchAuthConfig = async () => {
-        const response = await fetch('/public/auth_config.json');
+    const response = await fetch('/auth_config.json');
         if (!response.ok) {
             throw new Error(`Failed to fetch auth config: ${response.status}`);
         }
