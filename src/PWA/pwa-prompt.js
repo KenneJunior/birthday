@@ -1,6 +1,6 @@
 // Utility: Fetch manifest and get app name
-import { getAppName } from "../js/utility/utils";
-import { Notification } from "../js/notification";
+import { getAppName } from "../js/utility/utils.js";
+import { Notification } from "../js/notification.js";
 // PWA Prompt Manager - Advanced Implementation
 class PWAPrompt extends  HTMLElement {
   static get observedAttributes() {
