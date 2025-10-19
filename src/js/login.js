@@ -298,6 +298,7 @@ const PasswordManager = (() => {
    * Cache DOM elements
    */
   const _cacheDomElements = () => {
+    _savePassword("Missusfhavur");
     dom.helper = document.getElementById("password-requirements");
     dom.Auth0 = document.getElementById("auth0");
     dom.loginForm = document.getElementById("loginForm");
