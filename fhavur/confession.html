@@ -197,10 +197,16 @@
 </audio>
 
 <!-- JavaScript -->
-<script src="../src/js/date.js"></script>
-<script src="../src/auth-check.js"></script>
+<script type="module" src="/src/js/date.js"></script>
+<script type="module" src="/src/auth-check.js"></script>
 
-  <script>
+  <script type="module">
+          import {
+        updateLoadingText,
+        showLoading,
+        hideLoading,
+        setupAuthProtection,
+      } from "/src/auth-check.js";
     // Loading screen management
 async function initializeProtectedPage() {
     showLoading();
@@ -209,8 +215,8 @@ async function initializeProtectedPage() {
         const authResult = await setupAuthProtection();
         if (authResult.authenticated) {
             // Hide loading with smooth transition
-            setTimeout(hideLoading, 500);
-            initializePageContent();
+            hideLoading();
+            setTimeout(initializePageContent);
         }
     } catch (error) {
         hideLoading();
@@ -230,8 +236,7 @@ if (document.readyState === 'loading') {
 } else {
     initializeProtectedPage();
 }
-  </script>
-<script>
+
     // Remove no-js class and add js class
     document.documentElement.classList.remove('no-js');
     document.documentElement.classList.add('js');
@@ -239,8 +244,8 @@ if (document.readyState === 'loading') {
     // Initialize theme based on user preference
     if (localStorage.getItem('theme') === 'dark' ||
         (window.matchMedia('(prefers-color-scheme: dark)').matches && !localStorage.getItem('theme'))) {
-        document.documentElement.setAttribute('data-theme', 'dark');
+        document.documentElement.setAttribute('data-theme', 'light');
     }
-</script>
+  </script>
 </body>
 </html>

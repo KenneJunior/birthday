@@ -1,211 +1,279 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
+  <head>
+    <meta charset="UTF-8" />
     <title>Hey There Beautiful</title>
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  </head>
+  <link rel="stylesheet" href="fhav.css" />
+  <link rel="stylesheet" href="../../src/css/loading.css" />
 
-</head>
-<link rel="stylesheet" href="fhav.css">
-<link rel = "stylesheet" href="../../src/css/loading.css"/>
-
-<script type="application/ld+json">
+  <script type="application/ld+json">
     {
-        "@context": "https://schema.org",
-        "@type": "CreativeWork",
-        "name": "Interactive Greeting Experience",
-        "description": "A beautiful interactive greeting with animated gradient background",
-        "author": {
-            "@type": "Person",
-            "name": "Junior"
-        },
-        "creator": {
-            "@type": "Person",
-            "name": "Junior"
-        }
+      "@context": "https://schema.org",
+      "@type": "CreativeWork",
+      "name": "Interactive Greeting Experience",
+      "description": "A beautiful interactive greeting with animated gradient background",
+      "author": {
+        "@type": "Person",
+        "name": "Junior"
+      },
+      "creator": {
+        "@type": "Person",
+        "name": "Junior"
+      }
     }
-</script>
+  </script>
 
-<body>
-<div class="loading-container" id="loading">
-    <div class="loading-spinner">
+  <body>
+    <div class="loading-container" id="loading">
+      <div class="loading-spinner">
         <div class="loading-spinner-inner"></div>
-    </div>
-    <div class="loading-text">
+      </div>
+      <div class="loading-text">
         Verifying access
         <span class="loading-dots">
-            <span></span>
-            <span></span>
-            <span></span>
+          <span></span>
+          <span></span>
+          <span></span>
         </span>
+      </div>
     </div>
-</div>
-  
-<div class="cursor-follower" aria-hidden="true">
-    <div class="cursor-inner"></div>
-    <div class="cursor-outer"></div>
-</div>
 
-<main id="main-content" class="main-content" id="protectedContent" role="main">
-    <div class="card" role="article" aria-labelledby="greeting-heading">
-        <div class="card-inner">
-            <div class="card-effects">
-                <svg
-                        viewBox="0 0 100% 100%"
-                        xmlns='http://www.w3.org/2000/svg'
-                        class="noise"
-                >
-                    <filter id='noiseFilter'>
-                        <feTurbulence
-                                type='fractalNoise'
-                                baseFrequency='0.85'
-                                numOctaves='6'
-                                stitchTiles='stitch'/>
-                    </filter>
-
-                    <rect
-                            width='100%'
-                            height='100%'
-                            preserveAspectRatio="xMidYMid meet"
-                            filter='url(#noiseFilter)'/>
-                </svg>
-                <div class="card-shine" aria-hidden="true"></div>
-                <div class="card-glare" aria-hidden="true"></div>
-            </div>
-            <div class="content">
-                <header class="content-header">
-                    <h1 id="greeting-heading" class="greeting-title">
-                        <span class="title-word">God's Fhavur</span>
-                        <span class="title-punctuation">!</span>
-                    </h1>
-                    <div class="decoration-line" aria-hidden="true"></div>
-                </header>
-                <div class="message-content" id="proposalCard">
-                    <p class="message-text">
-                        you’ve been on my mind way more than I ever planned.<br>
-                        🥺 I kept telling myself to chill, but my heart didn’t get the memo. <br>
-                        What I really want… is to take you out, spend time with you, and make memories
-                        that are just ours. <br>
-                        would you give me the honor of a real date with you? 💕</p>
-                </div>
-
-                <footer class="content-footer">
-                    <div class="interaction-buttons">
-                        <button class="cta-button primary" id="yes-btn" aria-label="Continue to next experience">
-                            <span class="button-text">Im happy to </span>
-                            <span class="button-icon" aria-hidden="true">
-                                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none"
-                                         xmlns="http://www.w3.org/2000/svg">
-                                        <path d="M5 12H19M19 12L12 5M19 12L12 19" stroke="currentColor" stroke-width="2"
-                                              stroke-linecap="round" stroke-linejoin="round"/>
-                                    </svg>
-                                </span>
-                        </button>
-                        <button class="cta-button primary" id="maybe-btn" aria-label="Continue to next experience">
-                            <span class="button-text">i will think about it</span>
-                            <span class="button-icon" aria-hidden="true">
-                                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none"
-                                         xmlns="http://www.w3.org/2000/svg">
-                                        <path d="M5 12H19M19 12L12 5M19 12L12 19" stroke="currentColor" stroke-width="2"
-                                              stroke-linecap="round" stroke-linejoin="round"/>
-                                    </svg>
-                                </span>
-                        </button>
-                        <button class="cta-button primary" id="nope-btn" aria-label="Continue to next experience">
-                            <span class="button-text">No But thanks </span>
-                            <span class="button-icon" aria-hidden="true">
-                                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none"
-                                         xmlns="http://www.w3.org/2000/svg">
-                                        <path d="M5 12H19M19 12L12 5M19 12L12 19" stroke="currentColor" stroke-width="2"
-                                              stroke-linecap="round" stroke-linejoin="round"/>
-                                    </svg>
-                                </span>
-                        </button>
-                    </div>
-                </footer>
-            </div>
-        </div>
-
+    <div class="cursor-follower" aria-hidden="true">
+      <div class="cursor-inner"></div>
+      <div class="cursor-outer"></div>
     </div>
-</main>
 
-<div class="gradient-bg">
-    <svg
-            viewBox="0 0 100vw 100vw"
-            xmlns='http://www.w3.org/2000/svg'
-            class="noiseBg"
+    <main
+      id="main-content"
+      class="main-content"
+      id="protectedContent"
+      role="main"
     >
-        <filter id='noiseFilterBg'>
-            <feTurbulence
-                    type='fractalNoise'
-                    baseFrequency='0.6'
-                    stitchTiles='stitch'/>
+      <div class="card" role="article" aria-labelledby="greeting-heading">
+        <div class="card-inner">
+          <div class="card-effects">
+            <svg
+              viewBox="0 0 100% 100%"
+              xmlns="http://www.w3.org/2000/svg"
+              class="noise"
+            >
+              <filter id="noiseFilter">
+                <feTurbulence
+                  type="fractalNoise"
+                  baseFrequency="0.85"
+                  numOctaves="6"
+                  stitchTiles="stitch"
+                />
+              </filter>
+
+              <rect
+                width="100%"
+                height="100%"
+                preserveAspectRatio="xMidYMid meet"
+                filter="url(#noiseFilter)"
+              />
+            </svg>
+            <div class="card-shine" aria-hidden="true"></div>
+            <div class="card-glare" aria-hidden="true"></div>
+          </div>
+          <div class="content">
+            <header class="content-header">
+              <h1 id="greeting-heading" class="greeting-title">
+                <span class="title-word">God's Fhavur</span>
+                <span class="title-punctuation">!</span>
+              </h1>
+              <div class="decoration-line" aria-hidden="true"></div>
+            </header>
+            <div class="message-content" id="proposalCard">
+              <p class="message-text">
+                you’ve been on my mind way more than I ever planned.<br />
+                🥺 I kept telling myself to chill, but my heart didn’t get the
+                memo. <br />
+                What I really want… is to take you out, spend time with you, and
+                make memories that are just ours. <br />
+                would you give me the honor of a real date with you? 💕
+              </p>
+            </div>
+
+            <footer class="content-footer">
+              <div class="interaction-buttons">
+                <button
+                  class="cta-button primary"
+                  id="yes-btn"
+                  aria-label="Continue to next experience"
+                >
+                  <span class="button-text">Im happy to </span>
+                  <span class="button-icon" aria-hidden="true">
+                    <svg
+                      width="20"
+                      height="20"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      xmlns="http://www.w3.org/2000/svg"
+                    >
+                      <path
+                        d="M5 12H19M19 12L12 5M19 12L12 19"
+                        stroke="currentColor"
+                        stroke-width="2"
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                      />
+                    </svg>
+                  </span>
+                </button>
+                <button
+                  class="cta-button primary"
+                  id="maybe-btn"
+                  aria-label="Continue to next experience"
+                >
+                  <span class="button-text">i will think about it</span>
+                  <span class="button-icon" aria-hidden="true">
+                    <svg
+                      width="20"
+                      height="20"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      xmlns="http://www.w3.org/2000/svg"
+                    >
+                      <path
+                        d="M5 12H19M19 12L12 5M19 12L12 19"
+                        stroke="currentColor"
+                        stroke-width="2"
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                      />
+                    </svg>
+                  </span>
+                </button>
+                <button
+                  class="cta-button primary"
+                  id="nope-btn"
+                  aria-label="Continue to next experience"
+                >
+                  <span class="button-text">No But thanks </span>
+                  <span class="button-icon" aria-hidden="true">
+                    <svg
+                      width="20"
+                      height="20"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      xmlns="http://www.w3.org/2000/svg"
+                    >
+                      <path
+                        d="M5 12H19M19 12L12 5M19 12L12 19"
+                        stroke="currentColor"
+                        stroke-width="2"
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                      />
+                    </svg>
+                  </span>
+                </button>
+              </div>
+            </footer>
+          </div>
+        </div>
+      </div>
+    </main>
+
+    <div class="gradient-bg">
+      <svg
+        viewBox="0 0 100vw 100vw"
+        xmlns="http://www.w3.org/2000/svg"
+        class="noiseBg"
+      >
+        <filter id="noiseFilterBg">
+          <feTurbulence
+            type="fractalNoise"
+            baseFrequency="0.6"
+            stitchTiles="stitch"
+          />
         </filter>
 
         <rect
-                width='100%'
-                height='100%'
-                preserveAspectRatio="xMidYMid meet"
-                filter='url(#noiseFilterBg)'/>
-    </svg>
-    <svg xmlns="http://www.w3.org/2000/svg" class="svgBlur">
+          width="100%"
+          height="100%"
+          preserveAspectRatio="xMidYMid meet"
+          filter="url(#noiseFilterBg)"
+        />
+      </svg>
+      <svg xmlns="http://www.w3.org/2000/svg" class="svgBlur">
         <defs>
-            <filter id="goo">
-                <feGaussianBlur in="SourceGraphic" stdDeviation="10" result="blur"/>
-                <feColorMatrix in="blur" mode="matrix" values="1 0 0 0 0  0 1 0 0 0  0 0 1 0 0  0 0 0 18 -8"
-                               result="goo"/>
-                <feBlend in="SourceGraphic" in2="goo"/>
-            </filter>
+          <filter id="goo">
+            <feGaussianBlur
+              in="SourceGraphic"
+              stdDeviation="10"
+              result="blur"
+            />
+            <feColorMatrix
+              in="blur"
+              mode="matrix"
+              values="1 0 0 0 0  0 1 0 0 0  0 0 1 0 0  0 0 0 18 -8"
+              result="goo"
+            />
+            <feBlend in="SourceGraphic" in2="goo" />
+          </filter>
         </defs>
-    </svg>
-    <div class="gradients-container">
+      </svg>
+      <div class="gradients-container">
         <div class="g1"></div>
         <div class="g2"></div>
         <div class="g3"></div>
         <div class="g4"></div>
         <div class="g5"></div>
         <div class="interactive"></div>
+      </div>
     </div>
-</div>
-<div class="particles-container" hidden aria-hidden="true">
-    <canvas id="particles-canvas" role="presentation"></canvas>
-</div>
+    <div class="particles-container" hidden aria-hidden="true">
+      <canvas id="particles-canvas" role="presentation"></canvas>
+    </div>
 
-<audio id="hover-sound">
-    <source src="public/Ruth-B_-Dandelions-(TopGhanaMusic.Com).mp3" type="audio/mpeg" >
-</audio>
-<script src="fhav.js"></script>
-    <script src="../../src/auth-check.js"></script>
+    <audio id="hover-sound">
+      <source
+        src="public/Ruth-B_-Dandelions-(TopGhanaMusic.Com).mp3"
+        type="audio/mpeg"
+      />
+    </audio>
+    <script src="fhav.js" type="module"></script>
+    <script type="module" src="/src/auth-check.js"></script>
 
-  <script>
-async function initializeProtectedPage() {
-    showLoading();
-    
-    try {
-        const authResult = await setupAuthProtection();
-        if (authResult.authenticated) {
+    <script type="module">
+      import {
+        updateLoadingText,
+        showLoading,
+        hideLoading,
+        setupAuthProtection,
+      } from "/src/auth-check.js";
+      async function initializeProtectedPage() {
+        showLoading();
+
+        try {
+          const authResult = await setupAuthProtection();
+          if (authResult.authenticated) {
             // Hide loading with smooth transition
             setTimeout(hideLoading, 500);
             initializePageContent();
+          }
+        } catch (error) {
+          hideLoading();
+          console.error("Authentication failed:", error);
+          window.location.href = "/login";
         }
-    } catch (error) {
-        hideLoading();
-        console.error('Authentication failed:', error);
-        window.location.href = '/login';
-    }
-}
+      }
 
-function initializePageContent() {
-    console.log('Protected content loaded successfully');
-        document.querySelectorAll('button, input').forEach(element => {
-        element.disabled = false;
-    });
-}
-if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', initializeProtectedPage);
-} else {
-    initializeProtectedPage();
-}
-  </script>
-</body>
+      function initializePageContent() {
+        console.log("Protected content loaded successfully");
+        document.querySelectorAll("button, input").forEach((element) => {
+          element.disabled = false;
+        });
+      }
+      if (document.readyState === "loading") {
+        document.addEventListener("DOMContentLoaded", initializeProtectedPage);
+      } else {
+        initializeProtectedPage();
+      }
+    </script>
+  </body>
 </html>
