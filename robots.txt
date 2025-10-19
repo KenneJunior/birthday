@@ -1,0 +1,18 @@
+# robots.txt for fhavur.vercel.app
+# ---------------------------------
+# This file tells search engines how to crawl your site.
+
+User-agent: *
+Allow: /
+
+# Disallow internal or non-public routes
+Disallow: /api/
+Disallow: /admin/
+Disallow: /dashboard/
+Disallow: /auth/
+Disallow: /settings/
+Disallow: /private/
+Disallow: /tmp/
+
+# No sitemap yet — will be added later
+# Sitemap: https://fhavur.vercel.app/sitemap.xml
