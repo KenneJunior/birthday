@@ -14,6 +14,7 @@
     "vite-plugin-qrcode": "^0.3.0"
   },
   "dependencies": {
+    "@auth0/auth0-spa-js": "^2.7.0",
     "hammerjs": "^2.0.8",
     "pwa-asset-generator": "^8.1.2",
     "sharp": "^0.34.4"
