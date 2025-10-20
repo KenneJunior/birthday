@@ -221,7 +221,7 @@ Adjust durations and easing functions in CSS animation definitions.
 ### Adding Photos
 
 Update the photo gallery in fhavur.html and ensure proper file paths in the json file
-located in `\public\imageDIR.json`.
+located in `\public\gallery-data.json`.
 
 ### Modifying Text
 
@@ -229,9 +229,9 @@ Edit the HTML content directly in respective files for messages and greetings.
 
 ## 🚀 Deployment
 
-### Netlify Deployment
+### vercel Deployment
 
-1. Drag and drop folder to Netlify
+1. Drag and drop folder to vercel
 2. Configure build settings (if needed)
 3. Set up custom domain (optional)
 

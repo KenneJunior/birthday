@@ -126,9 +126,11 @@ function getVideoFiles(dir) {
   });
 }
 
-// Generate sitemap
+// Export the main function
 export async function generateSitemap() {
   try {
+    console.log("🔧 Generating sitemap...");
+
     const [htmlLinks, imageObjects, videoLinks] = await Promise.all([
       getHtmlFiles("."),
       getImageFiles("."),
@@ -162,14 +164,26 @@ export async function generateSitemap() {
     console.log(
       `📊 Stats: ${uniqueLinks.length} URLs, ${htmlLinks.length} pages, ${videoLinks.length} videos, ${imageObjects.length} images`
     );
-    return true;
+
+    return {
+      success: true,
+      stats: {
+        urls: uniqueLinks.length,
+        pages: htmlLinks.length,
+        videos: videoLinks.length,
+        images: imageObjects.length,
+      },
+    };
   } catch (err) {
     console.error("❌ Error generating sitemap:", err);
-    return false;
+    return {
+      success: false,
+      error: err.message,
+    };
   }
 }
 
-// Only run if called directly
+// Only run if called directly (not when imported)
 if (import.meta.url === `file://${process.argv[1]}`) {
   generateSitemap();
 }

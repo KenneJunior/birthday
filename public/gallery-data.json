@@ -3,31 +3,43 @@
     {
       "src": "/pics/img1.jpg",
       "thumb": "/pics/thumbnails/img1.jpg",
-      "alt": "Proud Bamenda pikin \ud83d\ude05\ud83d\ude05",
+      "alt": "Proud Bamenda pikin 😅😅",
       "data-type": "image"
     },
     {
       "src": "/pics/img2.jpg",
       "thumb": "/pics/thumbnails/img2.jpg",
-      "alt": "Miss Bamenda \ud83d\ude39\ud83d\ude39",
+      "alt": "Miss Bamenda 😹😹",
       "data-type": "image"
     },
     {
       "src": "/pics/img3.jpg",
       "thumb": "/pics/thumbnails/img3.jpg",
-      "alt": "andriod Generation and phone \ud83d\ude43\ud83d\ude06",
+      "alt": "andriod Generation and phone 😃😆",
       "data-type": "image"
     },
     {
       "src": "/pics/img4.jpg",
       "thumb": "/pics/thumbnails/img4.jpg",
-      "alt": "when you where learning how to ngess \ud83e\udd23\ud83e\udd23",
+      "alt": "when you where learning how to ngess 🤣🤣",
       "data-type": "image"
     },
     {
       "src": "/pics/img5.jpg",
       "thumb": "/pics/thumbnails/img5.jpg",
-      "alt": "smile smile smile \ud83d\ude01\ud83d\ude0a",
+      "alt": "smile smile smile 😁😊",
+      "data-type": "image"
+    },
+    {
+      "src": "/pics/profile_pic.jpg",
+      "thumb": "/pics/thumbnails/profile_pic.jpg",
+      "alt": "awwww wu is my princess 🤣🤣",
+      "data-type": "image"
+    },
+    {
+      "src": "/pics/screenshot1.jpg",
+      "thumb": "/pics/thumbnails/screenshot1.jpg",
+      "alt": "screenshot of the app",
       "data-type": "image"
     },
     {
@@ -37,34 +49,22 @@
       "data-type": "image"
     },
     {
-      "src": "/pics/profile_pic.jpg",
-      "thumb": "/pics/thumbnails/profile_pic.jpg",
-      "alt": "awwww wu is my princess \ud83e\udd23\ud83e\udd23",
-      "data-type": "image"
-    },
-    {
       "thumb": "/pics/thumbnails/video1.jpg",
-      "alt": "Under sun adey, Under rain .... \ud83e\udd23\ud83e\udd23",
+      "alt": "Under sun adey, Under rain .... 🤣🤣",
       "data-type": "video",
       "video-src": "/vid/video1.mp4"
     },
     {
       "thumb": "/pics/thumbnails/video2.jpg",
-      "alt": "fine child \ud83d\ude18\ud83d\ude18",
+      "alt": "fine child 😘😘",
       "data-type": "video",
       "video-src": "/vid/video2.mp4"
     },
     {
       "thumb": "/pics/thumbnails/video3.jpg",
-      "alt": "Ok whats happening here \ud83e\udd23\ud83e\udd23\ud83e\udd23",
+      "alt": "Ok whats happening here 🤣🤣🤣",
       "data-type": "video",
       "video-src": "/vid/video3.mp4"
-    },
-    {
-      "src": "/pics/screenshot1.jpg",
-      "thumb": "/pics/thumbnails/screenshot1.jpg",
-      "alt": "screenshot of the app",
-      "data-type": "image"
     }
   ]
 }
