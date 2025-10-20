@@ -43,19 +43,19 @@
       "data-type": "image"
     },
     {
-      "thumb": "/pics/thumbnails/img6.PNG",
+      "thumb": "/pics/thumbnails/video1.jpg",
       "alt": "Under sun adey, Under rain .... \ud83e\udd23\ud83e\udd23",
       "data-type": "video",
       "video-src": "/vid/video1.mp4"
     },
     {
-      "thumb": "/pics/thumbnails/img7.PNG",
+      "thumb": "/pics/thumbnails/video2.jpg",
       "alt": "fine child \ud83d\ude18\ud83d\ude18",
       "data-type": "video",
       "video-src": "/vid/video2.mp4"
     },
     {
-      "thumb": "/pics/thumbnails/img8.PNG",
+      "thumb": "/pics/thumbnails/video3.jpg",
       "alt": "Ok whats happening here \ud83e\udd23\ud83e\udd23\ud83e\udd23",
       "data-type": "video",
       "video-src": "/vid/video3.mp4"
