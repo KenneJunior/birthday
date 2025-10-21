@@ -18,6 +18,10 @@ export default defineConfig({
         login: resolve(__dirname, "login.html"),
         logout: resolve(__dirname, "logOut.html"),
       },
+      output: {
+        chunkFileNames: "assets/[name]-[hash].js",
+        assetFileNames: "assets/[name]-[hash].[ext]",
+      },
     },
     //uncomment this if you want to minify the option for terser
     //minify: "terser",
