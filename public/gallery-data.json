@@ -37,12 +37,6 @@
       "data-type": "image"
     },
     {
-      "src": "/pics/screenshot1.jpg",
-      "thumb": "/pics/thumbnails/screenshot1.jpg",
-      "alt": "screenshot of the app",
-      "data-type": "image"
-    },
-    {
       "src": "/pics/tata.jpg",
       "thumb": "/pics/thumbnails/tata.jpg",
       "alt": "Happy memory 5",
@@ -65,6 +59,12 @@
       "alt": "Ok whats happening here 🤣🤣🤣",
       "data-type": "video",
       "video-src": "/vid/video3.mp4"
+    },
+    {
+      "src": "/pics/screenshot1.jpg",
+      "thumb": "/pics/thumbnails/screenshot1.jpg",
+      "alt": "screenshot of the app",
+      "data-type": "image"
     }
   ]
 }

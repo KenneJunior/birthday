@@ -2,11 +2,12 @@ import { existsSync, readdirSync, writeFileSync } from "fs";
 import { join } from "path";
 
 // Configuration
-const CONFIG = {
+const DEFAULT_CONFIG = {
   picsDir: "public/pics",
   thumbsDir: "public/pics/thumbnails",
   vidDir: "public/vid",
   outputFile: "public/gallery-data.json",
+  lastFile: "screenshot1.jpg",
   imageAltTexts: {
     "img1.jpg": "Proud Bamenda pikin 😅😅",
     "img2.jpg": "Miss Bamenda 😹😹",
@@ -22,12 +23,15 @@ const CONFIG = {
     "video2.jpg": "fine child 😘😘",
     "video3.jpg": "Ok whats happening here 🤣🤣🤣",
   },
+  showstats: true,
 };
-
-function generateMediaJSON() {
-  console.log("📸 Generating media JSON file...");
+let CONFIG = {};
+function generateMediaJSON(config = {}) {
+  CONFIG = { ...DEFAULT_CONFIG, ...config };
+  _log("📸 Generating media JSON file...");
 
   const mediaArray = [];
+  let lastFileItem = null;
 
   try {
     // Get all files in the main pics directory (excluding thumbnails directory)
@@ -37,10 +41,14 @@ function generateMediaJSON() {
       )
       .map((dirent) => dirent.name);
 
-    console.log(`📁 Found ${picFiles.length} image files in ${CONFIG.picsDir}`);
+    _log(`📁 Found ${picFiles.length} image files in ${CONFIG.picsDir}`);
 
     // Process images
     picFiles.forEach((filename) => {
+      if (filename === CONFIG.lastFile) {
+        // Skip the last file for now
+        return;
+      }
       const srcPath = `/pics/${filename}`;
       const thumbPath = `/pics/thumbnails/${filename}`;
 
@@ -57,9 +65,9 @@ function generateMediaJSON() {
           "data-type": "image",
         });
 
-        console.log(`✅ Added image: ${filename}`);
+        _log(`✅ Added image: ${filename}`);
       } else {
-        console.log(`⚠️  Skipping ${filename} - thumbnail not found`);
+        _log(`⚠️  Skipping ${filename} - thumbnail not found`);
       }
     });
 
@@ -70,17 +78,17 @@ function generateMediaJSON() {
       )
       .map((dirent) => dirent.name);
 
-    console.log(`📁 Found ${thumbFiles.length} thumbnail files`);
+    _log(`📁 Found ${thumbFiles.length} thumbnail files`);
 
     // Find video thumbnails (those that don't have corresponding images in main pics dir)
     const videoThumbs = thumbFiles.filter((thumbFile) => {
       const correspondingImage = picFiles.find(
         (picFile) => picFile === thumbFile
       );
-      return !correspondingImage;
+      return !correspondingImage && thumbFile !== CONFIG.lastFile;
     });
 
-    console.log(`🎥 Found ${videoThumbs.length} video thumbnails`);
+    _log(`🎥 Found ${videoThumbs.length} video thumbnails`);
 
     // Process videos
     videoThumbs.forEach((thumbFile) => {
@@ -102,13 +110,36 @@ function generateMediaJSON() {
           "video-src": videoPath,
         });
 
-        console.log(`✅ Added video: ${videoName}`);
+        _log(`✅ Added video: ${videoName}`);
       } else {
-        console.log(
-          `⚠️  Skipping ${thumbFile} - video file ${videoName} not found`
-        );
+        _log(`⚠️  Skipping ${thumbFile} - video file ${videoName} not found`);
       }
     });
+
+    // Add the last specified file at the end if it exists
+    if (picFiles.includes(CONFIG.lastFile)) {
+      const srcPath = `/pics/${CONFIG.lastFile}`;
+      const thumbPath = `/pics/thumbnails/${CONFIG.lastFile}`;
+      const thumbExists = existsSync(join(CONFIG.thumbsDir, CONFIG.lastFile));
+
+      if (thumbExists) {
+        const altText =
+          CONFIG.imageAltTexts[CONFIG.lastFile] || `Image: ${CONFIG.lastFile}`;
+
+        lastFileItem = {
+          src: srcPath,
+          thumb: thumbPath,
+          alt: altText,
+          "data-type": "image",
+        };
+
+        console.log(`✅ Added last image: ${CONFIG.lastFile}`);
+      }
+    }
+
+    if (lastFileItem) {
+      mediaArray.push(lastFileItem);
+    }
 
     // Create the final JSON structure
     const jsonOutput = {
@@ -116,16 +147,16 @@ function generateMediaJSON() {
     };
 
     // Write to file
-    writeFileSync(CONFIG.outputFile, JSON.stringify(jsonOutput, null, 2));
+    writeFileSync(CONFIG.outputFile, `${JSON.stringify(jsonOutput, null, 2)}`);
 
-    console.log(`✅ Successfully generated ${CONFIG.outputFile}`);
-    console.log(`📊 Total media items: ${mediaArray.length}`);
-    console.log(
+    _log(`✅ Successfully generated ${CONFIG.outputFile}`);
+    _log(`📊 Total media items: ${mediaArray.length}`);
+    _log(
       `📷 Images: ${
         mediaArray.filter((item) => item["data-type"] === "image").length
       }`
     );
-    console.log(
+    _log(
       `🎥 Videos: ${
         mediaArray.filter((item) => item["data-type"] === "video").length
       }`
@@ -148,6 +179,10 @@ function generateMediaJSON() {
       error: error.message,
     };
   }
+}
+
+function _log(message) {
+  if (CONFIG.showstats) console.log(message);
 }
 
 // Only run if called directly

@@ -4,7 +4,7 @@ import { SitemapStream, streamToPromise } from "sitemap";
 import { Readable } from "stream";
 
 // Configuration
-const CONFIG = {
+const DEFAULT_CONFIG = {
   hostname: "https://fhavur.vercel.app",
   maxDepth: 4,
   excludeDirs: [
@@ -25,7 +25,9 @@ const CONFIG = {
     "logOut.html",
     "pwa-prompt.html",
   ],
+  showstats: true,
 };
+let CONFIG = {};
 
 // Generic function to scan files
 function scanFiles(dir, fileExtensions, options = {}) {
@@ -127,9 +129,11 @@ function getVideoFiles(dir) {
 }
 
 // Export the main function
-export async function generateSitemap() {
+export async function generateSitemap(config = {}) {
+  CONFIG = { ...DEFAULT_CONFIG, ...config };
+
   try {
-    console.log("🔧 Generating sitemap...");
+    _log("🔧 Generating sitemap...");
 
     const [htmlLinks, imageObjects, videoLinks] = await Promise.all([
       getHtmlFiles("."),
@@ -160,8 +164,8 @@ export async function generateSitemap() {
     );
     writeFileSync("public/sitemap.xml", data.toString());
 
-    console.log("✅ Sitemap generated successfully at public/sitemap.xml");
-    console.log(
+    _log("✅ Sitemap generated successfully at public/sitemap.xml");
+    _log(
       `📊 Stats: ${uniqueLinks.length} URLs, ${htmlLinks.length} pages, ${videoLinks.length} videos, ${imageObjects.length} images`
     );
 
@@ -181,6 +185,10 @@ export async function generateSitemap() {
       error: err.message,
     };
   }
+}
+
+function _log(message) {
+  if (CONFIG.showstats) console.log(message);
 }
 
 // Only run if called directly (not when imported)

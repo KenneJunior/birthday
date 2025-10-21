@@ -6,6 +6,8 @@
   "scripts": {
     "sitemap": "node src/scripts/generate-sitemap.js",
     "media-json": "node src/scripts/generate-media-json.js",
+    "robots": "node scripts/generate-robots.js",
+    "robots:dev": "node scripts/generate-robots.js development",
     "prebuild": "node src/scripts/pre-build.js",
     "build": "vite build",
     "dev": "vite",
