@@ -24,7 +24,7 @@ export default defineConfig({
       },
     },
     //uncomment this if you want to minify the option for terser
-    //minify: "terser",
-    minify: "false",
+    minify: "terser",
+    //minify: "false",
   },
 });
