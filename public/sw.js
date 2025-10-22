@@ -1,6 +1,6 @@
-const CACHE_NAME = "fhavur-pwa-cache-v1";
-const STATIC_CACHE = "fhavur-static-v1";
-const DYNAMIC_CACHE = "fhavur-dynamic-v1";
+const CACHE_NAME = "fhavur-pwa-cache-v2";
+const STATIC_CACHE = "fhavur-static-v2";
+const DYNAMIC_CACHE = "fhavur-dynamic-v2";
 
 // External CDN domains to cache
 const EXTERNAL_CDNS = [
@@ -10,21 +10,27 @@ const EXTERNAL_CDNS = [
   "fonts.googleapis.com",
   "fonts.gstatic.com",
   "use.fontawesome.com",
+  "cdn.jsdelivr.net",
+  "code.jquery.com",
   "maxcdn.bootstrapcdn.com",
 ];
 
 // Common external library patterns
 const EXTERNAL_LIBRARIES = [
   // Bootstrap 5
-  /bootstrap.*\.css/,
-  /bootstrap.*\.js/,
+  /bootstrap.min*\.css/,
+  /bootstrap.min*\.js/,
 
   // Font Awesome 6.4.0
   /font-awesome/,
   /fontawesome/,
 
+  // awesome-free
+  /all.min\.css/,
+  /all.min\.js/,
+
   // Animate.css
-  /animate\.css/,
+  /animate.min\.css/,
 
   // Hammer.js
   /hammer\.js/,
@@ -37,6 +43,7 @@ const EXTERNAL_LIBRARIES = [
 // Base URLs to cache - these will work in both development and production
 const ESSENTIAL_URLS = [
   "/",
+  "www.youtube.com",
   "/index.html",
   "/fhavur.html",
   "/login.html",
@@ -94,7 +101,7 @@ const EXCLUDED_DIRS = [
   "/src/utils",
 ];
 
-// Check if URL should be cached
+// Check if URL should be cached (including external libraries)
 function shouldCache(url) {
   const urlObj = new URL(url);
   const pathname = urlObj.pathname;
@@ -148,7 +155,7 @@ function shouldCache(url) {
   return pathname === "/" || pathname.endsWith(".html");
 }
 
-// Install event: Cache essential files with error handling
+// Install event: Cache essential files including external libs
 self.addEventListener("install", (event) => {
   console.log("🛠 Service Worker installing...");
 
@@ -224,7 +231,7 @@ self.addEventListener("fetch", (event) => {
   }
 });
 
-// Strategy 1: Cache First for static assets
+// Strategy for static assets (images, fonts, media)
 async function staticAssetsStrategy(request, isExternal = false) {
   const cacheName = isExternal ? DYNAMIC_CACHE : STATIC_CACHE;
 
@@ -240,9 +247,9 @@ async function staticAssetsStrategy(request, isExternal = false) {
     const networkResponse = await fetch(request);
 
     if (networkResponse.ok) {
-      const dynamicCache = await caches.open(cacheName);
-      await dynamicCache.put(request, networkResponse.clone());
-      console.log("💾 Cached new static asset:", request.url);
+      const cache = await caches.open(cacheName);
+      await cache.put(request, networkResponse.clone());
+      console.log("💾 Cached static asset:", request.url);
     }
 
     return networkResponse;
@@ -264,8 +271,47 @@ async function staticAssetsStrategy(request, isExternal = false) {
   }
 }
 
-// Strategy 2: Network First for HTML documents
-async function htmlDocumentsStrategy(request, isExternal = false) {
+// Special strategy for CSS and external resources
+async function cssAndExternalStrategy(request, isExternal = false) {
+  const cacheName = isExternal ? DYNAMIC_CACHE : STATIC_CACHE;
+
+  try {
+    const cache = await caches.open(cacheName);
+    const cachedResponse = await cache.match(request);
+
+    if (cachedResponse) {
+      console.log("🎨 Serving CSS/External from cache:", request.url);
+      return cachedResponse;
+    }
+
+    const networkResponse = await fetch(request);
+
+    if (networkResponse.ok) {
+      const cache = await caches.open(cacheName);
+      await cache.put(request, networkResponse.clone());
+      console.log("💾 Cached CSS/External resource:", request.url);
+    }
+
+    return networkResponse;
+  } catch (error) {
+    console.log("🌐 Offline - CSS/External not available:", request.url);
+
+    // For critical CSS, you might want to return a basic fallback
+    if (
+      request.url.includes("bootstrap") ||
+      request.url.includes("fontawesome")
+    ) {
+      console.warn("⚠️ Critical CSS library offline:", request.url);
+    }
+
+    return new Response("/* Library offline */", {
+      headers: { "Content-Type": "text/css" },
+    });
+  }
+}
+
+// Strategy for HTML documents
+async function htmlDocumentsStrategy(request) {
   try {
     const networkResponse = await fetch(request);
 
@@ -308,27 +354,29 @@ async function htmlDocumentsStrategy(request, isExternal = false) {
   }
 }
 
-// Strategy 3: Stale-While-Revalidate for CSS/JS/JSON
+// Strategy for JS and other files
 async function staleWhileRevalidateStrategy(request, isExternal = false) {
-  const cache = await caches.open(STATIC_CACHE);
   const cacheName = isExternal ? DYNAMIC_CACHE : STATIC_CACHE;
+  const cache = await caches.open(cacheName);
   const cachedResponse = await cache.match(request);
 
   if (cachedResponse) {
     console.log("⚡ Serving from cache (SWR):", request.url);
 
-    // Update cache in background
-    fetch(request)
-      .then(async (networkResponse) => {
-        if (networkResponse.ok) {
-          const dynamicCache = await caches.open(cacheName);
-          await dynamicCache.put(request, networkResponse.clone());
-          console.log("🔄 Background cache update:", request.url);
-        }
-      })
-      .catch(() => {
-        // Silent fail - we have the cached version
-      });
+    // Update cache in background for external resources
+    if (isExternal) {
+      fetch(request)
+        .then(async (networkResponse) => {
+          if (networkResponse.ok) {
+            const cache = await caches.open(cacheName);
+            await cache.put(request, networkResponse.clone());
+            console.log("🔄 Background cache update:", request.url);
+          }
+        })
+        .catch(() => {
+          // Silent fail for external resources
+        });
+    }
 
     return cachedResponse;
   }
@@ -337,8 +385,8 @@ async function staleWhileRevalidateStrategy(request, isExternal = false) {
     const networkResponse = await fetch(request);
 
     if (networkResponse.ok) {
-      const dynamicCache = await caches.open(cacheName);
-      await dynamicCache.put(request, networkResponse.clone());
+      const cache = await caches.open(cacheName);
+      await cache.put(request, networkResponse.clone());
     }
 
     return networkResponse;
@@ -381,6 +429,13 @@ async function cleanupOldCaches() {
   }
 }
 
+// Handle skip waiting message
+self.addEventListener("message", (event) => {
+  if (event.data && event.data.type === "SKIP_WAITING") {
+    console.log("🔄 Skipping waiting phase...");
+    self.skipWaiting();
+  }
+});
 // Background sync for offline actions
 self.addEventListener("sync", (event) => {
   if (event.tag === "background-sync") {
