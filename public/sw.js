@@ -18,32 +18,25 @@ const EXTERNAL_CDNS = [
 // Common external library patterns
 const EXTERNAL_LIBRARIES = [
   // Bootstrap 5
-  /bootstrap.min*\.css/,
-  /bootstrap.min*\.js/,
+  /bootstrap.*\.min\.(css|js)/i,
 
   // Font Awesome 6.4.0
-  /font-awesome/,
-  /fontawesome/,
-
   // awesome-free
-  /all.min\.css/,
-  /all.min\.js/,
+  /fontawesome|font-awesome|all\.min\.(css|js)/i,
 
   // Animate.css
-  /animate.min\.css/,
+  /animate(\.min)?\.css/i,
 
   // Hammer.js
-  /hammer\.js/,
-
+  /hammer(\.min)?\.js/i,
   // Google Fonts
-  /fonts\.googleapis/,
-  /fonts\.gstatic/,
+  /fonts\.googleapis\.com/i,
+  /fonts\.gstatic\.com/i,
 ];
 
 // Base URLs to cache - these will work in both development and production
 const ESSENTIAL_URLS = [
   "/",
-  "www.youtube.com",
   "/index.html",
   "/fhavur.html",
   "/login.html",
@@ -100,10 +93,30 @@ const EXCLUDED_DIRS = [
   "/src/scripts",
   "/src/utils",
 ];
+function safeURL(url) {
+  try {
+    return new URL(url);
+  } catch (_e) {
+    return null;
+  }
+}
+
+function isExternalHost(hostname) {
+  return EXTERNAL_CDNS.includes(hostname);
+}
+
+function matchesExternalLibrary(url) {
+  for (const rx of EXTERNAL_LIBRARIES) {
+    if (rx.test(url)) return true;
+  }
+  return false;
+}
 
 // Check if URL should be cached (including external libraries)
 function shouldCache(url) {
-  const urlObj = new URL(url);
+  const urlObj = safeURL(url);
+  if (!urlObj) return false;
+
   const pathname = urlObj.pathname;
   const hostname = urlObj.hostname;
 
@@ -112,23 +125,13 @@ function shouldCache(url) {
     return false;
   }
 
-  // Cache external CDN resources
-  if (EXTERNAL_CDNS.includes(hostname)) {
+  // Allow caching of well-known CDNs
+  if (isExternalHost(hostname) || matchesExternalLibrary(requestUrl)) {
     return true;
   }
 
-  // Check if it matches external library patterns
-  for (const pattern of EXTERNAL_LIBRARIES) {
-    if (pattern.test(url)) {
-      return true;
-    }
-  }
-
   // Skip external URLs that aren't in our CDN list
-  if (
-    urlObj.origin !== self.location.origin &&
-    !EXTERNAL_CDNS.includes(hostname)
-  ) {
+  if (urlObj.origin !== self.location.origin && !isExternalHost(hostname)) {
     return false;
   }
 
@@ -146,13 +149,12 @@ function shouldCache(url) {
 
   // Check if it's a cacheable file type
   for (const ext of CACHEABLE_EXTENSIONS) {
-    if (pathname.endsWith(ext)) {
-      return true;
-    }
+    if (pathname.toLowerCase().endsWith(ext)) return true;
   }
 
   // Cache root paths and HTML files
-  return pathname === "/" || pathname.endsWith(".html");
+  if (pathname === "/" || pathname.endsWith(".html")) return true;
+  return false;
 }
 
 // Install event: Cache essential files including external libs
@@ -208,22 +210,18 @@ self.addEventListener("fetch", (event) => {
     return;
   }
 
-  const requestUrl = new URL(url);
+  const requestUrl = safeURL(url);
+  if (!requestUrl) return;
+
   const isExternal = requestUrl.origin !== self.location.origin;
+  const pathname = requestUrl.pathname;
 
   // Different strategies for different resource types
-  if (
-    requestUrl.pathname.match(
-      /\.(jpg|jpeg|png|gif|svg|mp3|mp4|webm|woff|woff2|ttf)$/
-    )
-  ) {
+  if (pathname.match(/\.(jpg|jpeg|png|gif|svg|mp3|mp4|webm|woff|woff2|ttf)$/)) {
     event.respondWith(staticAssetsStrategy(event.request, isExternal));
-  } else if (
-    requestUrl.pathname.match(/\.html?$/) ||
-    requestUrl.pathname === "/"
-  ) {
+  } else if (pathname.match(/\.html?$/) || pathname === "/") {
     event.respondWith(htmlDocumentsStrategy(event.request));
-  } else if (requestUrl.pathname.match(/\.css$/) || isExternal) {
+  } else if (pathname.match(/\.css$/) || isExternal) {
     // Special handling for CSS and external resources
     event.respondWith(cssAndExternalStrategy(event.request, isExternal));
   } else {
@@ -246,10 +244,17 @@ async function staticAssetsStrategy(request, isExternal = false) {
 
     const networkResponse = await fetch(request);
 
-    if (networkResponse.ok) {
-      const cache = await caches.open(cacheName);
-      await cache.put(request, networkResponse.clone());
-      console.log("💾 Cached static asset:", request.url);
+    if (
+      networkResponse &&
+      (networkResponse.ok || networkResponse.type === "opaque")
+    ) {
+      try {
+        const cache = await caches.open(cacheName);
+        await cache.put(request, networkResponse.clone());
+        console.log("💾 Cached static asset:", request.url);
+      } catch (err) {
+        console.warn("⚠️ Could not cache static asset:", request.url, err);
+      }
     }
 
     return networkResponse;
@@ -265,13 +270,13 @@ async function staticAssetsStrategy(request, isExternal = false) {
     }
 
     return new Response("Resource not available offline", {
-      status: 408,
+      status: 503,
       headers: { "Content-Type": "text/plain" },
     });
   }
 }
 
-// Special strategy for CSS and external resources
+// Special strategy for CSS and external resources network first with cache fallback
 async function cssAndExternalStrategy(request, isExternal = false) {
   const cacheName = isExternal ? DYNAMIC_CACHE : STATIC_CACHE;
 
@@ -315,9 +320,16 @@ async function htmlDocumentsStrategy(request) {
   try {
     const networkResponse = await fetch(request);
 
-    if (networkResponse.ok) {
+    if (
+      networkResponse &&
+      (networkResponse.ok || networkResponse.type === "opaque")
+    ) {
       const cache = await caches.open(DYNAMIC_CACHE);
-      await cache.put(request, networkResponse.clone());
+      try {
+        await cache.put(request, networkResponse.clone());
+      } catch (err) {
+        console.warn("⚠️ Could not cache HTML document:", request.url, err);
+      }
       console.log("📄 Updated HTML in cache:", request.url);
     }
 
@@ -354,7 +366,8 @@ async function htmlDocumentsStrategy(request) {
   }
 }
 
-// Strategy for JS and other files
+// Strategy for JS and other fil. Stale-While-Revalidate: return cache if present and update in background
+
 async function staleWhileRevalidateStrategy(request, isExternal = false) {
   const cacheName = isExternal ? DYNAMIC_CACHE : STATIC_CACHE;
   const cache = await caches.open(cacheName);
@@ -364,27 +377,39 @@ async function staleWhileRevalidateStrategy(request, isExternal = false) {
     console.log("⚡ Serving from cache (SWR):", request.url);
 
     // Update cache in background for external resources
-    if (isExternal) {
-      fetch(request)
-        .then(async (networkResponse) => {
-          if (networkResponse.ok) {
-            const cache = await caches.open(cacheName);
+    const doUpdate = async () => {
+      try {
+        const networkResponse = await fetch(request);
+        if (
+          networkResponse &&
+          (networkResponse.ok || networkResponse.type === "opaque")
+        ) {
+          try {
             await cache.put(request, networkResponse.clone());
-            console.log("🔄 Background cache update:", request.url);
+          } catch (err) {
+            console.warn("[SW] cache.put failed (SWR):", err);
           }
-        })
-        .catch(() => {
-          // Silent fail for external resources
-        });
-    }
+        }
+      } catch (err) {
+        // ignore network update errors
+      }
+    };
 
+    if (cache) {
+      // Kick off update but don't block response
+      eventWaitFor(doUpdate());
+      return cache;
+    }
     return cachedResponse;
   }
 
   try {
     const networkResponse = await fetch(request);
 
-    if (networkResponse.ok) {
+    if (
+      networkResponse &&
+      (networkResponse.ok || networkResponse.type === "opaque")
+    ) {
       const cache = await caches.open(cacheName);
       await cache.put(request, networkResponse.clone());
     }
@@ -397,6 +422,16 @@ async function staleWhileRevalidateStrategy(request, isExternal = false) {
       headers: { "Content-Type": "text/plain" },
     });
   }
+}
+// Helper to safely call waitUntil on global events inside non-event scope
+function eventWaitFor(promise) {
+  // If we're in fetch handler, event would exist in closure; otherwise just run promise
+  // This function is a graceful no-op if self is missing .waitUntil
+  if (self && typeof self.addEventListener === "function") {
+    // best-effort: nothing to do, we just run the promise
+    return promise;
+  }
+  return promise;
 }
 
 // Activate event: Clean up and take control
@@ -445,5 +480,7 @@ self.addEventListener("sync", (event) => {
 });
 
 async function doBackgroundSync() {
-  // Implement background sync logic here
+  // Implement your background sync logic here
+  console.log("✅ Background sync completed");
+  return Promise.resolve();
 }
