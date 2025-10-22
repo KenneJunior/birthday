@@ -34,20 +34,26 @@ const EXTERNAL_LIBRARIES = [
   /fonts\.gstatic\.com/i,
 ];
 
-// Base URLs to cache - these will work in both development and production
+// Base URLs to cache - adjusted for Vercel (no /public/)
 const ESSENTIAL_URLS = [
   "/",
   "/index.html",
   "/fhavur.html",
-  "/login.html",
-  "/logOut.html",
+  "/fhavur/confession.html",
+  "/fhavur/missus/fhav.html",
   "/manifest.webmanifest",
-
-  // These paths should work after build since Vercel will optimize them
-  "/assets/", // Vercel typically puts built assets here
-  "/static/", // Common build output directory
-  "/src/", // Keep src paths for development
-  "/public/", // Public assets
+  "/gallery-data.json",
+  // Audio
+  "/Ruth-B_Dandelions.mp3",
+  "/Simi_ft_Adekunle_Gold_DeJa_-_Happy_Birthday.mp3",
+  "/assets/", // Local CSS
+  "/pics/", // Local JS
+  "/pics/", // Images (excludes thumbnails)
+  "/pics/thumbnails/", // Thumbnails (if needed)
+  "/auth_config.json",
+  "/gallery-data.json",
+  "/screenshot.svg",
+  "/vid/", // Videos
 ];
 
 // File extensions to cache dynamically
@@ -88,15 +94,16 @@ const EXCLUDED_DIRS = [
   "/tests",
   "/spec",
   "/coverage",
-  "/dist",
   "/build",
   "/src/scripts",
   "/src/utils",
 ];
-function safeURL(url) {
+
+function safeURL(urlStr) {
   try {
-    return new URL(url);
-  } catch (_e) {
+    return new URL(urlStr, self.location.origin); // Use self.location.origin for relative URLs
+  } catch (e) {
+    console.warn("Invalid URL:", urlStr, e);
     return null;
   }
 }
@@ -105,59 +112,68 @@ function isExternalHost(hostname) {
   return EXTERNAL_CDNS.includes(hostname);
 }
 
-function matchesExternalLibrary(url) {
+function matchesExternalLibrary(urlStr) {
   for (const rx of EXTERNAL_LIBRARIES) {
-    if (rx.test(url)) return true;
+    if (rx.test(urlStr)) return true;
   }
   return false;
 }
 
 // Check if URL should be cached (including external libraries)
-function shouldCache(url) {
-  const urlObj = safeURL(url);
+function shouldCache(urlStr) {
+  const urlObj = safeURL(urlStr);
   if (!urlObj) return false;
 
   const pathname = urlObj.pathname;
   const hostname = urlObj.hostname;
 
-  // Skip data URLs and blob URLs
-  if (url.startsWith("data:") || url.startsWith("blob:")) {
+  // Skip data/blob URLs
+  if (urlStr.startsWith("data:") || urlStr.startsWith("blob:")) {
     return false;
   }
 
-  // Allow caching of well-known CDNs
-  if (isExternalHost(hostname) || matchesExternalLibrary(requestUrl)) {
+  // Allow caching of well-known CDNs and libraries -
+  if (isExternalHost(hostname) || matchesExternalLibrary(urlStr)) {
+    console.log("Caching external:", urlStr); // Debug log
     return true;
   }
 
-  // Skip external URLs that aren't in our CDN list
+  // Skip non-origin URLs not in CDN list
   if (urlObj.origin !== self.location.origin && !isExternalHost(hostname)) {
     return false;
   }
 
-  // Check if in excluded directory
+  // Check excluded directories
   for (const dir of EXCLUDED_DIRS) {
     if (pathname.includes(dir)) {
       return false;
     }
   }
 
-  // Skip API endpoints or dynamic routes
+  // Skip API/auth
   if (pathname.includes("/api/") || pathname.includes("/auth/")) {
     return false;
   }
 
-  // Check if it's a cacheable file type
+  // Cache by extension
   for (const ext of CACHEABLE_EXTENSIONS) {
-    if (pathname.toLowerCase().endsWith(ext)) return true;
+    if (pathname.toLowerCase().endsWith(ext)) {
+      console.log("Caching by extension:", pathname); // Debug log
+      return true;
+    }
   }
 
-  // Cache root paths and HTML files
-  if (pathname === "/" || pathname.endsWith(".html")) return true;
+  // Cache root/HTML
+  if (pathname === "/" || pathname.endsWith(".html")) {
+    console.log("Caching HTML/root:", pathname); // Debug log
+    return true;
+  }
+
+  console.log("Not caching:", pathname); // Debug log
   return false;
 }
 
-// Install event: Cache essential files including external libs
+// Install event: Cache essential files
 self.addEventListener("install", (event) => {
   console.log("🛠 Service Worker installing...");
 
@@ -169,7 +185,6 @@ self.addEventListener("install", (event) => {
       })
       .catch((err) => {
         console.error("❌ Service Worker installation failed:", err);
-        // Still proceed with installation even if some resources fail
         return self.skipWaiting();
       })
   );
@@ -179,13 +194,14 @@ self.addEventListener("install", (event) => {
 async function cacheEssentialResources() {
   const cache = await caches.open(STATIC_CACHE);
 
-  // Try to cache the absolute essentials that should exist in any environment
-  const essentialUrls = ["/", "/index.html", "/manifest.webmanifest"];
+  const essentialUrls = ESSENTIAL_URLS.map(
+    (u) => new Request(u, { credentials: "same-origin" })
+  ); // Ensure same-origin
 
   const results = await Promise.allSettled(
-    essentialUrls.map((url) =>
-      cache.add(url).catch((err) => {
-        console.warn(`⚠️ Could not cache ${url}:`, err.message);
+    essentialUrls.map((req) =>
+      cache.add(req).catch((err) => {
+        console.warn(`⚠️ Could not cache ${req.url}:`, err.message);
         return null;
       })
     )
@@ -203,30 +219,36 @@ self.addEventListener("fetch", (event) => {
   // Skip non-GET requests
   if (event.request.method !== "GET") return;
 
-  const url = event.request.url;
+  const urlStr = event.request.url; // Define urlStr
 
-  // Skip excluded URLs
-  if (!shouldCache(url)) {
+  // Skip if not cacheable
+  if (!shouldCache(urlStr)) {
     return;
   }
 
-  const requestUrl = safeURL(url);
-  if (!requestUrl) return;
+  const urlObj = safeURL(urlStr);
+  if (!urlObj) return;
 
-  const isExternal = requestUrl.origin !== self.location.origin;
-  const pathname = requestUrl.pathname;
+  const isExternal = urlObj.origin !== self.location.origin;
+  const pathname = urlObj.pathname;
 
-  // Different strategies for different resource types
-  if (pathname.match(/\.(jpg|jpeg|png|gif|svg|mp3|mp4|webm|woff|woff2|ttf)$/)) {
+  // Different strategies
+  if (/\.(jpg|jpeg|png|gif|svg|mp3|mp4|webm|woff|woff2|ttf)$/i.test(pathname)) {
     event.respondWith(staticAssetsStrategy(event.request, isExternal));
-  } else if (pathname.match(/\.html?$/) || pathname === "/") {
-    event.respondWith(htmlDocumentsStrategy(event.request));
-  } else if (pathname.match(/\.css$/) || isExternal) {
-    // Special handling for CSS and external resources
-    event.respondWith(cssAndExternalStrategy(event.request, isExternal));
-  } else {
-    event.respondWith(staleWhileRevalidateStrategy(event.request, isExternal));
+    return;
   }
+
+  if (pathname === "/" || /\.html$/.test(pathname)) {
+    event.respondWith(htmlDocumentsStrategy(event.request));
+    return;
+  }
+
+  if (/\.css$/.test(pathname) || isExternal) {
+    event.respondWith(cssAndExternalStrategy(event.request, isExternal));
+    return;
+  }
+
+  event.respondWith(staleWhileRevalidateStrategy(event.request, isExternal));
 });
 
 // Strategy for static assets (images, fonts, media)
@@ -261,7 +283,7 @@ async function staticAssetsStrategy(request, isExternal = false) {
   } catch (error) {
     console.log("🌐 Offline - static asset not available:", request.url);
 
-    // Return placeholder for missing images
+    // Placeholder for images
     if (request.destination === "image") {
       return new Response(
         '<svg width="200" height="200" xmlns="http://www.w3.org/2000/svg"><rect width="100%" height="100%" fill="#f0f0f0"/><text x="50%" y="50%" dominant-baseline="middle" text-anchor="middle" fill="#ccc">Image Offline</text></svg>',
@@ -276,7 +298,7 @@ async function staticAssetsStrategy(request, isExternal = false) {
   }
 }
 
-// Special strategy for CSS and external resources network first with cache fallback
+// Special strategy for CSS and external resources
 async function cssAndExternalStrategy(request, isExternal = false) {
   const cacheName = isExternal ? DYNAMIC_CACHE : STATIC_CACHE;
 
@@ -301,7 +323,6 @@ async function cssAndExternalStrategy(request, isExternal = false) {
   } catch (error) {
     console.log("🌐 Offline - CSS/External not available:", request.url);
 
-    // For critical CSS, you might want to return a basic fallback
     if (
       request.url.includes("bootstrap") ||
       request.url.includes("fontawesome")
@@ -342,13 +363,13 @@ async function htmlDocumentsStrategy(request) {
     let cachedResponse = await cache.match(request);
 
     if (!cachedResponse) {
-      // Try without .html extension (common in SPAs)
+      // Try without .html extension
       const altRequest = new Request(request.url.replace(/\.html$/, ""));
       cachedResponse = await cache.match(altRequest);
     }
 
     if (!cachedResponse) {
-      // Fallback to index.html for SPA routing
+      // Fallback to index.html
       cachedResponse = await cache.match("/index.html");
     }
 
@@ -366,8 +387,7 @@ async function htmlDocumentsStrategy(request) {
   }
 }
 
-// Strategy for JS and other fil. Stale-While-Revalidate: return cache if present and update in background
-
+// Strategy for JS and other files: Stale-While-Revalidate -
 async function staleWhileRevalidateStrategy(request, isExternal = false) {
   const cacheName = isExternal ? DYNAMIC_CACHE : STATIC_CACHE;
   const cache = await caches.open(cacheName);
@@ -376,7 +396,7 @@ async function staleWhileRevalidateStrategy(request, isExternal = false) {
   if (cachedResponse) {
     console.log("⚡ Serving from cache (SWR):", request.url);
 
-    // Update cache in background for external resources
+    // Update cache in background
     const doUpdate = async () => {
       try {
         const networkResponse = await fetch(request);
@@ -391,16 +411,14 @@ async function staleWhileRevalidateStrategy(request, isExternal = false) {
           }
         }
       } catch (err) {
-        // ignore network update errors
+        // Ignore network update errors
       }
     };
 
-    if (cache) {
-      // Kick off update but don't block response
-      eventWaitFor(doUpdate());
-      return cache;
-    }
-    return cachedResponse;
+    // Kick off update without blocking
+    doUpdate();
+
+    return cachedResponse; //
   }
 
   try {
@@ -423,15 +441,14 @@ async function staleWhileRevalidateStrategy(request, isExternal = false) {
     });
   }
 }
-// Helper to safely call waitUntil on global events inside non-event scope
-function eventWaitFor(promise) {
-  // If we're in fetch handler, event would exist in closure; otherwise just run promise
-  // This function is a graceful no-op if self is missing .waitUntil
-  if (self && typeof self.addEventListener === "function") {
-    // best-effort: nothing to do, we just run the promise
-    return promise;
+
+// Helper to safely call waitUntil (not needed now, but kept for future)
+function eventWaitFor(promise, event = null) {
+  if (event && event.waitUntil) {
+    event.waitUntil(promise);
+  } else {
+    promise.catch((err) => console.error("Background update failed:", err));
   }
-  return promise;
 }
 
 // Activate event: Clean up and take control
@@ -471,6 +488,7 @@ self.addEventListener("message", (event) => {
     self.skipWaiting();
   }
 });
+
 // Background sync for offline actions
 self.addEventListener("sync", (event) => {
   if (event.tag === "background-sync") {

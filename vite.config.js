@@ -17,6 +17,7 @@ export default defineConfig({
         fhav: resolve(__dirname, "fhavur/missus/fhav.html"),
         login: resolve(__dirname, "login.html"),
         logout: resolve(__dirname, "logOut.html"),
+        sw: resolve(__dirname, "public/sw.js"),
       },
       output: {
         chunkFileNames: "assets/[name]-[hash].js",
