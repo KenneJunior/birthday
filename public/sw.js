@@ -265,7 +265,7 @@ async function staticAssetsStrategy(request, isExternal = false) {
 }
 
 // Strategy 2: Network First for HTML documents
-async function htmlDocumentsStrategy(request) {
+async function htmlDocumentsStrategy(request, isExternal = false) {
   try {
     const networkResponse = await fetch(request);
 
@@ -309,7 +309,7 @@ async function htmlDocumentsStrategy(request) {
 }
 
 // Strategy 3: Stale-While-Revalidate for CSS/JS/JSON
-async function staleWhileRevalidateStrategy(request) {
+async function staleWhileRevalidateStrategy(request, isExternal = false) {
   const cache = await caches.open(STATIC_CACHE);
   const cacheName = isExternal ? DYNAMIC_CACHE : STATIC_CACHE;
   const cachedResponse = await cache.match(request);
