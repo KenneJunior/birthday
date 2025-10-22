@@ -48,6 +48,13 @@ const ESSENTIAL_URLS = [
   "/Simi_ft_Adekunle_Gold_DeJa_-_Happy_Birthday.mp3",
   "/assets/", // Local CSS
   "/pics/", // Local JS
+  "/pics/img1.jpg",
+  "/pics/img2.jpg",
+  "/pics/img3.jpg",
+  "/pics/img4.jpg",
+  "/pics/img5.jpg",
+  "/pics/profile_pic.jpg",
+  "/pics/tat.jpg",
   "/pics/", // Images (excludes thumbnails)
   "/pics/thumbnails/", // Thumbnails (if needed)
   "/auth_config.json",
