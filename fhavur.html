@@ -316,12 +316,12 @@
             // Handle case where authentication succeeds but user is not authorized
             hideLoading();
             console.warn("Access denied: User not authenticated");
-            window.location.href = "/login";
+            window.location.href = "/login.html";
           }
         } catch (error) {
           hideLoading();
           console.error("Authentication fail:", error);
-          window.location.href = "/login";
+          window.location.href = "/login.html";
         }
       }
 

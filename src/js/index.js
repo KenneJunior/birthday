@@ -93,7 +93,7 @@ class ConfettiSystem {
     const imageContainer = document.querySelector(".image-container");
     if (imageContainer) {
       imageContainer.addEventListener("click", () => {
-        window.location.href = "fhavur";
+        window.location.href = "fhavur.html";
       });
     }
 
@@ -101,7 +101,7 @@ class ConfettiSystem {
     const nameHighlight = document.querySelector(".name-highlight");
     if (nameHighlight) {
       nameHighlight.addEventListener("click", () => {
-        window.location.href = "fhavur";
+        window.location.href = "fhavur.html";
       });
     }
   }
