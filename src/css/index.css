@@ -624,7 +624,7 @@ a {
   }
 
   .content-section {
-    background-image: url("../../public/pics/profile_pic.jpg") !important;
+    background-image: url("/pics/profile_pic.jpg") !important;
     background-size: cover !important;
     background-position: center !important;
     background-repeat: no-repeat !important;
@@ -644,7 +644,7 @@ a {
     display: none !important;
   }
   .content-section {
-    background-image: url("../../public/pics/profile_pic.jpg") !important;
+    background-image: url("/pics/profile_pic.jpg") !important;
     background-size: cover !important;
     background-position: center -15.5rem !important;
     background-repeat: no-repeat !important;

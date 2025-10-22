@@ -2,6 +2,38 @@ const CACHE_NAME = "fhavur-pwa-cache-v1";
 const STATIC_CACHE = "fhavur-static-v1";
 const DYNAMIC_CACHE = "fhavur-dynamic-v1";
 
+// External CDN domains to cache
+const EXTERNAL_CDNS = [
+  "cdnjs.cloudflare.com",
+  "cdn.jsdelivr.net",
+  "unpkg.com",
+  "fonts.googleapis.com",
+  "fonts.gstatic.com",
+  "use.fontawesome.com",
+  "maxcdn.bootstrapcdn.com",
+];
+
+// Common external library patterns
+const EXTERNAL_LIBRARIES = [
+  // Bootstrap 5
+  /bootstrap.*\.css/,
+  /bootstrap.*\.js/,
+
+  // Font Awesome 6.4.0
+  /font-awesome/,
+  /fontawesome/,
+
+  // Animate.css
+  /animate\.css/,
+
+  // Hammer.js
+  /hammer\.js/,
+
+  // Google Fonts
+  /fonts\.googleapis/,
+  /fonts\.gstatic/,
+];
+
 // Base URLs to cache - these will work in both development and production
 const ESSENTIAL_URLS = [
   "/",
@@ -66,9 +98,30 @@ const EXCLUDED_DIRS = [
 function shouldCache(url) {
   const urlObj = new URL(url);
   const pathname = urlObj.pathname;
+  const hostname = urlObj.hostname;
 
-  // Skip external URLs and data URLs
-  if (urlObj.origin !== self.location.origin || pathname.startsWith("data:")) {
+  // Skip data URLs and blob URLs
+  if (url.startsWith("data:") || url.startsWith("blob:")) {
+    return false;
+  }
+
+  // Cache external CDN resources
+  if (EXTERNAL_CDNS.includes(hostname)) {
+    return true;
+  }
+
+  // Check if it matches external library patterns
+  for (const pattern of EXTERNAL_LIBRARIES) {
+    if (pattern.test(url)) {
+      return true;
+    }
+  }
+
+  // Skip external URLs that aren't in our CDN list
+  if (
+    urlObj.origin !== self.location.origin &&
+    !EXTERNAL_CDNS.includes(hostname)
+  ) {
     return false;
   }
 
@@ -149,6 +202,7 @@ self.addEventListener("fetch", (event) => {
   }
 
   const requestUrl = new URL(url);
+  const isExternal = requestUrl.origin !== self.location.origin;
 
   // Different strategies for different resource types
   if (
@@ -156,21 +210,26 @@ self.addEventListener("fetch", (event) => {
       /\.(jpg|jpeg|png|gif|svg|mp3|mp4|webm|woff|woff2|ttf)$/
     )
   ) {
-    event.respondWith(staticAssetsStrategy(event.request));
+    event.respondWith(staticAssetsStrategy(event.request, isExternal));
   } else if (
     requestUrl.pathname.match(/\.html?$/) ||
     requestUrl.pathname === "/"
   ) {
     event.respondWith(htmlDocumentsStrategy(event.request));
+  } else if (requestUrl.pathname.match(/\.css$/) || isExternal) {
+    // Special handling for CSS and external resources
+    event.respondWith(cssAndExternalStrategy(event.request, isExternal));
   } else {
-    event.respondWith(staleWhileRevalidateStrategy(event.request));
+    event.respondWith(staleWhileRevalidateStrategy(event.request, isExternal));
   }
 });
 
 // Strategy 1: Cache First for static assets
-async function staticAssetsStrategy(request) {
+async function staticAssetsStrategy(request, isExternal = false) {
+  const cacheName = isExternal ? DYNAMIC_CACHE : STATIC_CACHE;
+
   try {
-    const cache = await caches.open(STATIC_CACHE);
+    const cache = await caches.open(cacheName);
     const cachedResponse = await cache.match(request);
 
     if (cachedResponse) {
@@ -181,7 +240,7 @@ async function staticAssetsStrategy(request) {
     const networkResponse = await fetch(request);
 
     if (networkResponse.ok) {
-      const dynamicCache = await caches.open(DYNAMIC_CACHE);
+      const dynamicCache = await caches.open(cacheName);
       await dynamicCache.put(request, networkResponse.clone());
       console.log("💾 Cached new static asset:", request.url);
     }
@@ -252,6 +311,7 @@ async function htmlDocumentsStrategy(request) {
 // Strategy 3: Stale-While-Revalidate for CSS/JS/JSON
 async function staleWhileRevalidateStrategy(request) {
   const cache = await caches.open(STATIC_CACHE);
+  const cacheName = isExternal ? DYNAMIC_CACHE : STATIC_CACHE;
   const cachedResponse = await cache.match(request);
 
   if (cachedResponse) {
@@ -261,7 +321,7 @@ async function staleWhileRevalidateStrategy(request) {
     fetch(request)
       .then(async (networkResponse) => {
         if (networkResponse.ok) {
-          const dynamicCache = await caches.open(DYNAMIC_CACHE);
+          const dynamicCache = await caches.open(cacheName);
           await dynamicCache.put(request, networkResponse.clone());
           console.log("🔄 Background cache update:", request.url);
         }
@@ -277,7 +337,7 @@ async function staleWhileRevalidateStrategy(request) {
     const networkResponse = await fetch(request);
 
     if (networkResponse.ok) {
-      const dynamicCache = await caches.open(DYNAMIC_CACHE);
+      const dynamicCache = await caches.open(cacheName);
       await dynamicCache.put(request, networkResponse.clone());
     }
 
