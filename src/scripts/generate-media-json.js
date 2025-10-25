@@ -22,6 +22,9 @@ const DEFAULT_CONFIG = {
     "video1.jpg": "Under sun adey, Under rain .... 🤣🤣",
     "video2.jpg": "fine child 😘😘",
     "video3.jpg": "Ok whats happening here 🤣🤣🤣",
+    "video5.jpg": "Missus Fhavur 🥰😍",
+    "video4.jpg": "Red Carpet 🤣🤣🤣",
+    "vidoe6.jpg": "Mami play play 😂😂",
   },
   showstats: true,
 };
@@ -67,7 +70,7 @@ function generateMediaJSON(config = {}) {
 
         _log(`✅ Added image: ${filename}`);
       } else {
-        _log(`⚠️  Skipping ${filename} - thumbnail not found`);
+        console.warn(`⚠️  Skipping ${filename} - thumbnail not found`);
       }
     });
 
@@ -112,7 +115,9 @@ function generateMediaJSON(config = {}) {
 
         _log(`✅ Added video: ${videoName}`);
       } else {
-        _log(`⚠️  Skipping ${thumbFile} - video file ${videoName} not found`);
+        console.warn(
+          `⚠️  Skipping ${thumbFile} - video file ${videoName} not found`
+        );
       }
     });
 

@@ -7,6 +7,60 @@
       "data-type": "image"
     },
     {
+      "src": "/pics/img10.JPG",
+      "thumb": "/pics/thumbnails/img10.JPG",
+      "alt": "Image: img10.JPG",
+      "data-type": "image"
+    },
+    {
+      "src": "/pics/img11.JPG",
+      "thumb": "/pics/thumbnails/img11.JPG",
+      "alt": "Image: img11.JPG",
+      "data-type": "image"
+    },
+    {
+      "src": "/pics/img12.JPG",
+      "thumb": "/pics/thumbnails/img12.JPG",
+      "alt": "Image: img12.JPG",
+      "data-type": "image"
+    },
+    {
+      "src": "/pics/img13.JPG",
+      "thumb": "/pics/thumbnails/img13.JPG",
+      "alt": "Image: img13.JPG",
+      "data-type": "image"
+    },
+    {
+      "src": "/pics/img14.JPG",
+      "thumb": "/pics/thumbnails/img14.JPG",
+      "alt": "Image: img14.JPG",
+      "data-type": "image"
+    },
+    {
+      "src": "/pics/img15.JPG",
+      "thumb": "/pics/thumbnails/img15.JPG",
+      "alt": "Image: img15.JPG",
+      "data-type": "image"
+    },
+    {
+      "src": "/pics/img16.JPG",
+      "thumb": "/pics/thumbnails/img16.JPG",
+      "alt": "Image: img16.JPG",
+      "data-type": "image"
+    },
+    {
+      "src": "/pics/img17.JPG",
+      "thumb": "/pics/thumbnails/img17.JPG",
+      "alt": "Image: img17.JPG",
+      "data-type": "image"
+    },
+    {
+      "src": "/pics/img18.JPG",
+      "thumb": "/pics/thumbnails/img18.JPG",
+      "alt": "Image: img18.JPG",
+      "data-type": "image"
+    },
+    {
       "src": "/pics/img2.jpg",
       "thumb": "/pics/thumbnails/img2.jpg",
       "alt": "Miss Bamenda 😹😹",
@@ -28,6 +82,30 @@
       "src": "/pics/img5.jpg",
       "thumb": "/pics/thumbnails/img5.jpg",
       "alt": "smile smile smile 😁😊",
+      "data-type": "image"
+    },
+    {
+      "src": "/pics/img6.JPG",
+      "thumb": "/pics/thumbnails/img6.JPG",
+      "alt": "Image: img6.JPG",
+      "data-type": "image"
+    },
+    {
+      "src": "/pics/img7.JPG",
+      "thumb": "/pics/thumbnails/img7.JPG",
+      "alt": "Image: img7.JPG",
+      "data-type": "image"
+    },
+    {
+      "src": "/pics/img8.JPG",
+      "thumb": "/pics/thumbnails/img8.JPG",
+      "alt": "Image: img8.JPG",
+      "data-type": "image"
+    },
+    {
+      "src": "/pics/img9.JPG",
+      "thumb": "/pics/thumbnails/img9.JPG",
+      "alt": "Image: img9.JPG",
       "data-type": "image"
     },
     {
@@ -59,6 +137,24 @@
       "alt": "Ok whats happening here 🤣🤣🤣",
       "data-type": "video",
       "video-src": "/vid/video3.mp4"
+    },
+    {
+      "thumb": "/pics/thumbnails/video4.jpg",
+      "alt": "Red Carpet 🤣🤣🤣",
+      "data-type": "video",
+      "video-src": "/vid/video4.mp4"
+    },
+    {
+      "thumb": "/pics/thumbnails/video5.jpg",
+      "alt": "Missus Fhavur 🥰😍",
+      "data-type": "video",
+      "video-src": "/vid/video5.mp4"
+    },
+    {
+      "thumb": "/pics/thumbnails/video6.jpg",
+      "alt": "Video: video6.mp4",
+      "data-type": "video",
+      "video-src": "/vid/video6.mp4"
     },
     {
       "src": "/pics/screenshot1.jpg",

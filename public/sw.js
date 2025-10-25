@@ -1,6 +1,6 @@
-const CACHE_NAME = "fhavur-pwa-cache-v1.3";
-const STATIC_CACHE = "fhavur-static-v1.3";
-const DYNAMIC_CACHE = "fhavur-dynamic-v1.3";
+const CACHE_NAME = "fhavur-pwa-cache-v1.4";
+const STATIC_CACHE = "fhavur-static-v1.4";
+const DYNAMIC_CACHE = "fhavur-dynamic-v1.4";
 
 // External CDN domains to cache
 const EXTERNAL_CDNS = [
