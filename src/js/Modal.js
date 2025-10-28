@@ -207,7 +207,7 @@ export class UltimateModal {
       this.exitFullscreen();
     }
     document.body.style.overflow = "";
-    if (!this.elements.modalVideo.hidden) {
+    if (!this.elements.modalVideo.classList.contains("d-none")) {
       this.elements.modalVideo.pause();
     }
     this.elements.modal.classList.remove("active");
@@ -284,7 +284,7 @@ export class UltimateModal {
   }
 
   navigate(direction) {
-    if (!this.elements.modalVideo.hidden) {
+    if (!this.elements.modalVideo.classList.contains("d-none")) {
       this.elements.modalVideo.pause();
     }
     this.state.currentIndex += direction;
@@ -327,15 +327,15 @@ export class UltimateModal {
   _showImage(src, alt) {
     this.elements.modalImage.src = src;
     this.elements.modalImage.alt = alt;
-    this.elements.modalVideo.hidden = true;
-    this.elements.modalImage.hidden = false;
+    this.elements.modalVideo.classList.add("d-none");
+    this.elements.modalImage.classList.remove("d-none");
   }
 
   _showVideo(src, alt) {
     this.elements.modalVideo.src = src;
     this.elements.modalVideo.alt = alt;
-    this.elements.modalVideo.hidden = false;
-    this.elements.modalImage.hidden = true;
+    this.elements.modalVideo.classList.remove("d-none");
+    this.elements.modalImage.classList.add("d-none");
     this.elements.modalVideo.play();
   }
 
@@ -506,7 +506,7 @@ export class UltimateModal {
     // Pinch to zoom
     this.hammer.get("pinch").set({ enable: true });
     this.hammer.on("pinchstart pinchmove", (e) => {
-      if (!this.elements.modalImage.hidden) {
+      if (!this.elements.modalImage.classList.contains("d-none")) {
         e.preventDefault();
         this.handlePinch(e);
       }
