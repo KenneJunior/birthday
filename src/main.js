@@ -1,52 +1,56 @@
 // PWA Service Worker Registration
+
 function initializePWA() {
   if (!("serviceWorker" in navigator)) {
-    console.log("❌ Service Workers are not supported in this browser");
+    _log("❌ Service Workers are not supported in this browser");
     return;
   }
 
   window.addEventListener("load", async () => {
     try {
-      const registration = await navigator.serviceWorker.register("/sw.js", {
-        scope: "/",
-      });
+      const registration = await navigator.serviceWorker.register(
+        "/sw.js?debug=debug",
+        {
+          scope: "/",
+        }
+      );
 
-      console.log("✅ Service Worker registered successfully:", registration);
+      _log("✅ Service Worker registered successfully:", registration);
 
       // Handle service worker updates
       registration.addEventListener("updatefound", () => {
         const newWorker = registration.installing;
-        console.log("🔄 New Service Worker found:", newWorker);
+        _log("🔄 New Service Worker found:", newWorker);
 
         newWorker.addEventListener("statechange", () => {
-          console.log(`🔄 Service Worker state: ${newWorker.state}`);
+          _log(`🔄 Service Worker state: ${newWorker.state}`);
 
           if (
             newWorker.state === "installed" &&
             navigator.serviceWorker.controller
           ) {
-            console.log("🔄 New version available!");
+            _log("🔄 New version available!");
             showUpdateNotification(registration);
           }
 
           if (newWorker.state === "activated") {
-            console.log("✅ New Service Worker activated!");
+            _log("✅ New Service Worker activated!");
           }
         });
       });
 
       // Track installation progress
       if (registration.installing) {
-        console.log("📥 Service Worker installing...");
+        _log("📥 Service Worker installing...");
       } else if (registration.waiting) {
-        console.log("⏳ Service Worker waiting...");
+        _log("⏳ Service Worker waiting...");
       } else if (registration.active) {
-        console.log("✅ Service Worker active and ready!");
+        _log("✅ Service Worker active and ready!");
       }
 
       // Handle controller changes (when SW takes control)
       navigator.serviceWorker.addEventListener("controllerchange", () => {
-        console.log("🔄 Service Worker controller changed, reloading page...");
+        _log("🔄 Service Worker controller changed, reloading page...");
         window.location.reload();
       });
     } catch (error) {

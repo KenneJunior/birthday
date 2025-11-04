@@ -1,5 +1,6 @@
 import { existsSync, readdirSync, writeFileSync } from "fs";
 import { join } from "path";
+import { _log } from "../js/utility/logger.js";
 
 // Configuration
 const DEFAULT_CONFIG = {
@@ -138,7 +139,7 @@ function generateMediaJSON(config = {}) {
           "data-type": "image",
         };
 
-        console.log(`✅ Added last image: ${CONFIG.lastFile}`);
+        _log(`✅ Added last image: ${CONFIG.lastFile}`);
       }
     }
 
@@ -186,9 +187,7 @@ function generateMediaJSON(config = {}) {
   }
 }
 
-function _log(message) {
-  if (CONFIG.showstats) console.log(message);
-}
+// logging is handled by src/util.logger.js (imported as _log)
 
 // Only run if called directly
 if (import.meta.url === `file://${process.argv[1]}`) {

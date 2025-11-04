@@ -1,5 +1,6 @@
 // Utility: Fetch manifest and get app name
 import Notification from "../js/notification.js";
+import { _log } from "../js/utility/logger.js";
 import { getAppName } from "../js/utility/utils.js";
 // PWA Prompt Manager - Advanced Implementation
 class PWAPrompt extends HTMLElement {
@@ -143,7 +144,7 @@ class PWAPrompt extends HTMLElement {
     const content = this.querySelector("#pwa-prompt-content");
     const actions = this.querySelector("#pwa-prompt-actions");
     if (content && actions) {
-      console.log("Injecting templates for platform:", platform);
+      _log("Injecting templates for platform:", platform);
       content.innerHTML = "";
       actions.innerHTML = "";
       const templateConfig = this.getTemplateConfig(platform);

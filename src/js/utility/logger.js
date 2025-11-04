@@ -22,8 +22,8 @@ const LOG_LEVELS = Object.freeze({
  * Default configuration for the logger
  */
 const DEFAULT_CONFIG = Object.freeze({
-  level: LOG_LEVELS.DEBUG,
-  prefix: "[FHAVUR]",
+  level: LOG_LEVELS.INFO,
+  prefix: "%c[FHAVUR]",
   enablePerformance: true,
   enableAnalytics: false,
   maxStringLength: 1000,
@@ -61,45 +61,101 @@ class Logger {
     }
 
     // Worker environment (Service Worker, Web Worker)
-    if (this.isWorker) {
+    /* if (this.isWorker) {
       this._setupWorkerEnvironment();
       return;
     }
+      */
 
     // Fallback for unknown environments
     this.shouldLog = false;
   }
 
   _setupBrowserEnvironment() {
-    const { hostname, origin } = window.location;
+    const { hostname, origin, search } = window.location;
     const isLocal =
       hostname === "localhost" ||
       hostname === "127.0.0.1" ||
       hostname === "[::1]" ||
       origin.includes("local.");
 
-    // Check multiple debug sources with priority
-    const debugSources = [
+    const urlParams = new URLSearchParams(search);
+
+    // Check all possible parameter names
+    const paramValues = {
+      debug: urlParams.get("debug"),
+      log: urlParams.get("log"),
+      logLevel: urlParams.get("logLevel"),
+      fhavur: urlParams.get("fhavur"),
+      logger: urlParams.get("logger"),
+    };
+
+    // Combine with storage and global variables
+    const allSources = [
+      ...Object.values(paramValues).filter(Boolean),
       window.localStorage?.getItem("FHAVUR_DEBUG"),
       window.sessionStorage?.getItem("FHAVUR_DEBUG"),
-      new URLSearchParams(window.location.search).get("debug"),
-      window._FHAVUR_DEBUG, // Global variable
-    ];
+      window._FHAVUR_DEBUG,
+      window._FHAVUR_LOG_LEVEL,
+    ].filter((source) => source !== null && source !== undefined);
 
-    const debugFlag = debugSources.find(
-      (source) => source === "true" || source === "1" || source === "enable"
-    );
+    // Default: only log on localhost
+    this.shouldLog = isLocal;
+    let levelSet = false;
 
-    this.shouldLog = isLocal || !!debugFlag;
+    // Process each source
+    for (const source of allSources) {
+      const value = String(source).toLowerCase().trim();
 
-    // Set log level from debug flag or URL parameter
-    const levelParam = debugSources.find(
-      (source) =>
-        source && ["debug", "info", "warn", "error", "silent"].includes(source)
-    );
+      // Enable/disable flags
+      if (
+        value === "true" ||
+        value === "1" ||
+        value === "enable" ||
+        value === "on" ||
+        value === "yes"
+      ) {
+        this.shouldLog = true;
+        continue;
+      }
 
-    if (levelParam) {
-      this.config = { ...this.config, level: this._parseLogLevel(levelParam) };
+      if (
+        value === "false" ||
+        value === "0" ||
+        value === "disable" ||
+        value === "off" ||
+        value === "no"
+      ) {
+        this.shouldLog = false;
+        continue;
+      }
+
+      // If it's a log level, enable logging AND set level
+      if (["debug", "info", "warn", "error", "silent"].includes(value)) {
+        this.shouldLog = true;
+        this.config = { ...this.config, level: this._parseLogLevel(value) };
+        levelSet = true;
+        break; // First level parameter wins
+      }
+    }
+
+    // Log the configuration
+    this._logConfiguration(levelSet);
+  }
+
+  _logConfiguration(levelWasSet = false) {
+    if (this.shouldLog) {
+      const levelName = this._getLevelLabel(this.config.level);
+      const source = levelWasSet ? "URL/Config" : "Default";
+
+      console.log(
+        `%c[FHAVUR] Logger Active`,
+        "background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 6px 12px; border-radius: 8px; font-weight: bold; font-size: 14px;"
+      );
+      console.log(
+        `%c📊 Level: ${levelName} | 🔧 Source: ${source}`,
+        "color: #6b7280; font-weight: bold; margin-left: 10px;"
+      );
     }
   }
 
@@ -137,7 +193,7 @@ class Logger {
       error: LOG_LEVELS.ERROR,
       silent: LOG_LEVELS.SILENT,
     };
-    return levelMap[level?.toLowerCase()] ?? LOG_LEVELS.DEBUG;
+    return levelMap[String(level).toLowerCase()] ?? LOG_LEVELS.DEBUG;
   }
 
   /**
@@ -183,16 +239,18 @@ class Logger {
     try {
       const timestamp = this.config.timestamp ? this._getTimestamp() : "";
       const prefix = this.config.prefix;
-      const levelLabel = this._getLevelLabel(level);
-      const style = this.config.colors ? this._getLevelStyle(level) : "";
+      const emoji = this._getLevelEmoji(level); // Add this line
 
-      const formattedArgs = this._formatArguments(args);
+      const levelLabel = this._getLevelLabel(level);
+
       const mergedContext = this._mergeContext(context);
+      const formattedArgs = this._formatArguments(args);
+      const style = this.config.colors ? this._getLevelStyle(level) : "";
 
       const logArgs = this._buildLogArguments(
         prefix,
         timestamp,
-        levelLabel,
+        `${emoji} ${levelLabel}`,
         style,
         formattedArgs,
         mergedContext
@@ -302,39 +360,37 @@ class Logger {
     const args = [];
 
     if (this.config.colors) {
-      args.push(
-        `${style}${prefix}${timestamp ? ` ${timestamp}` : ""} ${levelLabel}`
-      );
-    } else {
-      args.push(`${prefix}${timestamp ? ` ${timestamp}` : ""} ${levelLabel}`);
+      args.push(style);
     }
-
+    args.push(`${prefix}${timestamp ? ` ${timestamp}` : ""} ${levelLabel}`);
     args.push(...formattedArgs);
 
     // Add context if present
     if (Object.keys(context).length > 0) {
-      args.push("\n↳ Context:", context);
+      args.push("\n↳ Context:", { context });
     }
 
     return args;
   }
 
-  _writeToConsole(level, args) {
+  _writeToConsole(level, args = []) {
+    const color = this.config.colors ? args.shift() : "";
+    // const prefix = args.shift();
     switch (level) {
       case LOG_LEVELS.DEBUG:
-        console.debug(...args);
+        console.debug(`${args.shift()}`, color, args);
         break;
       case LOG_LEVELS.INFO:
-        console.info(...args);
+        console.info(`${args.shift()}`, color, args);
         break;
       case LOG_LEVELS.WARN:
-        console.warn(...args);
+        console.warn(`${args.shift()}`, color, args);
         break;
       case LOG_LEVELS.ERROR:
-        console.error(...args);
+        console.error(`${args.shift()}`, color, args);
         break;
       default:
-        console.log(...args);
+        console.log(`${args.shift()}`, color, args);
     }
   }
 
@@ -348,18 +404,127 @@ class Logger {
       [LOG_LEVELS.INFO]: "INFO",
       [LOG_LEVELS.WARN]: "WARN",
       [LOG_LEVELS.ERROR]: "ERROR",
+      [LOG_LEVELS.SILENT]: "SILENT",
     };
-    return labels[level] || "LOG";
+    return labels[level] || "UNKNOWN";
   }
 
-  _getLevelStyle(level) {
-    const styles = {
-      [LOG_LEVELS.DEBUG]: "color: #6b7280; font-weight: bold;",
-      [LOG_LEVELS.INFO]: "color: #2563eb; font-weight: bold;",
-      [LOG_LEVELS.WARN]: "color: #d97706; font-weight: bold;",
-      [LOG_LEVELS.ERROR]: "color: #dc2626; font-weight: bold;",
+  _getLevelEmoji(level) {
+    const emojis = {
+      [LOG_LEVELS.DEBUG]: "🐛",
+      [LOG_LEVELS.INFO]: "ℹ️",
+      [LOG_LEVELS.WARN]: "⚠️",
+      [LOG_LEVELS.ERROR]: "💀",
     };
-    return styles[level] || "color: #6b7280;";
+    return emojis[level] || "📝";
+  }
+
+  // Create a closure to maintain style cache and configuration
+  _createLevelStyleGenerator = () => {
+    // Pre-computed style configurations
+    const STYLE_CONFIGS = {
+      [LOG_LEVELS.DEBUG]: {
+        bg: "linear-gradient(135deg, #1e293b 0%, #334155 100%)",
+        color: "#93c5fd",
+        border: "1px solid #3b82f6",
+        glow: "0 0 8px rgba(59, 130, 246, 0.3)",
+      },
+      [LOG_LEVELS.INFO]: {
+        bg: "linear-gradient(135deg, #1d4ed8 0%, #3b82f6 100%)",
+        color: "#f9fafb",
+        border: "1px solid #60a5fa",
+        glow: "0 0 8px rgba(59, 130, 246, 0.4)",
+      },
+      [LOG_LEVELS.WARN]: {
+        bg: "linear-gradient(135deg, #f59e0b 0%, #fbbf24 100%)",
+        color: "#1f2937",
+        border: "1px solid #b45309",
+        glow: "0 0 8px rgba(245, 158, 11, 0.4)",
+      },
+      [LOG_LEVELS.ERROR]: {
+        bg: "linear-gradient(135deg, #b91c1c 0%, #ef4444 100%)",
+        color: "#fef2f2",
+        border: "1px solid #7f1d1d",
+        glow: "0 0 8px rgba(239, 68, 68, 0.4)",
+      },
+    };
+
+    // Cache for generated styles
+    const styleCache = new Map();
+
+    // Base style template
+    const baseStyle = `
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font-family: 'SF Mono', 'Monaco', 'Consolas', 'Roboto Mono', monospace;
+    font-weight: 600;
+    font-size: 0.75rem;
+    padding: 6px 10px;
+    border-radius: 8px;
+    letter-spacing: 0.5px;
+    text-transform: uppercase;
+    line-height: 1;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    position: relative;
+    overflow: hidden;
+    transition: all 0.2s ease-in-out;
+  `;
+
+    /**
+     * Generates CSS style for a given log level
+     * @param {string} level - The log level (DEBUG, INFO, WARN, ERROR)
+     * @returns {string} The CSS style string
+     */
+    return (level) => {
+      // Return cached style if available
+      if (styleCache.has(level)) {
+        return styleCache.get(level);
+      }
+
+      // Get config for the level or fallback to DEBUG
+      const config = STYLE_CONFIGS[level] || STYLE_CONFIGS[LOG_LEVELS.DEBUG];
+
+      // Generate the complete style
+      const style = `
+      ${baseStyle}
+      border: ${config.border};
+      background: ${config.bg};
+      color: ${config.color};
+      box-shadow: ${config.glow}, 0 2px 4px rgba(0, 0, 0, 0.1);
+      
+      /* Hover effect shimmer */
+      &::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: -100%;
+        width: 100%;
+        height: 100%;
+        background: linear-gradient(90deg, transparent, rgba(255,255,255,0.1), transparent);
+        transition: left 0.5s ease-in-out;
+      }
+      
+      &:hover::before {
+        left: 100%;
+      }
+    `
+        .replace(/\s+/g, " ")
+        .trim();
+
+      // Cache the generated style
+      styleCache.set(level, style);
+
+      return style;
+    };
+  };
+
+  // Create the style generator instance
+  getLevelStyle = this._createLevelStyleGenerator();
+
+  // Your main method becomes a simple wrapper
+  _getLevelStyle(level) {
+    return this.getLevelStyle(level);
   }
 
   _mergeContext(context) {
@@ -378,7 +543,7 @@ class Logger {
   }
 
   _sendToAnalytics(level, args, context) {
-    if (!this.config.enableAnalytics) return;
+    if (!this.config.enableAnalytics) return this;
 
     const event = {
       level: this._getLevelLabel(level),
@@ -400,10 +565,11 @@ class Logger {
     }
 
     // Send to backend logging service
-    // this._sendToBackend(event);
+    this._sendToBackend(event);
+    return this;
   }
 
-  /* _sendToBackend(event) {
+  _sendToBackend(event) {
     if (typeof fetch === "undefined") return;
 
     // Use sendBeacon for better performance in browsers
@@ -420,35 +586,39 @@ class Logger {
         body: JSON.stringify(event),
         keepalive: true, // Browser support for background requests
       }).catch(() => {
-        //Silent fail 
+        //Silent fail
       });
     }
-  }*/
+  }
 
   /**
    * Public API methods
    */
   debug(...args) {
     this._log(LOG_LEVELS.DEBUG, args);
+    return this;
   }
 
   info(...args) {
     this._log(LOG_LEVELS.INFO, args);
+    return this;
   }
 
   warn(...args) {
     this._log(LOG_LEVELS.WARN, args);
+    return this;
   }
 
   error(...args) {
     this._log(LOG_LEVELS.ERROR, args);
+    return this;
   }
 
   /**
    * Performance monitoring methods
    */
   time(label) {
-    if (!this.config.enablePerformance || !this.shouldLog) return;
+    if (!this.config.enablePerformance || !this.shouldLog) return this;
 
     const mark = `log_${label}_${Date.now()}`;
     // Store performance mark in session storage
@@ -459,12 +629,12 @@ class Logger {
     if (this.isBrowser && performance?.mark) {
       performance.mark(mark);
     }
-
     this.debug(`⏱️  Started: ${label}`);
+    return this;
   }
 
   timeEnd(label) {
-    if (!this.config.enablePerformance || !this.shouldLog) return;
+    if (!this.config.enablePerformance || !this.shouldLog) return this;
 
     let markData = this.performanceMarks.get(label);
 
@@ -480,7 +650,7 @@ class Logger {
     }
     if (!markData || !markData.startTime) {
       this.warn(`No timer found for label: ${label}`);
-      return;
+      return this;
     }
 
     const duration = Date.now() - markData.startTime;
@@ -498,6 +668,8 @@ class Logger {
       this.debug(`⏱️  Completed: ${label}`, `${duration}ms`);
     }
 
+    // Clean up
+    sessionStorage.removeItem(`perfMark_${label}`);
     this.performanceMarks.delete(label);
   }
 
@@ -515,33 +687,80 @@ class Logger {
   }
 
   withContext(context) {
-    this.pushContext(context);
-    return {
+    // Create a proxy-like object that maintains the original logger state
+    // but adds context to every log call
+    const loggerWithContext = {
+      // Store reference to the original logger
+      _logger: this,
+      _context: context,
+
+      // Log methods with context
       debug: (...args) => {
         this._log(LOG_LEVELS.DEBUG, args, context);
-        this.popContext();
+        return loggerWithContext;
       },
       info: (...args) => {
         this._log(LOG_LEVELS.INFO, args, context);
-        this.popContext();
+        return loggerWithContext;
       },
       warn: (...args) => {
         this._log(LOG_LEVELS.WARN, args, context);
-        this.popContext();
+        return loggerWithContext;
       },
       error: (...args) => {
         this._log(LOG_LEVELS.ERROR, args, context);
-        this.popContext();
+        return loggerWithContext;
       },
+
+      // Performance methods
       time: (label) => {
         this.time(label);
-        this.popContext();
+        return loggerWithContext;
       },
       timeEnd: (label) => {
         this.timeEnd(label);
+        return loggerWithContext;
+      },
+
+      // Grouping methods
+      group: (label) => {
+        this.group(label);
+        return loggerWithContext;
+      },
+      groupEnd: () => {
+        this.groupEnd();
+        return loggerWithContext;
+      },
+
+      // Nested context
+      withContext: (additionalContext) => {
+        return this.withContext({ ...context, ...additionalContext });
+      },
+
+      // Utility methods that return the original logger
+      enable: () => {
+        this.enable();
+        return this; // Return original logger for chaining
+      },
+      disable: () => {
+        this.disable();
+        return this;
+      },
+      setLevel: (level) => {
+        this.setLevel(level);
+        return this;
+      },
+      pushContext: (ctx) => {
+        this.pushContext(ctx);
+        return loggerWithContext;
+      },
+      popContext: () => {
         this.popContext();
+        return loggerWithContext;
       },
     };
+
+    return loggerWithContext;
   }
 
   /**

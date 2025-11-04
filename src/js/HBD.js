@@ -1,81 +1,122 @@
+import { logger } from "./utility/logger.js";
+
+// Create contextual loggers for different modules
+const pwaLogger = logger.withContext({ module: "PWA" });
+const appLogger = logger.withContext({ module: "BirthdayApp" });
+const confettiLogger = appLogger.withContext({ module: "Confetti" });
+const audioLogger = appLogger.withContext({ module: "Audio" });
+const heartLogger = appLogger.withContext({ module: "HeartEffects" });
+const celebrationLogger = appLogger.withContext({ module: "Celebration" });
+const socialLogger = appLogger.withContext({ module: "SocialSharing" });
+
+// PWA Service Worker Registration
 function initializePWA() {
+  pwaLogger.time("PWA initialization");
+
   if (!("serviceWorker" in navigator)) {
-    console.log("❌ Service Workers are not supported in this browser");
+    pwaLogger.warn("Service Workers are not supported in this browser");
+    pwaLogger.timeEnd("PWA initialization");
     return;
   }
 
   window.addEventListener("load", async () => {
     try {
-      const registration = await navigator.serviceWorker.register("/sw.js", {
-        scope: "/",
-      });
+      pwaLogger.debug("Registering service worker");
+      const registration = await navigator.serviceWorker.register(
+        "/sw.js?debug=debug",
+        {
+          scope: "/",
+        }
+      );
 
-      console.log("✅ Service Worker registered successfully:", registration);
+      pwaLogger.info("Service Worker registered successfully", {
+        scope: registration.scope,
+        active: !!registration.active,
+      });
 
       // Handle service worker updates
       registration.addEventListener("updatefound", () => {
         const newWorker = registration.installing;
-        console.log("🔄 New Service Worker found:", newWorker);
+        pwaLogger.info("New Service Worker found", {
+          state: newWorker.state,
+          scriptURL: newWorker.scriptURL,
+        });
 
         newWorker.addEventListener("statechange", () => {
-          console.log(`🔄 Service Worker state: ${newWorker.state}`);
+          pwaLogger.debug(`Service Worker state change`, {
+            state: newWorker.state,
+          });
 
           if (
             newWorker.state === "installed" &&
             navigator.serviceWorker.controller
           ) {
-            console.log("🔄 New version available!");
+            pwaLogger.info(
+              "New version available, showing update notification"
+            );
             showUpdateNotification(registration);
           }
 
           if (newWorker.state === "activated") {
-            console.log("✅ New Service Worker activated!");
+            pwaLogger.info("New Service Worker activated");
           }
         });
       });
 
       // Track installation progress
       if (registration.installing) {
-        console.log("📥 Service Worker installing...");
+        pwaLogger.debug("Service Worker installing");
       } else if (registration.waiting) {
-        console.log("⏳ Service Worker waiting...");
+        pwaLogger.debug("Service Worker waiting");
       } else if (registration.active) {
-        console.log("✅ Service Worker active and ready!");
+        pwaLogger.info("Service Worker active and ready");
       }
 
       // Handle controller changes (when SW takes control)
       navigator.serviceWorker.addEventListener("controllerchange", () => {
-        console.log("🔄 Service Worker controller changed, reloading page...");
+        pwaLogger.info("Service Worker controller changed, reloading page");
         window.location.reload();
       });
+
+      pwaLogger.timeEnd("PWA initialization");
     } catch (error) {
-      console.error("❌ Service Worker registration failed:", error);
+      pwaLogger.error("Service Worker registration failed", error);
 
       // Provide helpful error messages
       if (error.name === "SecurityError") {
-        console.error("Make sure you are serving over HTTPS or localhost");
+        pwaLogger.error(
+          "Service Worker security error - serve over HTTPS or localhost"
+        );
       } else if (error.name === "TypeError") {
-        console.error(
+        pwaLogger.error(
           "Service Worker file might not exist or have syntax errors"
         );
       } else if (error.message.includes("MIME type")) {
-        console.error("Service Worker file might have wrong MIME type");
+        pwaLogger.error("Service Worker file might have wrong MIME type");
       }
+
+      pwaLogger.timeEnd("PWA initialization");
     }
   });
 }
 
 function showUpdateNotification(registration) {
+  pwaLogger.debug("Showing update notification to user");
+
   // You can customize this to show a nicer UI notification later
   const shouldUpdate = confirm(
     "A new version of Fhavur is available! Reload to update?"
   );
+
   if (shouldUpdate) {
+    pwaLogger.info("User accepted update, activating new Service Worker");
     // Tell the waiting service worker to activate
     if (registration.waiting) {
       registration.waiting.postMessage({ type: "SKIP_WAITING" });
     }
     window.location.reload();
+  } else {
+    pwaLogger.debug("User declined update");
   }
 }
 
@@ -87,6 +128,8 @@ import { UltimateModal } from "./Modal.js";
 import Notification from "./notification.js";
 
 document.addEventListener("DOMContentLoaded", () => {
+  appLogger.time("Birthday app initialization");
+
   // DOM Elements
   const elements = {
     birthdayAudio: document.getElementById("birthdayAudio"),
@@ -102,6 +145,12 @@ document.addEventListener("DOMContentLoaded", () => {
       ".social-share a, .social-share button"
     ),
   };
+
+  appLogger.debug("DOM elements cached", {
+    elementsFound: Object.keys(elements).filter((key) => !!elements[key])
+      .length,
+    totalElements: Object.keys(elements).length,
+  });
 
   // State management
   const state = {
@@ -138,13 +187,18 @@ document.addEventListener("DOMContentLoaded", () => {
         "#ff5722",
         "#3e0909",
       ],
-
       interval: 5000,
       numberOfFloatingElement: 16,
     },
     animating: false,
     cooldown: 10000,
   };
+
+  appLogger.debug("Application state initialized", {
+    confettiCount: state.confetti.number,
+    floatingElements: state.confetti.numberOfFloatingElement,
+    cooldown: state.cooldown,
+  });
 
   // Constants
   const EMOJIS = [
@@ -176,7 +230,10 @@ document.addEventListener("DOMContentLoaded", () => {
 
   // Initialize the application
   function init() {
-    detectlPatform();
+    appLogger.time("App component initialization");
+
+    detectPlatform();
+
     // Add tooltip styles
     const style = document.createElement("style");
     style.textContent = `
@@ -195,7 +252,7 @@ document.addEventListener("DOMContentLoaded", () => {
       white-space: nowrap;
     }
     .modal-tooltip.visible {
-      opacity: 1;E
+      opacity: 1;
       transform: translate(-50%, 0);
     }
     .modal-tooltip::after {
@@ -210,8 +267,14 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   `;
     document.head.appendChild(style);
+    appLogger.debug("Tooltip styles added to document");
+
     new Notification().toggleViewDetails(true).initialize();
+    appLogger.debug("Notification system initialized");
+
     new UltimateModal().init();
+    appLogger.debug("UltimateModal initialized");
+
     setupEventListeners();
     loadImages();
     triggerCelebration(1000); // Initial celebration after 1 second
@@ -221,13 +284,20 @@ document.addEventListener("DOMContentLoaded", () => {
 
     // Periodic confetti and floating elements refresh
     setInterval(() => {
+      appLogger.debug("Periodic celebration refresh triggered");
       triggerConfetti();
       createFloatingElements();
     }, state.cooldown);
+
+    appLogger.info("Birthday application initialized successfully");
+    appLogger.timeEnd("App component initialization");
   }
 
-  function detectlPatform() {
+  function detectPlatform() {
+    appLogger.time("Platform detection");
     const platform = PlatformDetector.detect();
+    appLogger.debug("Platform detected", { platform });
+
     if (platform === "iOS" || platform === "Android") {
       state.confetti.numberOfFloatingElement = 8;
       state.confetti.number = 50;
@@ -236,10 +306,22 @@ document.addEventListener("DOMContentLoaded", () => {
       state.heart.maxSize = 80;
       state.growButton.maxScale = 2.5;
       state.cooldown = 15000;
+
+      appLogger.info("Mobile platform detected, adjusting settings", {
+        floatingElements: state.confetti.numberOfFloatingElement,
+        confettiCount: state.confetti.number,
+        heartGrowthRate: state.heart.growthRate,
+        cooldown: state.cooldown,
+      });
+    } else {
+      appLogger.debug("Desktop platform detected, using default settings");
     }
+    appLogger.timeEnd("Platform detection");
   }
 
   function setupGrowButtonEventListeners() {
+    appLogger.time("Grow button event setup");
+
     elements.growButton.addEventListener("mousedown", startGrowing);
     elements.growButton.addEventListener("touchstart", startGrowing);
 
@@ -249,9 +331,11 @@ document.addEventListener("DOMContentLoaded", () => {
 
     // Reset transforms on mouse leave
     document.addEventListener("mouseleave", () => {
+      appLogger.debug("Mouse left document, resetting transforms");
       elements.imageContainer.style.transform = "scale(1) rotate(0deg)";
       elements.signatureElement.style.transform = "translate(0, 0)";
     });
+
     let lastMove = 0;
     document.addEventListener("mousemove", (e) => {
       const now = Date.now();
@@ -267,41 +351,75 @@ document.addEventListener("DOMContentLoaded", () => {
         elements.signatureElement.style.transform = `translate(${
           moveX / 2
         }px, ${moveY / 2}px)`;
+
+        appLogger.debug("Mouse move parallax effect applied", {
+          moveX,
+          moveY,
+        });
       }
     });
+
+    appLogger.debug("Grow button event listeners configured");
+    appLogger.timeEnd("Grow button event setup");
   }
 
   function startGrowing(e) {
+    appLogger.time("Start growing animation");
     e.preventDefault();
     state.growButton.currentScale = 1;
     elements.growButton.classList.add("holding");
     clearInterval(elements.growInterval);
 
+    appLogger.debug("Starting grow interval", {
+      currentScale: state.growButton.currentScale,
+      maxScale: state.growButton.maxScale,
+    });
+
     state.growButton.growInterval = setInterval(() => {
       if (state.growButton.currentScale < state.growButton.maxScale) {
         state.growButton.currentScale += state.growButton.scaleIncrement;
         elements.growButton.style.transform = `scale(${state.growButton.currentScale})`;
+        appLogger.debug("Grow button scaling", {
+          currentScale: state.growButton.currentScale,
+        });
       }
     }, state.growButton.growSpeed);
+
+    appLogger.timeEnd("Start growing animation");
   }
 
   function releaseButton(e) {
+    appLogger.time("Release button");
+
     elements.growButton.classList.remove("holding");
     clearInterval(state.growButton.growInterval);
 
     const wasHeld = state.growButton.currentScale > 1.1;
     elements.growButton.style.transform = "scale(1)";
+
+    appLogger.debug("Button released", {
+      wasHeld,
+      finalScale: state.growButton.currentScale,
+    });
+
     state.growButton.currentScale = 1;
     const es = e;
     e.preventDefault();
+
     if (!wasHeld) {
+      appLogger.debug("Short press detected, toggling audio");
       toggleAudio();
     } else {
+      appLogger.debug("Long press detected, toggling audio");
       toggleAudio();
     }
+
+    appLogger.timeEnd("Release button");
   }
 
   function createFloatingElements() {
+    appLogger.time("Create floating elements");
+
     const symbols = [
       { class: "hearts", emoji: "❤️" },
       { class: "hearts", emoji: "💖" },
@@ -319,7 +437,12 @@ document.addEventListener("DOMContentLoaded", () => {
       { class: "stars", emoji: "🎇" },
       { class: "flowers", emoji: "🌸" },
     ];
-    const numElements = state.confetti.numberOfFloatingElement; // Number of floating elements to generate
+
+    const numElements = state.confetti.numberOfFloatingElement;
+    appLogger.debug("Creating floating elements", {
+      count: numElements,
+      symbolTypes: symbols.length,
+    });
 
     for (let i = 0; i < numElements; i++) {
       const randomSymbol = symbols[Math.floor(Math.random() * symbols.length)];
@@ -340,7 +463,9 @@ document.addEventListener("DOMContentLoaded", () => {
       // Limit the number of floating elements to prevent memory leaks
       const maxFloatingElements = 40;
       const currentFloating = document.querySelectorAll(".floating");
+
       if (currentFloating.length >= maxFloatingElements) {
+        appLogger.debug("Floating element limit reached, removing oldest");
         // Remove oldest floating elements
         for (
           let j = 0;
@@ -350,14 +475,26 @@ document.addEventListener("DOMContentLoaded", () => {
           currentFloating[j].remove();
         }
       }
+
       setTimeout(() => {
         element.remove();
+        appLogger.debug("Floating element removed after timeout");
       }, 30000);
+
       document.body.appendChild(element);
     }
+
+    appLogger.debug("Floating elements created", { count: numElements });
+    appLogger.timeEnd("Create floating elements");
   }
 
   function triggerConfetti() {
+    confettiLogger.time("Trigger confetti");
+
+    confettiLogger.debug("Animating confetti elements", {
+      elementCount: elements.confettiElements.length,
+    });
+
     elements.confettiElements.forEach((confetti, index) => {
       confetti.style.animation = "none";
       void confetti.offsetWidth; // Trigger reflow
@@ -369,6 +506,10 @@ document.addEventListener("DOMContentLoaded", () => {
     });
 
     // Create additional confetti for burst effect
+    confettiLogger.debug("Creating extra confetti", {
+      count: state.confetti.number,
+    });
+
     for (let i = 0; i < state.confetti.number; i++) {
       const extraConfetti = document.createElement("div");
       extraConfetti.className = "confetti extra-confetti";
@@ -384,22 +525,39 @@ document.addEventListener("DOMContentLoaded", () => {
       // Remove extra confetti after animation
       setTimeout(() => {
         extraConfetti.remove();
+        confettiLogger.debug("Extra confetti removed");
       }, state.confetti.interval);
     }
+
+    confettiLogger.debug("Confetti animation triggered");
+    confettiLogger.timeEnd("Trigger confetti");
   }
 
   function getRandomColor() {
     const { colors } = state.confetti;
-    return colors[Math.floor(Math.random() * colors.length)];
+    const color = colors[Math.floor(Math.random() * colors.length)];
+    confettiLogger.debug("Random color selected", { color });
+    return color;
   }
 
   function animateName() {
+    appLogger.time("Animate name");
+
     const nameElement = elements.nameElement;
-    if (!nameElement) return;
+    if (!nameElement) {
+      appLogger.warn("Name element not found for animation");
+      appLogger.timeEnd("Animate name");
+      return;
+    }
 
     const name = nameElement.textContent.trim();
     nameElement.innerHTML = "";
     const randomAnimations = getUniqueRandomAnimations(name.length);
+
+    appLogger.debug("Animating name letters", {
+      nameLength: name.length,
+      animationCount: randomAnimations.length,
+    });
 
     name.split("").forEach((letter, index) => {
       state.animating = true;
@@ -410,15 +568,22 @@ document.addEventListener("DOMContentLoaded", () => {
         const anim = randomAnimations[index % randomAnimations.length];
         span.style.animation = `${anim} 2s ${index * 0.1 + 0.1}s forwards`;
         span.style.opacity = "1";
+        appLogger.debug("Letter animation applied", {
+          letter,
+          animation: anim,
+        });
       }
       span.textContent = letter;
       span.addEventListener("animationend", () => {
         if (index === randomAnimations.length - 1) {
           state.animating = false;
+          appLogger.debug("Name animation completed");
         }
       });
       nameElement.appendChild(span);
     });
+
+    appLogger.timeEnd("Animate name");
   }
 
   function getUniqueRandomAnimations(count) {
@@ -428,47 +593,67 @@ document.addEventListener("DOMContentLoaded", () => {
       const j = Math.floor(Math.random() * (i + 1));
       [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
     }
-    return shuffled.slice(0, count);
+    const result = shuffled.slice(0, count);
+    appLogger.debug("Random animations generated", {
+      count,
+      animations: result,
+    });
+    return result;
   }
+
   // Event Listeners setup
   function setupEventListeners() {
+    appLogger.time("Event listeners setup");
+
     // Audio control
     document.body.addEventListener("click", enableAudio, { once: true });
+    appLogger.debug("One-time audio enable listener added");
 
     // Celebration button
-    elements.celebrateButton.addEventListener("click", () =>
-      triggerCelebration(0)
-    );
+    elements.celebrateButton.addEventListener("click", () => {
+      celebrationLogger.debug("Celebrate button clicked");
+      triggerCelebration(0);
+    });
+
     elements.celebrateButton.addEventListener(
       "keydown",
       handleCelebrateKeyDown
     );
-
-    // setupGrowButtonEventListeners();
+    appLogger.debug("Celebrate button event listeners added");
 
     // Mobile touch effects
     elements.celebrateButton.addEventListener("touchstart", () => {
       elements.celebrateButton.style.transform = "scale(0.95)";
+      appLogger.debug("Celebrate button touch start - scaling down");
     });
+
     elements.celebrateButton.addEventListener("touchend", () => {
       elements.celebrateButton.style.transform = "";
+      appLogger.debug("Celebrate button touch end - reset scale");
     });
 
     elements.nameElement.addEventListener("mouseenter", () => {
       if (!state.animating) {
+        appLogger.debug("Name element mouse enter - triggering animation");
         animateName();
+      } else {
+        appLogger.debug(
+          "Name element mouse enter - animation already in progress"
+        );
       }
     });
 
     // Click effects
     document.addEventListener("mousedown", (e) => {
       if (!e.target.closest(" .modal-container, img,  a,  button")) {
+        heartLogger.debug("Mouse down on empty space - starting heart growth");
         startGrowingHeart(e);
       }
     });
 
     document.addEventListener("touchstart", (e) => {
       if (!e.target.closest(" .modal-container, img,  a,  button")) {
+        heartLogger.debug("Touch start on empty space - starting heart growth");
         startGrowingHeart(e.touches[0]);
       }
     });
@@ -478,92 +663,163 @@ document.addEventListener("DOMContentLoaded", () => {
     document.addEventListener("mouseup", releaseGrowingHeart);
     document.addEventListener("touchend", releaseGrowingHeart);
     document.addEventListener("mouseleave", releaseGrowingHeart);
+    appLogger.debug("Heart growth control listeners added");
 
     // Social share buttons
-    elements.socialShareLinks.forEach((link) => {
+    elements.socialShareLinks.forEach((link, index) => {
       link.addEventListener("click", handleSocialShareClick);
+      appLogger.debug("Social share listener added", {
+        index,
+        platform: link.className,
+      });
     });
 
     // Window resize - debounce to avoid excessive calls
     window.addEventListener(
       "resize",
       debounce(() => {
+        appLogger.debug(
+          "Window resize detected - handling responsive adjustments"
+        );
         // Handle any responsive adjustments if needed
       }, 200)
     );
+
+    appLogger.info("All event listeners configured successfully");
+    appLogger.timeEnd("Event listeners setup");
   }
+
   // Audio functions
   function enableAudio() {
+    audioLogger.time("Enable audio");
     state.audio.isAllowed = true;
+    audioLogger.info("Audio interaction allowed by user");
+
     if (state.audio.isPlaying) {
-      playAudio().catch(console.error);
+      audioLogger.debug("Audio was playing, resuming playback");
+      playAudio().catch((error) => {
+        audioLogger.error("Failed to resume audio after enable", error);
+      });
     }
+    audioLogger.timeEnd("Enable audio");
   }
 
   function toggleAudio() {
+    audioLogger.time("Toggle audio");
+
     if (state.audio.isPlaying) {
+      audioLogger.debug("Pausing audio");
       pauseAudio();
     } else {
+      audioLogger.debug("Playing audio");
       playAudio();
     }
+    audioLogger.timeEnd("Toggle audio");
   }
 
   async function playAudio() {
-    if (!state.audio.isAllowed) return;
+    audioLogger.time("Play audio");
+
+    if (!state.audio.isAllowed) {
+      audioLogger.warn("Audio not allowed by user, skipping playback");
+      audioLogger.timeEnd("Play audio");
+      return;
+    }
 
     try {
+      audioLogger.debug("Attempting to play birthday audio");
       await elements.birthdayAudio.play();
       elements.playBtn.innerHTML =
         '<i class="fas fa-pause" aria-hidden="true"></i>';
       state.audio.isPlaying = true;
+      audioLogger.info("Audio playback started successfully");
     } catch (error) {
-      console.error("Audio playback failed:", error);
+      audioLogger.error("Audio playback failed", error);
     }
+    audioLogger.timeEnd("Play audio");
   }
 
   function pauseAudio() {
+    audioLogger.time("Pause audio");
+
     elements.birthdayAudio.pause();
     elements.playBtn.innerHTML =
       '<i class="fas fa-play" aria-hidden="true"></i>';
     state.audio.isPlaying = false;
+    audioLogger.info("Audio playback paused");
+    audioLogger.timeEnd("Pause audio");
   }
 
   // Celebration effects
   function triggerCelebration(delay = 0) {
+    celebrationLogger.time("Trigger celebration");
+    celebrationLogger.debug("Scheduling celebration effects", { delay });
+
     setTimeout(() => {
+      celebrationLogger.info("Executing celebration sequence");
       createHeartBurst(100);
       animateImageBounce();
       triggerConfetti();
       animateName();
+
       if (!state.audio.isPlaying) {
+        celebrationLogger.debug("Starting audio for celebration");
         elements.birthdayAudio.currentTime = 0;
         playAudio();
+      } else {
+        celebrationLogger.debug("Audio already playing, continuing");
       }
+
+      celebrationLogger.timeEnd("Trigger celebration");
     }, delay);
   }
 
   function animateImageBounce() {
+    celebrationLogger.time("Animate image bounce");
+
     elements.imageContainer.classList.add("animate__animated", "animate__tada");
+    celebrationLogger.debug("Bounce animation added to image container");
+
     setTimeout(() => {
       elements.imageContainer.classList.remove(
         "animate__animated",
         "animate__bounce"
       );
+      celebrationLogger.debug("Bounce animation removed from image container");
     }, 2000);
+
+    celebrationLogger.timeEnd("Animate image bounce");
   }
 
   function createHeartBurst(count) {
+    heartLogger.time("Create heart burst");
+    heartLogger.debug("Creating heart burst", { heartCount: count });
+
     for (let i = 0; i < count; i++) {
       const x = Math.random() * window.innerWidth;
       const y = Math.random() * window.innerHeight;
       createHeart(x, y);
     }
+
+    heartLogger.info("Heart burst created successfully");
+    heartLogger.timeEnd("Create heart burst");
   }
 
   function createHeart(x, y, initialiseSize = 20, isGrowing = false) {
+    heartLogger.time("Create heart");
+
     const heart = document.createElement("div");
     heart.className = "hearts";
-    heart.innerHTML = EMOJIS[Math.floor(Math.random() * EMOJIS.length)];
+    const emoji = EMOJIS[Math.floor(Math.random() * EMOJIS.length)];
+    heart.innerHTML = emoji;
+
+    heartLogger.debug("Heart element created", {
+      x,
+      y,
+      initialSize: initialiseSize,
+      isGrowing,
+      emoji,
+    });
 
     // Position and style
     Object.assign(heart.style, {
@@ -578,11 +834,13 @@ document.addEventListener("DOMContentLoaded", () => {
     });
 
     elements.clickHeartsContainer.appendChild(heart);
+
     if (!isGrowing) {
       // For regular hearts, use animationend event for removal
       heart.addEventListener("animationend", () => {
         if (heart.parentNode) {
           heart.parentNode.removeChild(heart);
+          heartLogger.debug("Regular heart animation ended and removed");
         }
       });
     } else {
@@ -590,15 +848,21 @@ document.addEventListener("DOMContentLoaded", () => {
       setTimeout(() => {
         if (heart.parentNode && heart.dataset.growing === "false") {
           heart.parentNode.removeChild(heart);
+          heartLogger.debug("Growing heart removed by safety timeout");
         }
       }, 8000); // Long timeout as safety net
     }
+
+    heartLogger.timeEnd("Create heart");
     return heart;
   }
 
   function startGrowingHeart(e) {
+    heartLogger.time("Start growing heart");
+
     // Clear any existing growing heart
     if (state.heart.growing) {
+      heartLogger.debug("Clearing existing growing heart");
       state.heart.growing.remove();
       clearInterval(state.heart.growInterval);
     }
@@ -606,6 +870,12 @@ document.addEventListener("DOMContentLoaded", () => {
     // Create initial heart
     state.heart.growing = createHeart(e.clientX, e.clientY, 30, true);
     state.heart.growing.style.animation = "none"; // Disable float animation while growing
+    state.heart.growing.dataset.growing = "true";
+
+    heartLogger.debug("Initial growing heart created", {
+      clientX: e.clientX,
+      clientY: e.clientY,
+    });
 
     // Start growing interval
     state.heart.growInterval = setInterval(() => {
@@ -614,51 +884,89 @@ document.addEventListener("DOMContentLoaded", () => {
 
       if (newSize <= state.heart.maxSize) {
         state.heart.growing.style.fontSize = `${newSize}px`;
+        heartLogger.debug("Heart growing", { currentSize: newSize });
       } else {
         // Release if reached max size
+        heartLogger.debug("Heart reached max size, releasing");
         releaseGrowingHeart();
       }
     }, 50);
+
+    heartLogger.info("Heart growth started");
+    heartLogger.timeEnd("Start growing heart");
   }
 
   function releaseGrowingHeart() {
+    heartLogger.time("Release growing heart");
+
     clearInterval(state.heart.growInterval);
+    heartLogger.debug("Growth interval cleared");
 
     if (state.heart.growing) {
       // Re-enable float animation
       state.heart.growing.dataset.growing = "false";
-
       state.heart.growing.style.animation = `float ${
         3 + Math.random() * 4
       }s ease-in-out forwards`;
 
+      heartLogger.debug("Growing heart released for float animation");
       state.heart.growing = null;
+    } else {
+      heartLogger.debug("No growing heart to release");
     }
+
+    heartLogger.timeEnd("Release growing heart");
   }
+
   // Social share functions
   function handleSocialShareClick(e) {
+    socialLogger.time("Social share click");
+
+    const target = e.currentTarget;
+    socialLogger.debug("Social share clicked", {
+      className: target.className,
+      platform: Array.from(target.classList).find((cls) => cls.includes("fa-")),
+    });
+
     // Add click animation
-    e.currentTarget.classList.add("animate__animated", "animate__tada");
+    target.classList.add("animate__animated", "animate__tada");
+    socialLogger.debug("Share button animation started");
+
     setTimeout(() => {
-      e.currentTarget.classList.remove("animate__animated", "animate__tada");
+      target.classList.remove("animate__animated", "animate__tada");
+      socialLogger.debug("Share button animation ended");
     }, 5000);
 
     // Update share URLs if needed
-    if (e.currentTarget.classList.contains("fa-whatsapp")) {
+    if (target.classList.contains("fa-whatsapp")) {
       const currentUrl = encodeURIComponent(window.location.href);
       const message = encodeURIComponent(
         "Check out this beautiful birthday wish I received!"
       );
-      e.currentTarget.href = `https://api.whatsapp.com/send?text=${message}%20${currentUrl}`;
+      target.href = `https://api.whatsapp.com/send?text=${message}%20${currentUrl}`;
+      socialLogger.debug("WhatsApp share URL updated", { currentUrl });
     }
+
+    socialLogger.timeEnd("Social share click");
   }
 
   // Helper functions
   function handleCelebrateKeyDown(e) {
-    if (!e) return;
+    if (!e) {
+      appLogger.warn("Celebrate keydown event missing");
+      return;
+    }
+
     if (e.key === "Enter" || e.key === " ") {
       e.preventDefault();
+      celebrationLogger.debug("Celebrate triggered via keyboard", {
+        key: e.key,
+      });
       triggerCelebration();
+    } else {
+      celebrationLogger.debug("Unhandled key pressed on celebrate button", {
+        key: e.key,
+      });
     }
   }
 
@@ -669,6 +977,7 @@ document.addEventListener("DOMContentLoaded", () => {
         args = arguments;
       clearTimeout(timeout);
       timeout = setTimeout(() => {
+        appLogger.debug("Debounced function executed", { wait });
         func.apply(context, args);
       }, wait);
     };
@@ -676,22 +985,37 @@ document.addEventListener("DOMContentLoaded", () => {
 
   // Image loading
   function loadImages() {
-    const images = document.querySelectorAll('img[loading="lazy"]');
+    appLogger.time("Image loading");
 
-    images.forEach((img) => {
+    const images = document.querySelectorAll('img[loading="lazy"]');
+    appLogger.debug("Found lazy images to load", { count: images.length });
+
+    images.forEach((img, index) => {
       img.addEventListener("load", () => {
         img.style.opacity = "1";
         img.style.transition = "opacity 0.5s ease";
+        appLogger.debug("Image loaded successfully", { index, src: img.src });
       });
 
       img.style.opacity = "0";
+      appLogger.debug("Image opacity set to 0 for fade-in", { index });
 
       img.addEventListener("error", () => {
+        appLogger.warn("Image failed to load, using fallback", {
+          src: img.src,
+        });
         img.src = "https://via.placeholder.com/200?text=Photo+Not+Found";
         img.alt = "Image not available";
         img.style.opacity = "1";
       });
     });
+
+    appLogger.info("Image loading system initialized");
+    appLogger.timeEnd("Image loading");
   }
+
+  // Initialize the application
+  appLogger.debug("Starting main application initialization");
   init();
+  appLogger.timeEnd("Birthday app initialization");
 });

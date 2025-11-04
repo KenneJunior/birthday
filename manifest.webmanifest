@@ -101,7 +101,7 @@
       "url": "fhavur/missus/fhav.html",
       "icons": [
         {
-          "src": "public/icon/shortcut/ask_out.svg",
+          "src": "/icon/shortcut/ask_out.svg",
           "sizes": "96x96",
           "type": "image/svg+xml"
         }

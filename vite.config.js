@@ -1,5 +1,7 @@
 import { resolve } from "path";
 import { defineConfig } from "vite";
+import { createHtmlPlugin } from "vite-plugin-html";
+import htmlMinifier from "vite-plugin-html-minifier-terser";
 import { qrcode } from "vite-plugin-qrcode";
 
 export default defineConfig({
@@ -7,7 +9,21 @@ export default defineConfig({
     host: "0.0.0.0",
     port: 5173,
   },
-  plugins: [qrcode()],
+  plugins: [
+    qrcode(),
+    createHtmlPlugin(),
+    htmlMinifier({
+      minify: {
+        collapseWhitespace: true,
+        removeComments: true,
+        removeRedundantAttributes: true,
+        removeEmptyAttributes: true,
+        useShortDoctype: true,
+        minifyCSS: true,
+        minifyJS: true,
+      },
+    }),
+  ],
   build: {
     rollupOptions: {
       input: {

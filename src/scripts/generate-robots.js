@@ -1,7 +1,7 @@
 import { writeFileSync } from "fs";
-
+import { _log } from "../js/utility/logger.js";
 function generateRobotsTxt(environment = "production") {
-  console.log(`🤖 Generating robots.txt for ${environment}...`);
+  _log(`🤖 Generating robots.txt for ${environment}...`);
 
   const baseConfig = {
     userAgent: "*",
@@ -89,10 +89,10 @@ function generateRobotsTxt(environment = "production") {
   // Write to file
   writeFileSync("public/robots.txt", robotsContent);
 
-  console.log("✅ robots.txt generated successfully!");
-  console.log(`📁 Location: public/robots.txt`);
-  console.log(`🌐 Environment: ${environment}`);
-  console.log(
+  _log("✅ robots.txt generated successfully!");
+  _log(`📁 Location: public/robots.txt`);
+  _log(`🌐 Environment: ${environment}`);
+  _log(
     `📊 Rules: ${baseConfig.allow.length - 1} allow, ${
       baseConfig.disallow.length
     } disallow`

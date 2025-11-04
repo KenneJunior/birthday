@@ -1,0 +1,1371 @@
+<!DOCTYPE html>
+<html lang="en" data-whatsapp-number="670852835" data-theme="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Fhavur - Offline | Connection Required</title>
+    <meta name="description" content="Fhavur is currently offline. Check your internet connection and try again.">
+    <meta name="theme-color" content="#ef4d00">
+    
+    <!-- Open Graph -->
+    <meta property="og:title" content="Fhavur - Offline">
+    <meta property="og:description" content="Fhavur is currently offline. Check your internet connection and try again.">
+    <meta property="og:type" content="website">
+
+        <!-- Favicon -->
+    <link rel="icon" href="icon/andriod_svg/icon_168X168.svg" type="image/svg+xml">
+    <link rel="apple-touch-icon" href="icon/apple/img/apple-touch-icon.png">
+        <!-- Web App Manifest -->
+    <link rel="manifest" href="/manifest.webmanifest" crossorigin="use-credentials">
+<style>
+/* 
+ * FHAVUR OFFLINE PAGE - CSS ENHANCEMENTS
+ * 
+ * - v1.0.0
+ * - Complete design token system with semantic variables
+ * - Enhanced typography scale with system font stack
+ * - Improved spacing system using CSS grid and custom properties
+ * - Premium glassmorphism effects with backdrop-filter fallbacks
+ * - Refined animations with reduced-motion support
+ * - Enhanced button states with micro-interactions
+ * - Responsive fluid typography and spacing
+ * - Accessible focus indicators and color contrast
+ */
+
+:root {
+  /* ===== COLOR TOKENS ===== */
+  --color-primary-50: #f0f4ff;
+  --color-primary-500: #667eea;
+  --color-primary-600: #5a67d8;
+  --color-primary-700: #4c51bf;
+  
+  --color-success-500: #48bb78;
+  --color-success-600: #38a169;
+  
+  --color-error-50: #fef2f2;
+  --color-error-500: #f56565;
+  --color-error-600: #e53e3e;
+  --color-error-700: #c53030;
+  
+  --color-gray-50: #f9fafb;
+  --color-gray-100: #f3f4f6;
+  --color-gray-200: #e5e7eb;
+  --color-gray-300: #d1d5db;
+  --color-gray-400: #9ca3af;
+  --color-gray-500: #6b7280;
+  --color-gray-600: #4b5563;
+  --color-gray-700: #374151;
+  --color-gray-800: #1f2937;
+  --color-gray-900: #111827;
+  
+  /* ===== SEMANTIC TOKENS ===== */
+  --surface: rgba(255, 255, 255, 0.95);
+  --surface-elevated: rgba(255, 255, 255, 0.98);
+  --surface-muted: var(--color-gray-50);
+  --text-primary: var(--color-gray-900);
+  --text-secondary: var(--color-gray-600);
+  --text-muted: var(--color-gray-500);
+  --border: rgba(0, 0, 0, 0.08);
+  --border-strong: rgba(0, 0, 0, 0.12);
+  
+  /* ===== GRADIENT TOKENS ===== */
+  --gradient-primary: linear-gradient(135deg, var(--color-primary-500) 0%, var(--color-primary-700) 100%);
+  --gradient-success: linear-gradient(135deg, var(--color-success-500) 0%, var(--color-success-600) 100%);
+  --gradient-error: linear-gradient(135deg, #ff6b6b 0%, #ee5a24 100%);
+  --gradient-glass: linear-gradient(135deg, rgba(255, 255, 255, 0.1) 0%, rgba(255, 255, 255, 0.05) 100%);
+  
+  /* ===== SPACING SCALE ===== */
+  --space-1: 0.25rem;
+  --space-2: 0.5rem;
+  --space-3: 0.75rem;
+  --space-4: 1rem;
+  --space-5: 1.5rem;
+  --space-6: 2rem;
+  --space-8: 3rem;
+  --space-10: 4rem;
+  
+  /* ===== TYPOGRAPHY SCALE ===== */
+  --text-xs: 0.75rem;
+  --text-sm: 0.875rem;
+  --text-base: 1rem;
+  --text-lg: 1.125rem;
+  --text-xl: 1.25rem;
+  --text-2xl: 1.5rem;
+  --text-3xl: 1.875rem;
+  --text-4xl: 2.25rem;
+  
+  /* ===== BORDER RADIUS ===== */
+  --radius-sm: 0.375rem;
+  --radius-md: 0.5rem;
+  --radius-lg: 0.75rem;
+  --radius-xl: 1rem;
+  --radius-2xl: 1.5rem;
+  
+  /* ===== SHADOWS ===== */
+  --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+  --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+  --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+  --shadow-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+  --shadow-glow: 0 0 0 1px rgba(255, 255, 255, 0.1), 0 20px 40px rgba(0, 0, 0, 0.15);
+  
+  /* ===== TRANSITIONS ===== */
+  --transition-base: all 0.2s ease;
+  --transition-smooth: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  --transition-bounce: all 0.5s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+  
+  /* ===== Z-INDEX ===== */
+  --z-below: -1;
+  --z-base: 1;
+  --z-above: 10;
+  --z-modal: 100;
+}
+
+/* ===== BASE STYLES ===== */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+html {
+  font-size: 16px;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+body {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+  background: var(--gradient-error);
+  color: var(--text-primary);
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: var(--space-4);
+  line-height: 1.6;
+  position: relative;
+}
+
+/* Optional background pattern */
+body::before {
+  content: '';
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-image: 
+    radial-gradient(circle at 25% 25%, rgba(255, 255, 255, 0.1) 0%, transparent 50%),
+    radial-gradient(circle at 75% 75%, rgba(255, 255, 255, 0.05) 0%, transparent 50%);
+  pointer-events: none;
+  z-index: var(--z-below);
+}
+
+/* ===== LAYOUT COMPONENTS ===== */
+.offline-container {
+  background: var(--surface);
+  border-radius: var(--radius-2xl);
+  padding: var(--space-8) var(--space-5);
+  box-shadow: var(--shadow-glow);
+  text-align: center;
+  max-width: 28rem;
+  width: 100%;
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid var(--border);
+  position: relative;
+  overflow: hidden;
+}
+
+.offline-container::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.6), transparent);
+}
+
+/* ===== STATUS INDICATOR ===== */
+.status-indicator {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-2);
+  margin-bottom: var(--space-5);
+  font-size: var(--text-sm);
+  color: var(--text-secondary);
+  background: var(--surface-muted);
+  padding: var(--space-2) var(--space-3);
+  border-radius: var(--radius-lg);
+  border: 1px solid var(--border);
+}
+
+.connection-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--color-error-500);
+  position: relative;
+}
+
+.connection-dot::before {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 16px;
+  height: 16px;
+  background: var(--color-error-500);
+  border-radius: 50%;
+  opacity: 0.4;
+  transform: translate(-50%, -50%);
+  animation: pulse 2s ease-in-out infinite;
+}
+
+/* ===== EMOJI ===== */
+.emoji {
+  font-size: var(--text-4xl);
+  margin-bottom: var(--space-5);
+  display: block;
+  filter: grayscale(0.2);
+  transform-style: preserve-3d;
+  will-change: transform;
+}
+
+/* ===== TYPOGRAPHY ===== */
+h1 {
+  color: var(--text-primary);
+  margin-bottom: var(--space-4);
+  font-size: clamp(var(--text-2xl), 4vw, var(--text-3xl));
+  font-weight: 700;
+  line-height: 1.2;
+  letter-spacing: -0.025em;
+}
+
+.subtitle {
+  color: var(--text-secondary);
+  margin-bottom: var(--space-6);
+  font-size: var(--text-lg);
+  line-height: 1.5;
+  max-width: 32ch;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+/* ===== URL INFO ===== */
+.url-info {
+  background: var(--surface-muted);
+  border: 1px solid var(--border-strong);
+  border-radius: var(--radius-lg);
+  padding: var(--space-4);
+  margin: var(--space-5) 0;
+  font-family: 'SF Mono', 'Monaco', 'Inconsolata', 'Roboto Mono', monospace;
+  font-size: var(--text-sm);
+  word-break: break-all;
+  color: var(--text-muted);
+  position: relative;
+}
+
+.url-info::before {
+  content: '📡';
+  position: absolute;
+  left: var(--space-4);
+  top: 50%;
+  transform: translateY(-50%);
+  font-size: var(--text-base);
+}
+
+.url-info strong {
+  display: block;
+  margin-bottom: var(--space-2);
+  color: var(--text-primary);
+  font-weight: 600;
+}
+
+/* ===== BUTTON GROUP ===== */
+.button-group {
+  display: grid;
+  gap: var(--space-3);
+  margin-top: var(--space-6);
+}
+
+/* ===== BUTTONS ===== */
+.btn {
+  padding: var(--space-4) var(--space-5);
+  border: none;
+  border-radius: var(--radius-xl);
+  font-size: var(--text-base);
+  font-weight: 600;
+  cursor: pointer;
+  transition: var(--transition-smooth);
+  text-decoration: none;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-3);
+  position: relative;
+  overflow: hidden;
+  min-height: 3rem;
+  will-change: transform;
+}
+
+.btn::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.4), transparent);
+  transition: left 0.6s ease;
+}
+
+.btn:hover::before {
+  left: 100%;
+}
+
+.btn:focus {
+  outline: 2px solid currentColor;
+  outline-offset: 2px;
+}
+
+.btn:active {
+  transform: translateY(0) scale(0.98);
+}
+
+.btn-primary {
+  background: var(--gradient-primary);
+  color: white;
+  box-shadow: var(--shadow-md);
+}
+
+.btn-primary:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-lg);
+}
+
+.btn-success {
+  background: var(--gradient-success);
+  color: white;
+  box-shadow: var(--shadow-md);
+}
+
+.btn-success:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-lg);
+}
+
+.icon {
+  font-size: 1.25em;
+  transition: transform 0.2s ease;
+}
+
+.btn:hover .icon {
+  transform: scale(1.1);
+}
+
+/* ===== TIPS SECTION ===== */
+.tips {
+  margin-top: var(--space-6);
+  padding-top: var(--space-5);
+  border-top: 1px solid var(--border);
+}
+
+.tips h3 {
+  color: var(--text-primary);
+  margin-bottom: var(--space-4);
+  font-size: var(--text-base);
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.tips ul {
+  list-style: none;
+  text-align: left;
+  display: grid;
+  gap: var(--space-3);
+}
+
+.tips li {
+  padding: var(--space-2) 0;
+  color: var(--text-secondary);
+  display: flex;
+  align-items: flex-start;
+  gap: var(--space-3);
+  font-size: var(--text-sm);
+  line-height: 1.4;
+}
+
+.tips li::before {
+  content: "💡";
+  font-size: var(--text-sm);
+  flex-shrink: 0;
+  margin-top: 0.125em;
+}
+
+/* ===== RETRY INDICATOR ===== */
+.retry-indicator {
+  margin-top: var(--space-4);
+  font-size: var(--text-sm);
+  color: var(--text-muted);
+  background: var(--surface-muted);
+  padding: var(--space-3);
+  border-radius: var(--radius-lg);
+  border: 1px solid var(--border);
+}
+
+/* ===== RESPONSIVE DESIGN ===== */
+@media (min-width: 480px) {
+  .button-group {
+    grid-template-columns: 1fr 1fr;
+  }
+  
+  .button-group .btn:last-child:nth-child(odd) {
+    grid-column: 1 / -1;
+  }
+}
+
+@media (min-width: 640px) {
+  body {
+    padding: var(--space-6);
+  }
+  
+  .offline-container {
+    padding: var(--space-10) var(--space-8);
+  }
+  
+  .button-group {
+    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+  }
+}
+
+/* ===== ANIMATIONS ===== */
+@keyframes bounce {
+  0%, 20%, 50%, 80%, 100% {
+    transform: translateY(0) scale(1);
+  }
+  40% {
+    transform: translateY(-8px) scale(1.05);
+  }
+  60% {
+    transform: translateY(-4px) scale(1.02);
+  }
+}
+
+@keyframes pulse {
+  0%, 100% {
+    transform: translate(-50%, -50%) scale(1);
+    opacity: 0.4;
+  }
+  50% {
+    transform: translate(-50%, -50%) scale(1.5);
+    opacity: 0.2;
+  }
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(20px) scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+/* ===== MOTION PREFERENCES ===== */
+@media (prefers-reduced-motion: no-preference) {
+  .emoji {
+    animation: bounce 3s ease-in-out infinite;
+  }
+  
+  .fade-in {
+    animation: fadeIn 0.6s cubic-bezier(0.4, 0, 0.2, 1) both;
+  }
+  
+  .offline-container {
+    animation: fadeIn 0.8s cubic-bezier(0.4, 0, 0.2, 1) both;
+  }
+      .btn:focus-visible {
+        outline: 2px solid var(--color-primary-500);
+        outline-offset: 2px;
+        transform: translateY(-1px);
+    }
+    
+    .keyboard-shortcuts__summary:focus-visible {
+        outline: 2px solid var(--color-primary-500);
+        outline-offset: 2px;
+    }
+}
+/* High contrast mode support */
+@media (prefers-contrast: high) {
+    .offline-container {
+        border: 2px solid currentColor;
+    }
+    
+    .btn {
+        border: 1px solid currentColor;
+    }
+    
+    .url-info {
+        border: 2px solid currentColor;
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+      .btn:hover {
+        transform: none;
+    }
+    
+    .btn::before {
+        animation: none;
+    }
+}
+
+/* ===== UTILITY CLASSES ===== */
+.u-sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+.is-loading {
+  pointer-events: none;
+  opacity: 0.7;
+}
+
+.is-loading::after {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 1.25em;
+  height: 1.25em;
+  border: 2px solid transparent;
+  border-top-color: currentColor;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  to {
+    transform: translate(-50%, -50%) rotate(360deg);
+  }
+}
+/* Print styles */
+@media print {
+    .offline-container {
+        box-shadow: none;
+        border: 1px solid #000;
+    }
+    
+    .btn {
+        border: 1px solid #000;
+        color: #000;
+        background: none;
+    }
+    
+    .emoji {
+        display: none;
+    }
+}
+
+/* ===== THEME VARIATIONS (COMMENTED FOR FUTURE USE) ===== */
+@media (prefers-color-scheme: dark) {
+    :root {
+        --surface: rgba(17, 24, 39, 0.95);
+        --surface-muted: rgba(31, 41, 55, 0.8);
+        --text-primary: #f9fafb;
+        --text-secondary: #d1d5db;
+        --text-muted: #9ca3af;
+        --border: rgba(255, 255, 255, 0.1);
+        --border-strong: rgba(255, 255, 255, 0.15);
+    }
+}
+   
+.theme-dark {
+  --surface: rgba(17, 24, 39, 0.95);
+  --surface-muted: rgba(31, 41, 55, 0.8);
+  --text-primary: #f9fafb;
+  --text-secondary: #d1d5db;
+  --text-muted: #9ca3af;
+  --border: rgba(255, 255, 255, 0.1);
+  --border-strong: rgba(255, 255, 255, 0.15);
+}
+
+.theme-light {
+  --surface: rgba(255, 255, 255, 0.98);
+  --surface-muted: rgba(249, 250, 251, 0.9);
+  --text-primary: #111827;
+  --text-secondary: #374151;
+  --text-muted: #6b7280;
+  --border: rgba(0, 0, 0, 0.08);
+  --border-strong: rgba(0, 0, 0, 0.12);
+}
+/* Keyboard shortcuts component */
+.keyboard-shortcuts {
+    margin-top: var(--space-6);
+    padding-top: var(--space-4);
+    border-top: 1px solid var(--border);
+}
+
+.keyboard-shortcuts__summary {
+    list-style: none;
+    cursor: pointer;
+    padding: var(--space-2);
+    border-radius: var(--radius-md);
+    transition: var(--transition-base);
+}
+
+.keyboard-shortcuts__summary:hover {
+    background: var(--surface-muted);
+}
+
+.keyboard-shortcuts__summary::-webkit-details-marker {
+    display: none;
+}
+
+.keyboard-shortcuts__title {
+    font-size: var(--text-sm);
+    font-weight: 600;
+    color: var(--text-secondary);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+}
+
+.keyboard-shortcuts__content {
+    margin-top: var(--space-3);
+    padding: var(--space-3);
+    background: var(--surface-muted);
+    border-radius: var(--radius-lg);
+    border: 1px solid var(--border);
+}
+
+.keyboard-shortcuts ul {
+    list-style: none;
+    display: grid;
+    gap: var(--space-2);
+}
+
+.keyboard-shortcuts li {
+    display: flex;
+    align-items: center;
+    gap: var(--space-2);
+    font-size: var(--text-sm);
+    color: var(--text-secondary);
+}
+
+.keyboard-shortcuts kbd {
+    padding: var(--space-1) var(--space-2);
+    background: var(--surface);
+    border: 1px solid var(--border-strong);
+    border-radius: var(--radius-sm);
+    font-size: var(--text-xs);
+    font-family: 'SF Mono', Monaco, 'Cascadia Code', monospace;
+    box-shadow: var(--shadow-sm);
+}
+.loading-indicator__spinner {
+    width: 16px;
+    height: 16px;
+    border: 2px solid transparent;
+    border-top-color: currentColor;
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+}
+
+/* Enhanced utility classes */
+.u-sr-only--focusable:not(:focus):not(:focus-within) {
+    position: absolute !important;
+    width: 1px !important;
+    height: 1px !important;
+    padding: 0 !important;
+    margin: -1px !important;
+    overflow: hidden !important;
+    clip: rect(0, 0, 0, 0) !important;
+    white-space: nowrap !important;
+    border: 0 !important;
+}
+
+
+/* ===== OPTIONAL FONT FACE (COMMENTED) ===== */
+/*
+@font-face {
+  font-family: 'Inter';
+  font-style: normal;
+  font-weight: 400 700;
+  font-display: swap;
+  src: url('/fonts/inter-var.woff2') format('woff2-variations');
+}
+*/
+</style>
+</head>
+<body>
+    <!-- Skip to main content for keyboard users -->
+    <a href="#main-content" class="u-sr-only u-sr-only--focusable">Skip to main content</a>
+    
+    <!-- Live region for status announcements -->
+    <div class="u-sr-only" aria-live="polite" aria-atomic="true" id="a11y-status"></div>
+    
+    <!-- Live region for assertive announcements -->
+    <div class="u-sr-only" aria-live="assertive" aria-atomic="true" id="a11y-alert"></div>
+
+    <main id="main-content" class="offline-container fade-in" role="main">
+        <!-- Status indicator with semantic markup -->
+        <div class="status-indicator" role="status" aria-label="Connection status">
+            <span class="connection-dot" aria-hidden="true"></span>
+            <span class="status-indicator__text">Offline</span>
+            <span class="u-sr-only">No internet connection detected</span>
+        </div>
+        
+        <!-- Decorative emoji with accessible alternative -->
+        <span class="emoji" role="img" aria-label="Power plug symbol indicating offline status">🔌</span>
+        
+        <!-- Main heading hierarchy -->
+        <header class="offline-header">
+            <h1 class="offline-title">Connection Lost</h1>
+            <p class="subtitle">
+                This page requires an internet connection. You can try the following:
+            </p>
+        </header>
+
+        <!-- Requested URL information -->
+        <section class="url-section" aria-labelledby="url-heading">
+            <h2 id="url-heading" class="u-sr-only">Requested URL Information</h2>
+            <div id="url-info" class="url-info" style="display:none" role="region" aria-labelledby="url-heading">
+                <strong>Requested URL:</strong><br>
+                <span id="requested-url" aria-label="The URL you were trying to access"></span>
+            </div>
+        </section>
+
+        <!-- Action buttons section -->
+        <section class="actions-section" aria-labelledby="actions-heading">
+            <h2 id="actions-heading" class="u-sr-only">Available Actions</h2>
+            
+            <div class="button-group" role="group" aria-label="Connection recovery options">
+                <button class="btn btn-primary" id="retryBtn" type="button" aria-describedby="retry-description">
+                    <span class="icon" aria-hidden="true">🔄</span>
+                    Retry Connection
+                    <span class="u-sr-only" id="retry-description">Attempt to reconnect to the internet</span>
+                </button>
+                
+                <a href="/" class="btn btn-primary" id="goHomeBtn" role="button" aria-describedby="home-description">
+                    <span class="icon" aria-hidden="true">🏠</span>
+                    Go to Home
+                    <span class="u-sr-only" id="home-description">Navigate to the home page</span>
+                </a>
+                
+                <a href="#" class="btn btn-success" id="supportBtn" target="_blank" rel="noopener noreferrer" style="display:none" aria-describedby="support-description">
+                    <span class="icon" aria-hidden="true">💬</span>
+                    Contact Support
+                    <span class="u-sr-only" id="support-description">Open WhatsApp to contact customer support</span>
+                </a>
+            </div>
+
+            <!-- Retry status indicator -->
+            <div class="retry-indicator" id="retryIndicator" role="status" aria-live="polite">
+                Auto-retry in <span id="countdown">10</span> seconds
+            </div>
+        </section>
+
+        <!-- Troubleshooting tips -->
+        <section class="tips" aria-labelledby="tips-heading">
+            <h3 id="tips-heading">Troubleshooting Tips</h3>
+            <ul role="list">
+                <li role="listitem">
+                    <span class="tip__icon" aria-hidden="true"></span>
+                    Check your Wi-Fi or mobile data connection
+                </li>
+                <li role="listitem">
+                    <span class="tip__icon" aria-hidden="true"></span>
+                    Restart your router or modem
+                </li>
+                <li role="listitem">
+                    <span class="tip__icon" aria-hidden="true"></span>
+                    Verify airplane mode is turned off
+                </li>
+                <li role="listitem">
+                    <span class="tip__icon" aria-hidden="true"></span>
+                    Try accessing other websites to test your connection
+                </li>
+                <li role="listitem">
+                    <span class="tip__icon" aria-hidden="true"></span>
+                    Check if your device has sufficient signal strength
+                </li>
+            </ul>
+        </section>
+
+        <!-- Keyboard shortcuts help -->
+        <details class="keyboard-shortcuts">
+            <summary class="keyboard-shortcuts__summary">
+                <span class="keyboard-shortcuts__title">Keyboard Shortcuts</span>
+            </summary>
+            <div class="keyboard-shortcuts__content">
+                <ul role="list">
+                    <li role="listitem"><kbd>Ctrl</kbd> + <kbd>R</kbd> - Retry connection</li>
+                    <li role="listitem"><kbd>Esc</kbd> - Go to home page</li>
+                    <li role="listitem"><kbd>Tab</kbd> - Navigate between elements</li>
+                </ul>
+            </div>
+        </details>
+    </main>
+
+    <!-- Loading indicator template -->
+    <template id="loading-template">
+        <div class="loading-indicator" role="status" aria-label="Loading">
+            <span class="loading-indicator__spinner" aria-hidden="true"></span>
+            <span class="loading-indicator__text">Loading...</span>
+        </div>
+    </template>
+
+<script>
+/**
+ * FHAVUR OFFLINE PAGE - JAVASCRIPT ENHANCEMENTS
+ * 
+ * Changes:
+ * - Modern ES6+ class with private methods and proper error handling
+ * - Exponential backoff retry strategy with jitter
+ * - Network status monitoring with robust connection testing
+ * - Performance optimizations with requestAnimationFrame
+ * - Enhanced analytics and event tracking
+ * - Service Worker integration for offline capabilities
+ * - Better state management and cleanup
+ * - Accessibility improvements for screen readers
+ */
+
+class OfflinePage {
+    // Private fields
+    #retryCount = 0;
+    #maxRetries = 8; // Increased with exponential backoff
+    #baseRetryInterval = 3000; // 3 seconds base
+    #maxRetryInterval = 120000; // 2 minute maximum
+    #autoRetryTimer = null;
+    #countdownTimer = null;
+    #networkCheckTimer = null;
+    #visibilityHandler = null;
+    #onlineHandler = null;
+    #offlineHandler = null;
+    
+    // Configuration
+    config = {
+        testEndpoints: [
+            'https://www.google.com/favicon.ico', // External fallback
+            'https://mock.httpstatus.io/202' // 
+        ],
+        enableServiceWorker: true,
+        logLevel: 'debug', // 'debug', 'info', 'warn', 'error'
+    };
+
+    constructor() {
+        this.elements = {
+            countdown: document.getElementById('countdown'),
+            retryIndicator: document.getElementById('retryIndicator'),
+            retryBtn: document.getElementById('retryBtn'),
+            goHomeBtn: document.getElementById('goHomeBtn'),
+            supportBtn: document.getElementById('supportBtn'),
+            urlInfo: document.getElementById('url-info'),
+            requestedUrl: document.getElementById('requested-url')
+        };
+
+        this.state = {
+            isRetrying: false,
+            lastOnline: null,
+            connectionQuality: 'unknown',
+            userInteracted: false
+        };
+
+        this.supportWhatsAppNumber = document.documentElement.dataset.whatsappNumber || "670852835";
+        
+        this.init();
+    }
+
+    init() {
+        try {
+            this.#setupEventListeners();
+            this.#populateRequestInfo();
+            this.#startConnectionMonitoring();
+            this.#logOfflineEvent();
+            
+            // Initial connection check
+            this.#checkConnection().catch(() => {
+                this.#startAutoRetry();
+            });
+
+            this.#log('Offline page initialized', 'info');
+        } catch (error) {
+            this.#log(`Initialization failed: ${error.message}`, 'error');
+        }
+    }
+
+    #setupEventListeners() {
+        // Retry button with debouncing
+        if (this.elements.retryBtn) {
+            this.elements.retryBtn.addEventListener('click', () => this.#handleManualRetry());
+        }
+
+        // Home button with smart navigation
+        if (this.elements.goHomeBtn) {-
+            this.elements.goHomeBtn.addEventListener('click', (e) => {
+                this.state.userInteracted = true;
+                this.#log('Home navigation requested');
+                
+                // If we have history and not the first page, use back
+                if (window.history.length > 1 && document.referrer) {
+                    e.preventDefault();
+                    window.history.back();
+                }
+                // Otherwise proceed with normal navigation
+            });
+        }
+
+        // Support button with analytics
+        if (this.elements.supportBtn) {
+            this.elements.supportBtn.addEventListener('click', () => {
+                this.state.userInteracted = true;
+                this.#trackEvent('support_clicked');
+            });
+        }
+
+        // Network event listeners
+        this.#onlineHandler = () => this.#handleConnectionRestored();
+        this.#offlineHandler = () => this.#handleConnectionLost();
+        
+        window.addEventListener('online', this.#onlineHandler);
+        window.addEventListener('offline', this.#offlineHandler);
+
+        // Visibility change for performance optimization
+        this.#visibilityHandler = () => {
+            if (!document.hidden && !this.state.isRetrying) {
+                this.#checkConnection();
+            }
+        };
+        document.addEventListener('visibilitychange', this.#visibilityHandler);
+
+        // Page unload cleanup
+        window.addEventListener('beforeunload', () => this.#cleanup());
+        
+        // Keyboard shortcuts
+        document.addEventListener('keydown', (e) => this.#handleKeyboardShortcuts(e));
+    }
+
+    #handleKeyboardShortcuts(event) {
+        // Ctrl/Cmd + R for retry
+        if ((event.ctrlKey || event.metaKey) && event.key === 'r') {
+            event.preventDefault();
+            this.#handleManualRetry();
+        }
+        
+        // Escape key to go home
+        if (event.key === 'Escape') {
+            this.elements.goHomeBtn?.click();
+        }
+    }
+
+    #populateRequestInfo() {
+        try {
+            const requestedUrl = window.location.href;
+            const urlParams = new URLSearchParams(window.location.search);
+            const originalUrl = urlParams.get('originalUrl') || requestedUrl;
+
+            if (this.elements.requestedUrl) {
+                this.elements.requestedUrl.textContent = originalUrl;
+                this.elements.requestedUrl.setAttribute('aria-label', `Requested URL: ${originalUrl}`);
+            }
+
+            if (this.elements.urlInfo) {
+                this.elements.urlInfo.style.display = 'block';
+            }
+
+            // Setup WhatsApp support link
+            if (this.elements.supportBtn && this.supportWhatsAppNumber) {
+                const supportMessage = `Hello! I need support with Fhavur app. I'm offline and trying to access: ${originalUrl}`;
+                const encodedMessage = encodeURIComponent(supportMessage);
+                const whatsappUrl = `https://wa.me/${this.supportWhatsAppNumber}?text=${encodedMessage}`;
+                
+                this.elements.supportBtn.href = whatsappUrl;
+                this.elements.supportBtn.style.display = 'flex';
+                
+                // Add safety attributes
+                this.elements.supportBtn.setAttribute('rel', 'noopener noreferrer');
+                this.elements.supportBtn.setAttribute('aria-label', 'Contact support via WhatsApp');
+            }
+        } catch (error) {
+            this.#log(`Error populating request info: ${error.message}`, 'error');
+        }
+    }
+
+    #startConnectionMonitoring() {
+        // Periodic connection quality checks (every 30 seconds)
+        this.#networkCheckTimer = setInterval(() => {
+            if (navigator.onLine && !this.state.isRetrying) {
+                this.#checkConnectionQuality();
+            }
+        }, 30000);
+    }
+
+    async #checkConnectionQuality() {
+        try {
+            const startTime = performance.now();
+            const response = await fetch('/', { 
+                method: 'HEAD',
+                cache: 'no-cache',
+                signal: AbortSignal.timeout(5000)
+            });
+            const endTime = performance.now();
+            
+            const responseTime = endTime - startTime;
+            this.state.connectionQuality = responseTime < 1000 ? 'good' : 
+                                         responseTime < 3000 ? 'fair' : 'poor';
+            
+            this.#log(`Connection quality: ${this.state.connectionQualityconfig} (${responseTime}ms)`, 'debug');
+        } catch (error) {
+            this.state.connectionQuality = 'poor';
+        }
+    }
+
+    #startAutoRetry() {
+        this.#clearTimers();
+        
+        const delay = this.#calculateExponentialBackoff();
+        this.#updateCountdown(Math.ceil(delay / 1000));
+        
+        this.#autoRetryTimer = setTimeout(() => {
+            this.#checkConnection();
+        }, delay);
+
+        this.#log(`Auto-retry scheduled in ${delay}ms (attempt ${this.#retryCount + 1})`, 'debug');
+    }
+
+    #calculateExponentialBackoff() {
+        const exponentialDelay = this.#baseRetryInterval * Math.pow(2, this.#retryCount);
+        const jitter = Math.random() * 1000; // Add jitter to avoid thundering herd
+        return Math.min(exponentialDelay + jitter, this.#maxRetryInterval);
+    }
+
+    #updateCountdown(seconds) {
+        if (!this.elements.countdown) return;
+
+        let count = seconds;
+        this.#clearCountdown();
+        
+        this.elements.countdown.textContent = count;
+        this.elements.countdown.setAttribute('aria-live', 'polite');
+        
+        this.#countdownTimer = setInterval(() => {
+            count--;
+            this.elements.countdown.textContent = count;
+            
+            if (count <= 0) {
+                this.#clearCountdown();
+                this.elements.countdown.setAttribute('aria-live', 'off');
+            }
+        }, 1000);
+    }
+
+    #clearCountdown() {
+        if (this.#countdownTimer) {
+            clearInterval(this.#countdownTimer);
+            this.#countdownTimer = null;
+        }
+    }
+
+    async #handleManualRetry() {
+        if (this.state.isRetrying) return;
+        
+        this.state.userInteracted = true;
+        this.state.isRetrying = true;
+        
+        this.#trackEvent('manual_retry_triggered');
+        this.#showRetryStatus('Checking connection...');
+        
+        // Add loading state to button
+        this.elements.retryBtn?.classList.add('is-loading');
+        this.elements.retryBtn?.setAttribute('aria-busy', 'true');
+        
+        try {
+            await this.#checkConnection(true);
+        } finally {
+            this.state.isRetrying = false;
+            this.elements.retryBtn?.classList.remove('is-loading');
+            this.elements.retryBtn?.setAttribute('aria-busy', 'false');
+        }
+    }
+
+    async #checkConnection(isManual = false) {
+        if (this.#retryCount >= this.#maxRetries) {
+            this.#disableAutoRetry();
+            return false;
+        }
+
+        this.#retryCount++;
+        this.state.isRetrying = true;
+
+        try {
+            this.#log(`Connection check attempt ${this.#retryCount}`, 'info');
+            
+            // Try multiple endpoints for better reliability
+            const isOnline = await this.#testMultipleEndpoints();
+            
+            if (isOnline) {
+                await this.#handleConnectionRestored();
+                return true;
+            } else {
+                throw new Error('All endpoints failed');
+            }
+            
+        } catch (error) {
+            this.#log(`Connection check failed: ${error.message}`, 'warn');
+            
+            if (isManual) {
+                this.#showRetryStatus(
+                    `Still offline (attempt ${this.#retryCount}/${this.#maxRetries})`
+                );
+                
+                // Show final message after brief delay
+                setTimeout(() => {
+                    if (this.#retryCount >= this.#maxRetries) {
+                        this.#showRetryStatus('Please check your internet connection and try again.');
+                    }
+                }, 2000);
+            }
+            
+            if (!isManual) {
+                this.#retryConnection();
+            }
+            
+            return false;
+        } finally {
+            this.state.isRetrying = false;
+        }
+    }
+
+    async #testMultipleEndpoints() {
+        const timeout = 5000; // 5 second timeout per endpoint
+        const controller = new AbortController();
+        const timeoutId = setTimeout(() => controller.abort(), timeout);
+
+        try {
+            // Try endpoints in sequence, stop at first success
+            for (const endpoint of this.config.testEndpoints) {
+                try {
+                    const response = await fetch(endpoint, {
+                        method: 'HEAD',
+                        cache: 'no-cache',
+                        mode: 'no-cors',
+                        signal: controller.signal
+                    });
+                    
+                    // If we get any response, consider it successful
+                    this.#log(`Endpoint ${endpoint} responded successfully`, 'debug');
+                    return true;
+                    
+                } catch (error) {
+                    this.#log(`Endpoint ${endpoint} failed: ${error.message}`, 'debug');
+                    continue; // Try next endpoint
+                }
+            }
+            
+            return false; // All endpoints failed
+            
+        } finally {
+            clearTimeout(timeoutId);
+        }
+    }
+
+    #retryConnection() {
+        if (this.#retryCount < this.#maxRetries) {
+            this.#clearTimers();
+            this.#startAutoRetry();
+        } else {
+            this.#disableAutoRetry();
+        }
+    }
+
+    async #handleConnectionRestored() {
+        this.#log('Connection restored!', 'info');
+        this.#trackEvent('connection_restored', {
+            retryCount: this.#retryCount,
+            duration: this.state.lastOnline ? Date.now() - this.state.lastOnline : null
+        });
+
+        this.#showRetryStatus('Connection restored! Redirecting...');
+        
+        // Add a small delay to show the success message
+        await new Promise(resolve => setTimeout(resolve, 1000));
+        
+        // Use replace to prevent back navigation to offline page
+        window.location.replace(window.location.href);
+    }
+
+    #handleConnectionLost() {
+        this.#log('Connection lost', 'warn');
+        this.state.lastOnline = Date.now();
+        this.#trackEvent('connection_lost');
+        
+        if (!this.state.userInteracted) {
+            this.#startAutoRetry();
+        }
+    }
+
+    #showRetryStatus(message) {
+        requestAnimationFrame(() => {
+            if (this.elements.retryIndicator) {
+                this.elements.retryIndicator.textContent = message;
+                this.elements.retryIndicator.setAttribute('aria-live', 'polite');
+                
+                // Clear aria-live after announcement
+                setTimeout(() => {
+                    this.elements.retryIndicator?.setAttribute('aria-live', 'off');
+                }, 1000);
+            }
+        });
+    }
+
+    #disableAutoRetry() {
+        this.#clearTimers();
+        this.#showRetryStatus('Auto-retry disabled. Please check your connection.');
+        this.#trackEvent('auto_retry_disabled', { finalRetryCount: this.#retryCount });
+    }
+
+    #clearTimers() {
+        this.#clearCountdown();
+        
+        if (this.#autoRetryTimer) {
+            clearTimeout(this.#autoRetryTimer);
+            this.#autoRetryTimer = null;
+        }
+    }
+
+    #cleanup() {
+        this.#clearTimers();
+        
+        if (this.#networkCheckTimer) {
+            clearInterval(this.#networkCheckTimer);
+        }
+
+        // Remove event listeners
+        window.removeEventListener('online', this.#onlineHandler);
+        window.removeEventListener('offline', this.#offlineHandler);
+        document.removeEventListener('visibilitychange', this.#visibilityHandler);
+        
+        this.#log('Cleanup completed', 'debug');
+    }
+
+    #trackEvent(eventName, data = {}) {
+        const eventData = {
+            event: eventName,
+            timestamp: new Date().toISOString(),
+            url: window.location.href,
+            userAgent: navigator.userAgent,
+            ...data
+        };
+
+        this.#log(`Event: ${eventName}`, 'info', eventData);
+
+        // Send to service worker for background sync
+        if ('serviceWorker' in navigator && navigator.serviceWorker.controller) {
+            navigator.serviceWorker.controller.postMessage({
+                type: 'OFFLINE_PAGE_EVENT',
+                payload: eventData
+            });
+        }
+    }
+
+    #logOfflineEvent() {
+        this.#trackEvent('offline_page_loaded', {
+            retryCount: this.#retryCount,
+            maxRetries: this.#maxRetries,
+            connectionType: navigator.connection?.effectiveType || 'unknown'
+        });
+    }
+
+    #log(message, level = 'info', data = null) {
+        const timestamp = new Date().toISOString();
+        const levels = { error: 0, warn: 1, info: 2, debug: 3 };
+        const currentLevel = levels[this.config.logLevel] || levels.info;
+        const messageLevel = levels[level] || levels.info;
+
+        if (messageLevel <= currentLevel) {
+            const styles = {
+                error: 'color: #dc2626; font-weight: bold;',
+                warn: 'color: #d97706;',
+                info: 'color: #2563eb;',
+                debug: 'color: #6b7280;'
+            };
+
+            console.log(
+                `%c[FHAVUR-OFFLINE]%c ${timestamp} ${message}`,
+                'background: #7c3aed; color: white; padding: 2px 4px; border-radius: 3px;',
+                styles[level] || '',
+                data || ''
+            );
+        }
+    }
+}
+
+// Enhanced initialization with error boundary
+function initializeOfflinePage() {
+    try {
+        // Wait for DOM to be ready
+        if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', () => {
+                new OfflinePage();
+            });
+        } else {
+            new OfflinePage();
+        }
+    } catch (error) {
+        console.error('Failed to initialize offline page:', error);
+        // Fallback: basic retry functionality
+        const retryBtn = document.getElementById('retryBtn');
+        if (retryBtn) {
+            retryBtn.onclick = () => window.location.reload();
+        }
+    }
+}
+
+// Start the application
+initializeOfflinePage();
+
+// Export for potential testing or external access
+if (typeof module !== 'undefined' && module.exports) {
+    module.exports = { OfflinePage, initializeOfflinePage };
+}
+</script>
+ <!-- Noscript fallback -->
+   <noscript>
+        <style>
+            .offline-container {
+                animation: none;
+            }
+            .emoji {
+                animation: none;
+            }
+        </style>
+        <div class="offline-container" style="position: fixed; top: 0; left: 0; right: 0; bottom: 0; border-radius: 0;">
+            <h1>JavaScript Required</h1>
+            <p>This offline page requires JavaScript to function properly. Please enable JavaScript or check your internet connection and refresh the page.</p>
+            <div class="button-group">
+                <a href="/" class="btn btn-primary">Go to Home Page</a>
+                <button onclick="window.location.reload()" class="btn btn-primary">Refresh Page</button>
+            </div>
+        </div>
+   </noscript>
+</body>
+</html>

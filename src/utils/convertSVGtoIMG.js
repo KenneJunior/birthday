@@ -1,14 +1,15 @@
 // generate-icons.js
-import sharp from 'sharp';
-import fs from 'fs/promises';
-async function generateIcons() {
+import fs from "fs/promises";
+import sharp from "sharp";
+import { _log } from "../js/utility/logger.js";
 
+async function generateIcons() {
   const fetchIcon = async () => {
-    return await fs.readFile('public/icon/apple/svg/icon_512X512.svg', 'utf8');
-    };
+    return await fs.readFile("public/icon/apple/svg/icon_512X512.svg", "utf8");
+  };
   const baseSvg = await fetchIcon();
   const sizes = [
-    { name: 'apple-touch-icon-512x512', size: 512 },
+    { name: "apple-touch-icon-512x512", size: 512 },
     /*{ name: 'apple-touch-icon-167x167', size: 167 },
     { name: 'apple-touch-icon-152x152', size: 152 },
     { name: 'apple-touch-icon-120x120', size: 120 },
@@ -21,9 +22,8 @@ async function generateIcons() {
       /**.resize(size, size)*/
       .png()
       .toFile(`public/icon/${name}.png`);
-    
-    console.log(`Generated ${name}.png (${size}x${size})`);
-  }
 
-} 
- generateIcons();
+    _log(`Generated ${name}.png (${size}x${size})`);
+  }
+}
+generateIcons();

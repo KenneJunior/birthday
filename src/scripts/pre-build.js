@@ -1,11 +1,12 @@
+import { _log } from "../js/utility/logger.js";
 import { generateMediaJSON } from "./generate-media-json.js";
 import { generateRobotsTxt } from "./generate-robots.js";
 import { generateSitemap } from "./generate-sitemap.js";
 
 async function runPreBuild() {
-  console.log("🚀 Starting pre-build process...");
+  _log("🚀 Starting pre-build process...");
 
-  console.log("🤖 Step 1: Generating robots.txt...");
+  _log("🤖 Step 1: Generating robots.txt...");
   const robotsResult = generateRobotsTxt("production");
 
   if (!robotsResult.success) {
@@ -13,14 +14,14 @@ async function runPreBuild() {
     process.exit(1);
   }
 
-  console.log("✅ Step 1: robots.txt generated successfully");
-  console.log(`   - Environment: ${robotsResult.environment}`);
-  console.log(
+  _log("✅ Step 1: robots.txt generated successfully");
+  _log(`   - Environment: ${robotsResult.environment}`);
+  _log(
     `   - Rules: ${robotsResult.rules.allow} allow, ${robotsResult.rules.disallow} disallow`
   );
 
   // Generate media JSON
-  console.log("📸 step 2: Generating media JSON...");
+  _log("📸 step 2: Generating media JSON...");
   const mediaResult = await generateMediaJSON({ showstats: false });
 
   if (!mediaResult.success) {
@@ -28,13 +29,13 @@ async function runPreBuild() {
     process.exit(1);
   }
 
-  console.log("✅ step 2: Media JSON generated successfully");
-  console.log(
+  _log("✅ step 2: Media JSON generated successfully");
+  _log(
     `📊 Media Stats: ${mediaResult.stats.total} total items (${mediaResult.stats.images} images, ${mediaResult.stats.videos} videos)`
   );
 
   // Generate sitemap
-  console.log("📝 step 3: Generating sitemap...");
+  _log("📝 step 3: Generating sitemap...");
   const sitemapResult = await generateSitemap({ showstats: false });
 
   if (!sitemapResult.success) {
@@ -42,15 +43,15 @@ async function runPreBuild() {
     process.exit(1);
   }
 
-  console.log("✅ step 3: Sitemap generated successfully");
-  console.log("📊 Sitemap Stats:");
-  console.log(`   - ${sitemapResult.stats.urls} total URLs`);
-  console.log(`   - ${sitemapResult.stats.pages} HTML pages`);
-  console.log(`   - ${sitemapResult.stats.videos} videos`);
-  console.log(`   - ${sitemapResult.stats.images} images`);
+  _log("✅ step 3: Sitemap generated successfully");
+  _log("📊 Sitemap Stats:");
+  _log(`   - ${sitemapResult.stats.urls} total URLs`);
+  _log(`   - ${sitemapResult.stats.pages} HTML pages`);
+  _log(`   - ${sitemapResult.stats.videos} videos`);
+  _log(`   - ${sitemapResult.stats.images} images`);
 
-  console.log("🎉 All pre-build tasks completed successfully!");
-  console.log("🏗️  You can now run your build command...");
+  _log("🎉 All pre-build tasks completed successfully!");
+  _log("🏗️  You can now run your build command...");
 }
 
 runPreBuild().catch((error) => {

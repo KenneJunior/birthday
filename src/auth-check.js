@@ -2,6 +2,7 @@
  * Authentication Configuration
  * Defines constants for authentication behavior and storage
  */
+import { createLogger } from "./js/utility/logger";
 
 // Configuration
 const AuthConfig = {
@@ -16,31 +17,39 @@ const AuthConfig = {
 // Global state
 let authCheckInitialized = false;
 let auth0Available = false;
+const logger = createLogger({ enablePerformance: true });
+// Create contextual logger for authentication module
+const authLogger = logger.withContext({ module: "Authentication" });
 
 /**
  * Initializes the authentication system
  * @returns {Promise<boolean>} True if initialization succeeded, false otherwise
  */
 async function initAuthCheck() {
-  if (authCheckInitialized) return true;
-
+  if (authCheckInitialized) {
+    authLogger.debug("Auth check already initialized");
+    return true;
+  }
   try {
+    authLogger.time("Auth initialization");
+
     // Check if Auth0 is available
     auth0Available = typeof auth0 !== "undefined" && auth0 !== null;
 
     if (auth0Available) {
-      console.log("Auth0 authentication available");
+      authLogger.info("Auth0 authentication available");
     } else {
-      console.log("Using password-based authentication");
+      authLogger.info("Using password-based authentication");
     }
 
     // Check session timeout
     _checkSessionTimeout();
 
     authCheckInitialized = true;
+    authLogger.timeEnd("Auth initialization");
     return true;
   } catch (error) {
-    console.error("Failed to initialize auth check:", error);
+    authLogger.error("Failed to initialize auth check", error);
     return false;
   }
 }
@@ -50,11 +59,19 @@ async function initAuthCheck() {
  * @returns {Promise<Object>} Configuration object
  */
 const _fetchAuthConfig = async () => {
-  const response = await fetch("/auth_config.json");
-  if (!response.ok) {
-    throw new Error(`Failed to fetch auth config: ${response.status}`);
+  try {
+    authLogger.time("Fetch auth config");
+    const response = await fetch("/auth_config.json");
+    if (!response.ok) {
+      throw new Error(`Failed to fetch auth config: ${response.status}`);
+    }
+    const config = await response.json();
+    authLogger.timeEnd("Fetch auth config");
+    return config;
+  } catch (error) {
+    authLogger.error("Failed to fetch auth configuration", error);
+    throw error;
   }
-  return response.json();
 };
 
 /**
@@ -62,19 +79,23 @@ const _fetchAuthConfig = async () => {
  * @returns {Promise<Object>} Authentication result object
  */
 async function checkAuthentication() {
-  await setupPasswordManager();
   try {
+    authLogger.time("Authentication check");
+    await setupPasswordManager();
+
     // Check Auth0 authentication first
     if (auth0Available) {
       try {
         const auth0Authenticated = await auth0.isAuthenticated();
         if (auth0Authenticated) {
           _updateLastActivity();
+          authLogger.debug("Auth0 authentication successful");
           return { authenticated: true, method: "auth0" };
         }
+        authLogger.debug("Auth0 authentication failed");
       } catch (auth0Error) {
-        console.warn(
-          "Auth0 check failed, falling back to password:",
+        authLogger.warn(
+          "Auth0 check failed, falling back to password",
           auth0Error
         );
       }
@@ -82,22 +103,39 @@ async function checkAuthentication() {
 
     // Check local storage password (fallback)
     const storedPassword = localStorage.getItem(AuthConfig.PASSWORD_KEY);
-    if (storedPassword === AuthConfig.CORRECT_PASSWORD) {
+    const isPasswordValid = storedPassword === AuthConfig.CORRECT_PASSWORD;
+
+    if (isPasswordValid) {
       _updateLastActivity();
+      authLogger.debug("Password authentication successful");
       return { authenticated: true, method: "password" };
     }
 
+    authLogger.debug("No valid authentication method found");
     return { authenticated: false, method: "none" };
   } catch (error) {
-    console.error("Authentication check failed:", error);
+    authLogger.error("Authentication check failed", error);
     return { authenticated: false, method: "error", error: error.message };
+  } finally {
+    authLogger.timeEnd("Authentication check");
   }
 }
 
+/**
+ * Sets up password manager configuration
+ */
 async function setupPasswordManager() {
-  const config = await _fetchAuthConfig();
-  AuthConfig.CORRECT_PASSWORD = config.PasswordManager.PASSWORD;
-  AuthConfig.PASSWORD_KEY = config.PasswordManager.STORAGE_KEY;
+  try {
+    authLogger.time("Password manager setup");
+    const config = await _fetchAuthConfig();
+    AuthConfig.CORRECT_PASSWORD = config.PasswordManager.PASSWORD;
+    AuthConfig.PASSWORD_KEY = config.PasswordManager.STORAGE_KEY;
+    authLogger.debug("Password manager configured");
+    authLogger.timeEnd("Password manager setup");
+  } catch (error) {
+    authLogger.error("Failed to setup password manager", error);
+    throw error;
+  }
 }
 
 /**
@@ -109,21 +147,25 @@ async function setupPasswordManager() {
  */
 async function requireAuth(options = {}) {
   const { retryCount = 0, silent = false } = options;
+
   try {
+    authLogger.time(`requireAuth attempt ${retryCount + 1}`);
     const authResult = await checkAuthentication();
 
     if (authResult.authenticated) {
       if (!silent) {
-        console.log(`User authenticated via ${authResult.method}`);
+        authLogger.info(`User authenticated via ${authResult.method}`);
       }
+      authLogger.timeEnd(`requireAuth attempt ${retryCount + 1}`);
       return authResult;
     }
 
     // Not authenticated - handle redirect
     if (retryCount < AuthConfig.RETRY_ATTEMPTS) {
       if (!silent) {
-        console.log(
-          `Authentication failed, retrying in ${AuthConfig.RETRY_DELAY}ms...`
+        authLogger.warn(
+          `Authentication failed, retrying in ${AuthConfig.RETRY_DELAY}ms...`,
+          { attempt: retryCount + 1, maxAttempts: AuthConfig.RETRY_ATTEMPTS }
         );
       }
 
@@ -131,24 +173,28 @@ async function requireAuth(options = {}) {
       await new Promise((resolve) =>
         setTimeout(resolve, AuthConfig.RETRY_DELAY)
       );
-      return requireAuth({ retryCount: retryCount + 1, silent });
+      const result = await requireAuth({ retryCount: retryCount + 1, silent });
+      authLogger.timeEnd(`requireAuth attempt ${retryCount + 1}`);
+      return result;
     }
 
     // Final failure - redirect to login
     if (!silent) {
-      console.log("Authentication required, redirecting to login");
+      authLogger.warn("Authentication required, redirecting to login");
     }
 
     // Save current URL for post-login redirect
     const returnUrl = window.location.pathname + window.location.search;
     sessionStorage.setItem("returnUrl", returnUrl);
+    authLogger.debug("Saved return URL", { returnUrl });
 
     // Redirect to login page
     window.location.href = AuthConfig.LOGIN_URL;
 
+    authLogger.timeEnd(`requireAuth attempt ${retryCount + 1}`);
     return authResult;
   } catch (error) {
-    console.error("requireAuth failed:", error);
+    authLogger.error("requireAuth failed", error);
 
     // Redirect to login on error
     window.location.href = AuthConfig.LOGIN_URL;
@@ -161,6 +207,7 @@ async function requireAuth(options = {}) {
  * Show loading animation
  */
 function showLoading() {
+  authLogger.debug("Showing loading animation");
   saveCurrentLocation();
   const loader = document.getElementById("loading");
   if (loader) {
@@ -169,9 +216,13 @@ function showLoading() {
   }
 }
 
+/**
+ * Saves current location for post-login redirect
+ */
 function saveCurrentLocation() {
   const returnUrl = window.location.href;
   sessionStorage.setItem("returnUrl", returnUrl);
+  authLogger.debug("Saved current location", { returnUrl });
 }
 
 /**
@@ -179,6 +230,7 @@ function saveCurrentLocation() {
  * @param {string} text - New loading text
  */
 function updateLoadingText(text) {
+  authLogger.debug("Updating loading text", { text });
   const textEl = document.querySelector(".loading-text");
   if (textEl) {
     // Keep the dots animation
@@ -191,6 +243,7 @@ function updateLoadingText(text) {
  * Hide loading animation
  */
 function hideLoading() {
+  authLogger.debug("Hiding loading animation");
   const loader = document.getElementById("loading");
   if (loader) {
     loader.classList.add("fade-out");
@@ -205,51 +258,69 @@ function hideLoading() {
  */
 async function logout() {
   try {
+    authLogger.time("Logout process");
+    authLogger.info("Initiating logout");
+
     // Auth0 logout
     if (auth0Available && (await auth0.isAuthenticated())) {
       try {
+        authLogger.debug("Performing Auth0 logout");
         auth0.logout({
           returnTo: window.location.origin,
         });
       } catch (auth0Error) {
-        console.warn("Auth0 logout failed:", auth0Error);
+        authLogger.warn("Auth0 logout failed", auth0Error);
       }
     }
 
     // Clear password storage
     localStorage.removeItem(AuthConfig.PASSWORD_KEY);
+    authLogger.debug("Cleared password storage");
 
     // Clear session tracking
     localStorage.removeItem("lastActivityTime");
     sessionStorage.removeItem("returnUrl");
+    authLogger.debug("Cleared session tracking data");
 
-    console.log("User logged out successfully");
+    authLogger.info("User logged out successfully");
+    authLogger.timeEnd("Logout process");
   } catch (error) {
-    console.error("Logout failed:", error);
+    authLogger.error("Logout failed", error);
   }
+}
+
+/**
+ * Gets current authentication status
+ * @returns {Promise<Object>} Authentication status
+ */
+async function getAuthStatus() {
+  authLogger.debug("Getting authentication status");
+  return await checkAuthentication();
 }
 
 /**
  * Checks for session timeout and handles expiration
  * @private
  */
-async function getAuthStatus() {
-  return await checkAuthentication();
-}
-
-/**
- * Check if session has timed out
- */
 function _checkSessionTimeout() {
   const lastActivity = localStorage.getItem("lastActivityTime");
-  if (!lastActivity) return;
+  if (!lastActivity) {
+    authLogger.debug("No last activity time found");
+    return;
+  }
 
   const lastActivityTime = parseInt(lastActivity, 10);
   const currentTime = Date.now();
   const timeDiff = currentTime - lastActivityTime;
 
+  authLogger.debug("Session timeout check", {
+    lastActivity: new Date(lastActivityTime).toISOString(),
+    timeDiff,
+    timeout: AuthConfig.SESSION_TIMEOUT,
+  });
+
   if (timeDiff > AuthConfig.SESSION_TIMEOUT) {
-    console.log("Session timed out");
+    authLogger.warn("Session timed out, initiating logout");
     logout();
     window.location.href = AuthConfig.LOGIN_URL;
   }
@@ -260,7 +331,11 @@ function _checkSessionTimeout() {
  * @private
  */
 function _updateLastActivity() {
-  localStorage.setItem("lastActivityTime", Date.now().toString());
+  const timestamp = Date.now().toString();
+  localStorage.setItem("lastActivityTime", timestamp);
+  authLogger.debug("Updated last activity time", {
+    timestamp: new Date(parseInt(timestamp)).toISOString(),
+  });
 }
 
 /**
@@ -269,13 +344,16 @@ function _updateLastActivity() {
  * @returns {string} Return URL
  */
 function getReturnUrl(defaultUrl = "/") {
-  return sessionStorage.getItem("returnUrl") || defaultUrl;
+  const returnUrl = sessionStorage.getItem("returnUrl") || defaultUrl;
+  authLogger.debug("Retrieved return URL", { returnUrl });
+  return returnUrl;
 }
 
 /**
  * Clear stored return URL
  */
 function clearReturnUrl() {
+  authLogger.debug("Clearing return URL");
   sessionStorage.removeItem("returnUrl");
 }
 
@@ -284,6 +362,7 @@ function clearReturnUrl() {
  */
 function redirectToReturnUrl(defaultUrl = "/") {
   const returnUrl = getReturnUrl(defaultUrl);
+  authLogger.info("Redirecting to return URL", { returnUrl });
   clearReturnUrl();
   window.location.href = returnUrl;
 }
@@ -292,6 +371,8 @@ function redirectToReturnUrl(defaultUrl = "/") {
  * Set up activity tracking for session timeout
  */
 function setupActivityTracking() {
+  authLogger.debug("Setting up activity tracking");
+
   // Track user activity
   const activityEvents = ["mousedown", "keydown", "scroll", "touchstart"];
 
@@ -299,8 +380,11 @@ function setupActivityTracking() {
     document.addEventListener(event, _updateLastActivity, { passive: true });
   });
 
+  authLogger.debug(`Registered ${activityEvents.length} activity events`);
+
   // Periodic session check
   setInterval(_checkSessionTimeout, 60000); // Check every minute
+  authLogger.debug("Started periodic session timeout checks");
 }
 
 /**
@@ -308,16 +392,29 @@ function setupActivityTracking() {
  * @returns {Promise<Object>} Authentication result
  */
 async function setupAuthProtection() {
-  // Initialize auth check
-  await initAuthCheck();
+  try {
+    authLogger.time("Auth protection setup");
 
-  // Set up activity tracking
-  setupActivityTracking();
+    // Initialize auth check
+    await initAuthCheck();
 
-  // Check authentication on page load
-  const authResult = await requireAuth({ silent: true });
+    // Set up activity tracking
+    setupActivityTracking();
 
-  return authResult;
+    // Check authentication on page load
+    const authResult = await requireAuth({ silent: true });
+
+    authLogger.info("Authentication protection setup completed", {
+      authenticated: authResult.authenticated,
+      method: authResult.method,
+    });
+
+    authLogger.timeEnd("Auth protection setup");
+    return authResult;
+  } catch (error) {
+    authLogger.error("Authentication protection setup failed", error);
+    throw error;
+  }
 }
 
 // Export functions for use in other modules
