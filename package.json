@@ -14,7 +14,7 @@
     "preview": "vite preview"
   },
   "devDependencies": {
-    "html-minifier-terser": "file:html-minifier-terser.tgz",
+    "html-minifier-terser": "^7.2.0",
     "sitemap": "^8.0.1",
     "terser": "^5.44.0",
     "vite": "^7.1.0",
