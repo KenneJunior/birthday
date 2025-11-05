@@ -953,15 +953,6 @@ function eventWaitFor(promise, event = null) {
     event.waitUntil(promise);
   } else {
     promise.catch((err) =>
-      swLogger.error.error("Background update failed:", err)
-    );
-  }
-}
-function eventWaitFor(promise, event = null) {
-  if (event && event.waitUntil) {
-    event.waitUntil(promise);
-  } else {
-    promise.catch((err) =>
       swLogger.error("Background update failed", { error: err.message })
     );
   }
