@@ -3,7 +3,7 @@
 import "../src/js/utility/logger-global.js";
 
 const logger = self.logger;
-const CACHE_VERSION = "v1.3";
+const CACHE_VERSION = "v1.4";
 const STATIC_CACHE = `fhavur-static-${CACHE_VERSION}`;
 const DYNAMIC_CACHE = `fhavur-dynamic-${CACHE_VERSION}`;
 

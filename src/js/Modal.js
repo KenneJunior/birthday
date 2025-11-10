@@ -14,6 +14,7 @@ export class UltimateModal {
       openModalBtn: document.getElementById("modal_open"),
       modalImage: document.querySelector(".modal-image"),
       modalVideo: document.querySelector(".modal-video"),
+      galleryContainer: document.getElementById("photo-gallery"),
       profileImage: document.querySelector("#profile_pic"),
       profileImageContainer: document.querySelector("#profile_image"),
       closeButton: document.querySelector(".modal-close"),
@@ -23,6 +24,7 @@ export class UltimateModal {
       counter: document.querySelector(".modal-counter"),
       socialLinks: document.querySelectorAll(".modal-social a"),
       profile_pic: document.querySelector(".image-container"),
+      seeMoreBtn: document.querySelector(".see-more-arrow"),
     };
 
     modalLogger.debug("DOM elements cached", {
@@ -43,6 +45,7 @@ export class UltimateModal {
       panStart: { x: 0, y: 0 },
       panOffset: { x: 0, y: 0 },
     };
+    this.mediaData = {};
 
     modalLogger.debug("Initial state set", {
       transitionStyle: this.state.transitionStyle,
@@ -57,6 +60,7 @@ export class UltimateModal {
     modalLogger.time("UltimateModal initialization");
     modalLogger.debug("Starting gallery generation");
     this.generateGallery();
+    this.setupSeeMoreButton();
     modalLogger.timeEnd("UltimateModal initialization");
   }
 
@@ -147,21 +151,63 @@ export class UltimateModal {
     }
   }
 
-  cacheImages(mediaData) {
+  cacheImages() {
     modalLogger.time("Image caching");
-    this.elements.thumbnails = document.querySelectorAll(".photo-thumbnail");
-    this.state.media = mediaData.media.map((thumb) => ({
-      src: thumb.src,
-      alt: thumb.alt,
-      data_type: thumb["data-type"],
-      vidSrc: thumb["video-src"],
-    }));
 
-    modalLogger.debug("Media data cached", {
-      thumbnailCount: this.elements.thumbnails.length,
+    // Get only visible thumbnails (not hidden with d-none)
+    this.elements.thumbnails = document.querySelectorAll(".photo-thumbnail");
+    this.elements.allVisibleThumbnails = document.querySelectorAll(
+      ".photo-thumbnail:not(.d-none)"
+    );
+
+    modalLogger.debug("Found visible thumbnails", {
+      visibleCount: this.elements.allVisibleThumbnails.length,
+      totalMedia: this.mediaData.media.length,
+    });
+
+    // Create a map of media data by index for quick lookup
+    const mediaByIndex = {};
+    this.mediaData.media.forEach((media, index) => {
+      mediaByIndex[index] = media;
+    });
+
+    // Cache only the media that corresponds to visible thumbnails
+    this.state.media = [];
+
+    this.elements.allVisibleThumbnails.forEach((thumbnail) => {
+      // Get the media-index attribute
+      const mediaIndex = parseInt(thumbnail.getAttribute("media-index"));
+
+      if (!isNaN(mediaIndex) && mediaByIndex[mediaIndex]) {
+        const mediaItem = mediaByIndex[mediaIndex];
+        this.state.media.push({
+          src: mediaItem.src,
+          alt: mediaItem.alt,
+          data_type: mediaItem["data-type"],
+          vidSrc: mediaItem["video-src"],
+          originalIndex: mediaIndex, // Keep track of original index
+        });
+
+        modalLogger.debug("Cached thumbnail media", {
+          index: mediaIndex,
+          alt: mediaItem.alt,
+          dataType: mediaItem["data-type"],
+        });
+      } else {
+        modalLogger.warn("Invalid media index or missing media data", {
+          mediaIndex: mediaIndex,
+          thumbnail: thumbnail.querySelector("img")?.alt || "unknown",
+        });
+      }
+    });
+
+    modalLogger.info("Media data cached successfully", {
+      thumbnailCount: this.elements.allVisibleThumbnails.length,
       mediaCount: this.state.media.length,
       mediaTypes: this.state.media.map((m) => m.data_type),
+      originalIndices: this.state.media.map((m) => m.originalIndex),
     });
+
     modalLogger.timeEnd("Image caching");
   }
 
@@ -335,9 +381,9 @@ export class UltimateModal {
     }
 
     this.elements.modal.classList.remove("active");
-    this.elements.thumbnails[this.state.currentIndex].classList.remove(
-      "active"
-    );
+    this.elements.allVisibleThumbnails[
+      this.state.currentIndex
+    ].classList.remove("active");
 
     modalLogger.timeEnd("Modal close");
   }
@@ -540,11 +586,12 @@ export class UltimateModal {
   activeThumbnail() {
     modalLogger.time("Active thumbnail update");
 
-    this.elements.thumbnails.forEach((thumb) => {
+    this.elements.allVisibleThumbnails.forEach((thumb) => {
       thumb.classList.remove("active");
     });
 
-    const thumbnail = this.elements.thumbnails[this.state.currentIndex];
+    const thumbnail =
+      this.elements.allVisibleThumbnails[this.state.currentIndex];
     if (thumbnail) {
       thumbnail.classList.add("active");
       modalLogger.debug("Thumbnail activated", {
@@ -670,15 +717,14 @@ export class UltimateModal {
     img.width = 80;
     img.height = 80;
     figure.setAttribute("data-type", `${mediaData["data-type"] || "image"}`);
+    figure.setAttribute("media-index", index);
     figure.appendChild(img);
-
     return figure;
   }
 
   async generateGallery() {
     modalLogger.time("Gallery generation");
-
-    const galleryContainer = document.getElementById("photo-gallery");
+    const { galleryContainer } = this.elements;
     if (!galleryContainer) {
       modalLogger.error("Gallery container not found");
       modalLogger.timeEnd("Gallery generation");
@@ -686,22 +732,226 @@ export class UltimateModal {
     }
 
     modalLogger.debug("Starting gallery generation");
-    const mediaData = await this.loadMediaData();
+    this.mediaData = await this.loadMediaData();
 
-    mediaData.media.forEach((mediaData, index) => {
+    this.mediaData.media.forEach((mediaData, index) => {
       const figure = this.createGalleryFigure(mediaData, index);
+
+      // Hide images beyond the first 9 (index > 8) but keep the last 2 visible
+      if (index > 8 && index) {
+        figure.classList.add("d-none");
+      }
+
       galleryContainer.appendChild(figure);
     });
 
-    this.cacheImages(mediaData);
+    this.cacheImages();
     this.setupEventListeners();
     this.setupSocialSharing();
+
+    // Check if we need to show the See More button
+    this.checkSeeMoreButton();
 
     modalLogger.info("Gallery generation completed", {
       mediaCount: mediaData.media.length,
       thumbnailsCreated: galleryContainer.children.length,
+      hiddenThumbnails: document.querySelectorAll(".photo-thumbnail.d-none")
+        .length,
     });
     modalLogger.timeEnd("Gallery generation");
+  }
+  /**
+   * Check if See More button should be visible
+   */
+  checkSeeMoreButton() {
+    const hiddenThumbnails = document.querySelectorAll(
+      ".photo-thumbnail.d-none"
+    );
+
+    if (hiddenThumbnails.length === 0 && this.elements.seeMoreBtn) {
+      modalLogger.debug("No hidden thumbnails, hiding See More button");
+      this.elements.seeMoreBtn.style.display = "none";
+    } else {
+      modalLogger.debug(
+        "Hidden thumbnails found, See More button should be visible",
+        {
+          hiddenCount: hiddenThumbnails.length,
+        }
+      );
+    }
+  }
+
+  /**
+   * Setup the See More button functionality
+   */
+  setupSeeMoreButton() {
+    modalLogger.time("See More button setup");
+
+    if (!this.elements.seeMoreBtn) {
+      modalLogger.warn("See More button not found in DOM");
+      modalLogger.timeEnd("See More button setup");
+      return;
+    }
+
+    this.elements.seeMoreBtn.addEventListener("click", () => {
+      this.showMoreMemories();
+    });
+
+    modalLogger.debug("See More button event listener added");
+    modalLogger.timeEnd("See More button setup");
+  }
+
+  /**
+   * Show hidden memories when See More is clicked
+   */
+  showMoreMemories() {
+    modalLogger.time("Show more memories");
+
+    // Show loading state
+    const arrow = this.elements.seeMoreBtn.querySelector(".arrow");
+    const text = this.elements.seeMoreBtn.querySelector(".text");
+
+    if (arrow && text) {
+      arrow.style.animation = "none";
+      text.textContent = "Loading...";
+      arrow.style.opacity = "0.7";
+    }
+
+    // Get all hidden thumbnails
+    const hiddenThumbnails = document.querySelectorAll(
+      ".photo-thumbnail.d-none"
+    );
+    modalLogger.debug("Found hidden thumbnails", {
+      count: hiddenThumbnails.length,
+    });
+
+    if (hiddenThumbnails.length === 0) {
+      modalLogger.debug("No more hidden thumbnails to show");
+      this.hideSeeMoreButton();
+      modalLogger.timeEnd("Show more memories");
+      return;
+    }
+
+    // Show hidden thumbnails with staggered animation
+    hiddenThumbnails.forEach((thumbnail, index) => {
+      setTimeout(() => {
+        thumbnail.classList.remove("d-none");
+        thumbnail.classList.add("revealed");
+        thumbnail.style.animationDelay = `${index * 0.1}s`;
+
+        modalLogger.debug("Revealed thumbnail", {
+          index,
+          alt: thumbnail.querySelector("img")?.alt || "unknown",
+        });
+      }, index * 100);
+    });
+
+    // Check if there are still hidden thumbnails after revealing some
+    setTimeout(() => {
+      const remainingHidden = document.querySelectorAll(
+        ".photo-thumbnail.d-none"
+      );
+
+      if (remainingHidden.length === 0) {
+        modalLogger.debug("All thumbnails revealed, hiding See More button");
+        this.hideSeeMoreButton();
+      } else {
+        // Reset button state if there are still more to show
+        if (arrow && text) {
+          arrow.style.animation =
+            "float 2s ease-in-out infinite, pulse-glow 3s ease-in-out infinite";
+          text.textContent = "See More Memories";
+          arrow.style.opacity = "1";
+        }
+        modalLogger.debug("Some thumbnails remain hidden", {
+          remaining: remainingHidden.length,
+        });
+      }
+
+      // Update the media array to include the newly revealed thumbnails
+      this.updateMediaArray();
+
+      modalLogger.info("More memories revealed successfully", {
+        revealedCount: Math.min(hiddenThumbnails.length, 6), // Show 6 at a time
+        totalRevealed: this.state.media.length,
+      });
+
+      // Show notification
+      if (window.Notification) {
+        window.Notification(
+          "More Memories!",
+          `Added ${Math.min(
+            hiddenThumbnails.length,
+            6
+          )} new memories to your gallery! ✨`
+        );
+      }
+    }, hiddenThumbnails.length * 100 + 500);
+
+    modalLogger.timeEnd("Show more memories");
+  }
+
+  /**
+   * Hide the See More button with animation
+   */
+  hideSeeMoreButton() {
+    modalLogger.time("Hide See More button");
+
+    if (this.elements.seeMoreBtn) {
+      this.elements.seeMoreBtn.style.opacity = "0";
+      this.elements.seeMoreBtn.style.transform = "translateY(20px)";
+
+      setTimeout(() => {
+        this.elements.seeMoreBtn.style.display = "none";
+        modalLogger.debug("See More button hidden");
+      }, 500);
+    }
+
+    modalLogger.timeEnd("Hide See More button");
+  }
+
+  /**
+   * Update the media array to include newly revealed thumbnails
+   */
+  updateMediaArray() {
+    modalLogger.time("Update media array");
+
+    const allVisibleThumbnails = document.querySelectorAll(
+      ".photo-thumbnail:not(.d-none)"
+    );
+    const updatedMedia = [];
+    const mediaByIndex = {};
+
+    // Create a map of all media data
+    this.mediaData.media.forEach((media, index) => {
+      mediaByIndex[index] = media;
+    });
+
+    // Build media array based on visible thumbnails and their media-index
+    allVisibleThumbnails.forEach((thumb) => {
+      const mediaIndex = parseInt(thumb.getAttribute("media-index"));
+
+      if (!isNaN(mediaIndex) && mediaByIndex[mediaIndex]) {
+        const mediaItem = mediaByIndex[mediaIndex];
+        updatedMedia.push({
+          src: mediaItem.src,
+          alt: mediaItem.alt,
+          data_type: mediaItem["data-type"],
+          vidSrc: mediaItem["video-src"],
+          originalIndex: mediaIndex,
+        });
+      }
+    });
+
+    this.state.media = updatedMedia;
+
+    modalLogger.debug("Media array updated with media-index approach", {
+      visibleThumbnails: allVisibleThumbnails.length,
+      mediaCount: this.state.media.length,
+      indices: this.state.media.map((m) => m.originalIndex),
+    });
+
+    modalLogger.timeEnd("Update media array");
   }
 
   updateSocialLinks(current) {

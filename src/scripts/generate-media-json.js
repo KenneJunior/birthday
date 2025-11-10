@@ -8,7 +8,7 @@ const DEFAULT_CONFIG = {
   thumbsDir: "public/pics/thumbnails",
   vidDir: "public/vid",
   outputFile: "public/gallery-data.json",
-  lastFile: "screenshot1.jpg",
+  lastFile: "The_END.jpg",
   imageAltTexts: {
     "img1.jpg": "Proud Bamenda pikin 😅😅",
     "img2.jpg": "Miss Bamenda 😹😹",
@@ -17,7 +17,7 @@ const DEFAULT_CONFIG = {
     "img5.jpg": "smile smile smile 😁😊",
     "tata.jpg": "Happy memory 5",
     "profile_pic.jpg": "awwww wu is my princess 🤣🤣",
-    "screenshot1.jpg": "screenshot of the app",
+    "The_END.png": "The last Image",
   },
   videoAltTexts: {
     "video1.jpg": "Under sun adey, Under rain .... 🤣🤣",
@@ -28,6 +28,7 @@ const DEFAULT_CONFIG = {
     "vidoe6.jpg": "Mami play play 😂😂",
   },
   showstats: true,
+  ignoreFile: ["screenshot1.jpg"],
 };
 let CONFIG = {};
 function generateMediaJSON(config = {}) {
@@ -49,8 +50,11 @@ function generateMediaJSON(config = {}) {
 
     // Process images
     picFiles.forEach((filename) => {
-      if (filename === CONFIG.lastFile) {
-        // Skip the last file for now
+      if (
+        filename === CONFIG.lastFile ||
+        CONFIG.ignoreFile.includes(filename)
+      ) {
+        // Skip the last file and excludedfiles
         return;
       }
       const srcPath = `/pics/${filename}`;

@@ -15,7 +15,7 @@
  * Dependencies: Auth0 SDK
  */
 import { createAuth0Client } from "@auth0/auth0-spa-js";
-
+import Hammer from "hammerjs";
 import logger from "./utility/logger.js";
 
 // Create contextual loggers for different modules
