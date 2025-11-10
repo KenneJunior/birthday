@@ -14,14 +14,74 @@
  *
  * Dependencies: Auth0 SDK
  */
-//import { createAuth0Client } from "@auth0/auth0-spa-js";
+import { createAuth0Client } from "@auth0/auth0-spa-js";
 
-import { logger } from "./utility/logger.js";
+import logger from "./utility/logger.js";
 
 // Create contextual loggers for different modules
-const pwaLogger = logger.withContext({ module: "PWA" });
-const auth0Logger = logger.withContext({ module: "Auth0" });
+const loginLogger = logger.withContext({
+  module: "LoginModule",
+  File: "login.js",
+  location: window.location.href,
+  environment: process.env.NODE_ENV || "development",
+  userAgent: navigator.userAgent,
+});
+const pwaLogger = loginLogger.withContext({
+  module: "PWA",
+  pwa: {
+    // PWA capabilities
+    isInstalled: window.matchMedia("(display-mode: standalone)").matches,
+    hasServiceWorker: "serviceWorker" in navigator,
+    isOnline: navigator.onLine,
 
+    // Storage capabilities
+    storage: {
+      localStorage: !!window.localStorage,
+      sessionStorage: !!window.sessionStorage,
+      indexedDB: !!window.indexedDB,
+      cacheStorage: !!window.caches,
+    },
+
+    // Device capabilities
+    device: {
+      type: getDeviceType(),
+      touch: "ontouchstart" in window,
+      cores: navigator.hardwareConcurrency || "unknown",
+      memory: navigator.deviceMemory || "unknown",
+    },
+
+    // Network information
+    network: navigator.connection
+      ? {
+          type: navigator.connection.effectiveType,
+          downlink: navigator.connection.downlink,
+          rtt: navigator.connection.rtt,
+          saveData: navigator.connection.saveData,
+        }
+      : null,
+  },
+
+  // Service worker context
+  serviceWorker: {
+    status: navigator.serviceWorker?.controller ? "active" : "none",
+    scope: navigator.serviceWorker?.controller?.scriptURL || "none",
+  },
+});
+const auth0Logger = loginLogger.withContext({ module: "Auth0" });
+function getDeviceType() {
+  const ua = navigator.userAgent;
+  if (/(tablet|ipad|playbook|silk)|(android(?!.*mobi))/i.test(ua)) {
+    return "tablet";
+  }
+  if (
+    /Mobile|Android|iP(hone|od)|IEMobile|BlackBerry|Kindle|Silk-Accelerated|(hpw|web)OS|Opera M(obi|ini)/.test(
+      ua
+    )
+  ) {
+    return "mobile";
+  }
+  return "desktop";
+}
 // PWA Service Worker Registration
 function initializePWA() {
   pwaLogger.time("PWA initialization");
@@ -35,12 +95,9 @@ function initializePWA() {
   window.addEventListener("load", async () => {
     try {
       pwaLogger.debug("Registering service worker");
-      const registration = await navigator.serviceWorker.register(
-        "/sw.js?debug=debug",
-        {
-          scope: "/",
-        }
-      );
+      const registration = await navigator.serviceWorker.register("/sw.js", {
+        scope: "/",
+      });
 
       pwaLogger.info("Service Worker registered successfully", {
         scope: registration.scope,
@@ -521,7 +578,7 @@ const PasswordManager = (() => {
     //for testing purpose only
     if (window.location.origin.includes("localhost")) {
       passwordLogger.debug("Localhost detected, setting test password");
-      _savePassword("Missusfhavur");
+      //_savePassword("Missusfhavur");
     }
 
     dom.helper = document.getElementById("password-requirements");

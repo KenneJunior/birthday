@@ -240,6 +240,7 @@
     <script type="module" src="/src/auth-check.js"></script>
 
     <script type="module">
+      import logger from '/src/js/utility/logger.js';
       import {
         updateLoadingText,
         showLoading,
@@ -258,13 +259,13 @@
           }
         } catch (error) {
           hideLoading();
-          console.error("Authentication failed:", error);
+          logger.error("Authentication failed:", error);
           window.location.href = "/login.html";
         }
       }
 
       function initializePageContent() {
-        console.log("Protected content loaded successfully");
+        logger.info("Protected content loaded successfully");
         document.querySelectorAll("button, input").forEach((element) => {
           element.disabled = false;
         });

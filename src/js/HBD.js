@@ -1,8 +1,10 @@
-import { logger } from "./utility/logger.js";
+import logger from "./utility/logger.js";
 
 // Create contextual loggers for different modules
-const pwaLogger = logger.withContext({ module: "PWA" });
-const appLogger = logger.withContext({ module: "BirthdayApp" });
+const appLogger = logger.withContext({
+  name: "HBD.js",
+});
+const pwaLogger = appLogger.withContext({ module: "PWA" });
 const confettiLogger = appLogger.withContext({ module: "Confetti" });
 const audioLogger = appLogger.withContext({ module: "Audio" });
 const heartLogger = appLogger.withContext({ module: "HeartEffects" });
@@ -22,12 +24,9 @@ function initializePWA() {
   window.addEventListener("load", async () => {
     try {
       pwaLogger.debug("Registering service worker");
-      const registration = await navigator.serviceWorker.register(
-        "/sw.js?debug=debug",
-        {
-          scope: "/",
-        }
-      );
+      const registration = await navigator.serviceWorker.register("/sw.js", {
+        scope: "/",
+      });
 
       pwaLogger.info("Service Worker registered successfully", {
         scope: registration.scope,

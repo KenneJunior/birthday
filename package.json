@@ -9,7 +9,7 @@
     "robots": "node scripts/generate-robots.js",
     "robots:dev": "node scripts/generate-robots.js development",
     "prebuild": "node src/scripts/pre-build.js",
-    "build": "vite build",
+    "build": "vite build && node src/scripts/copy-sw.js",
     "dev": "vite",
     "preview": "vite preview"
   },
@@ -24,6 +24,7 @@
   },
   "dependencies": {
     "@auth0/auth0-spa-js": "^2.7.0",
+    "error-stack-parser": "^2.1.4",
     "hammerjs": "^2.0.8",
     "pwa-asset-generator": "^8.1.2",
     "sharp": "^0.34.4"

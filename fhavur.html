@@ -286,6 +286,7 @@
     <script type="module" src="/src/auth-check.js"></script>
     <script type="module" src="src/js/HBD.js"></script>
     <script type="module">
+      import logger from '/src/js/utility/logger.js';
       import {
         updateLoadingText,
         showLoading,
@@ -314,19 +315,19 @@
           } else {
             // Handle case where authentication succeeds but user is not authorized
             hideLoading();
-            console.warn("Access denied: User not authenticated");
+            logger.warn("Access denied: User not authenticated");
             window.location.href = "/login.html";
           }
         } catch (error) {
           hideLoading();
-          console.error("Authentication fail:", error);
+          logger.error("Authentication fail:", error);
           window.location.href = "/login.html";
         }
       }
 
       // Function to initialize page content after authentication
       function initializePageContent() {
-        console.log("Protected content loaded successfully");
+        logger.info("Protected content loaded successfully");
         // Enable all buttons and inputs that might have been disabled during loading
         document.querySelectorAll("button, input").forEach((element) => {
           element.disabled = false;

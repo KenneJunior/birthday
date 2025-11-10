@@ -1,5 +1,5 @@
 import Notification from "./notification";
-import { logger } from "./utility/logger.js";
+import logger from "./utility/logger.js";
 
 // Create contextual logger for UltimateModal
 const modalLogger = logger.withContext({ module: "UltimateModal" });

@@ -1,7 +1,9 @@
-importScripts("/src/js/utility/logger-global.js");
+//Uncomment this out in a dev environment
+//importScripts("../src/js/utility/logger-global.js");
+import "../src/js/utility/logger-global.js";
 
 const logger = self.logger;
-const CACHE_VERSION = "v1.3.26";
+const CACHE_VERSION = "v1.3";
 const STATIC_CACHE = `fhavur-static-${CACHE_VERSION}`;
 const DYNAMIC_CACHE = `fhavur-dynamic-${CACHE_VERSION}`;
 
@@ -309,7 +311,6 @@ async function cacheEssentialResources() {
 }
 
 // Fetch event: Handle both development and production paths
-// Fetch event: Handle both development and production paths
 self.addEventListener("fetch", (event) => {
   // Skip non-GET requests
   if (event.request.method !== "GET") {
@@ -326,8 +327,15 @@ self.addEventListener("fetch", (event) => {
     mode: event.request.mode,
   });
 
-  fetchLogger.debug("Fetch event intercepted");
-  event.respondWith(handleFetchStrategies(event.request, fetchLogger));
+  try {
+    fetchLogger.debug("Fetch event intercepted");
+    event.respondWith(handleFetchStrategies(event.request, fetchLogger));
+  } catch (err) {
+    fetchLogger.error("an error occured while fetching " + url.request.url, {
+      errorStack: err.stack,
+      errorMesage: err.message,
+    });
+  }
 });
 
 // Generate unique request ID for tracking
@@ -349,71 +357,75 @@ function handleFetchStrategies(request, logger = swLogger) {
     request.mode === "navigate" ||
     request.headers.get("accept")?.includes("text/html");
 
-  if (isNavigation) {
-    strategyLogger.debug("Selected HTML documents strategy", {
-      strategy: "htmlDocuments",
-      reason: "navigation_request",
-    });
-    return htmlDocumentsStrategy(request, strategyLogger);
-  }
+  try {
+    if (isNavigation) {
+      strategyLogger.debug("Selected HTML documents strategy", {
+        strategy: "htmlDocuments",
+        reason: "navigation_request",
+      });
+      return htmlDocumentsStrategy(request, strategyLogger);
+    }
 
-  const urlStr = request.url;
+    const urlStr = request.url;
 
-  // If not cacheable, fall back to network fetch
-  if (!shouldCache(urlStr)) {
-    strategyLogger.debug("Selected network-only strategy", {
-      strategy: "networkOnly",
-      reason: "not_cacheable",
-    });
-    return fetch(request);
-  }
+    // If not cacheable, fall back to network fetch
+    if (!shouldCache(urlStr)) {
+      strategyLogger.debug("Selected network-only strategy", {
+        strategy: "networkOnly",
+        reason: "not_cacheable",
+      });
+      return fetch(request);
+    }
 
-  const urlObj = safeURL(urlStr);
-  if (!urlObj) {
-    strategyLogger.debug("Selected network-only strategy", {
-      strategy: "networkOnly",
-      reason: "invalid_url",
-    });
-    return fetch(request);
-  }
+    const urlObj = safeURL(urlStr);
+    if (!urlObj) {
+      strategyLogger.debug("Selected network-only strategy", {
+        strategy: "networkOnly",
+        reason: "invalid_url",
+      });
+      return fetch(request);
+    }
 
-  const isExternal = urlObj.origin !== self.location.origin;
-  const pathname = urlObj.pathname;
+    const isExternal = urlObj.origin !== self.location.origin;
+    const pathname = urlObj.pathname;
 
-  // Route to appropriate strategy based on file type
-  if (/\.(jpg|jpeg|png|gif|svg|mp3|webm|woff|woff2|ttf)$/i.test(pathname)) {
-    strategyLogger.debug("Selected static assets strategy", {
-      strategy: "staticAssets",
-      type: "media/font",
+    // Route to appropriate strategy based on file type
+    if (/\.(jpg|jpeg|png|gif|svg|mp3|webm|woff|woff2|ttf)$/i.test(pathname)) {
+      strategyLogger.debug("Selected static assets strategy", {
+        strategy: "staticAssets",
+        type: "media/font",
+        isExternal,
+      });
+      return staticAssetsStrategy(request, isExternal, strategyLogger);
+    }
+
+    if (/\.css$/.test(pathname) || isExternal) {
+      strategyLogger.debug("Selected CSS/external strategy", {
+        strategy: "cssAndExternal",
+        type: isExternal ? "external" : "css",
+        isExternal,
+      });
+      return cssAndExternalStrategy(request, isExternal, strategyLogger);
+    }
+
+    if (pathname === "/" || /\.html$/.test(pathname)) {
+      strategyLogger.debug("Selected HTML documents strategy", {
+        strategy: "htmlDocuments",
+        type: "html",
+        isExternal: false,
+      });
+      return htmlDocumentsStrategy(request, strategyLogger);
+    }
+
+    strategyLogger.debug("Selected stale-while-revalidate strategy", {
+      strategy: "staleWhileRevalidate",
+      type: "other",
       isExternal,
     });
-    return staticAssetsStrategy(request, isExternal, strategyLogger);
+    return staleWhileRevalidateStrategy(request, isExternal, strategyLogger);
+  } catch (err) {
+    strategyLogger.error({ message: err.message, stack: err.stack });
   }
-
-  if (/\.css$/.test(pathname) || isExternal) {
-    strategyLogger.debug("Selected CSS/external strategy", {
-      strategy: "cssAndExternal",
-      type: isExternal ? "external" : "css",
-      isExternal,
-    });
-    return cssAndExternalStrategy(request, isExternal, strategyLogger);
-  }
-
-  if (pathname === "/" || /\.html$/.test(pathname)) {
-    strategyLogger.debug("Selected HTML documents strategy", {
-      strategy: "htmlDocuments",
-      type: "html",
-      isExternal: false,
-    });
-    return htmlDocumentsStrategy(request, strategyLogger);
-  }
-
-  strategyLogger.debug("Selected stale-while-revalidate strategy", {
-    strategy: "staleWhileRevalidate",
-    type: "other",
-    isExternal,
-  });
-  return staleWhileRevalidateStrategy(request, isExternal, strategyLogger);
 }
 
 // Strategy for static assets (images, fonts, media) it first check if the image is in the cache then uses the network as a fallback
@@ -610,6 +622,7 @@ async function cssAndExternalStrategy(
     strategyLogger.debug("Returning empty CSS fallback");
     return new Response("/* Library offline */", {
       headers: { "Content-Type": "text/css" },
+      status: 505,
     });
   } finally {
     strategyLogger.timeEnd("CSSExternalFetch");

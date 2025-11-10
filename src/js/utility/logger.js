@@ -10,6 +10,17 @@
 /**
  * Log levels for consistent logging across environments
  */
+import StackTraceParser from "error-stack-parser";
+import {
+  getBrowserContext,
+  getDeviceContext,
+  getNetworkInfo,
+  getPWAInfo,
+  getPageContext,
+  getPerformanceContext,
+  getServiceWorkerInfo,
+  isBrowser,
+} from "./logger_info.js";
 const LOG_LEVELS = Object.freeze({
   DEBUG: 0,
   INFO: 1,
@@ -26,7 +37,7 @@ const DEFAULT_CONFIG = Object.freeze({
   prefix: "%c[FHAVUR]",
   enablePerformance: true,
   enableAnalytics: false,
-  maxStringLength: 1000,
+  maxStringLength: 2000,
   timestamp: true,
   colors: true,
 });
@@ -37,11 +48,13 @@ class Logger {
     this.isBrowser = typeof window !== "undefined";
     this.isNode = typeof process !== "undefined" && process.env;
     this.isWorker = typeof self !== "undefined" && self.location;
-    this.performanceMarks = new Map();
+    this.performanceMarks = new Map();   
+    this.workingFolder = "/home/kenne-junior/Desktop/birthday";
     this.contextStack = [];
-
     this._detectEnvironment();
     this._setupGlobalErrorHandling();
+    this.platform =
+      typeof navigator !== "undefined" ? navigator.platform : "unknown";
   }
 
   /**
@@ -89,6 +102,28 @@ class Logger {
       fhavur: urlParams.get("fhavur"),
       logger: urlParams.get("logger"),
     };
+    const getWorkingFolder = {
+      debug: urlParams.get("debugfolder"),
+      log: urlParams.get("logfolder"),
+      logLevel: urlParams.get("logfolder"),
+      fhavur: urlParams.get("fhavurfolder"),
+      logger: urlParams.get("loggerfolder"),
+    };
+    if (
+      getWorkingFolder.debug ||
+      getWorkingFolder.log ||
+      getWorkingFolder.logLevel ||
+      getWorkingFolder.fhavur ||
+      getWorkingFolder.logger
+    ) {
+      this.workingFolder =
+        getWorkingFolder.debug ||
+        getWorkingFolder.log ||
+        getWorkingFolder.logLevel ||
+        getWorkingFolder.fhavur ||
+        getWorkingFolder.logger;
+      this.info("usiing the param folder " + this.workingFolder);
+    }
 
     // Combine with storage and global variables
     const allSources = [
@@ -205,7 +240,7 @@ class Logger {
     if (this.isBrowser) {
       window.addEventListener("error", (event) => {
         this.error("Uncaught error", event.error, {
-          filename: event.filename,
+          filename: ` ${event.filename}:${event.lineno}:${event.colno}`,
           lineno: event.lineno,
           colno: event.colno,
         });
@@ -235,6 +270,11 @@ class Logger {
     if (!this.shouldLog || level < this.config.level) {
       return;
     }
+    const callerInfo = this._getCallerInfo();
+    const edhanceContext = {
+      ...context,
+      caller: callerInfo,
+    };
 
     try {
       const timestamp = this.config.timestamp ? this._getTimestamp() : "";
@@ -243,15 +283,19 @@ class Logger {
 
       const levelLabel = this._getLevelLabel(level);
 
-      const mergedContext = this._mergeContext(context);
+      const mergedContext = this._mergeContext(edhanceContext);
       const formattedArgs = this._formatArguments(args);
       const style = this.config.colors ? this._getLevelStyle(level) : "";
+      const messageStle = this.getMessageStyle(level, {
+        highlight: true,
+      });
 
       const logArgs = this._buildLogArguments(
         prefix,
         timestamp,
         `${emoji} ${levelLabel}`,
         style,
+        messageStle,
         formattedArgs,
         mergedContext
       );
@@ -265,6 +309,117 @@ class Logger {
     } catch (error) {
       // Ultimate fallback - minimal logging
       this._fallbackLog(...args);
+    }
+  }
+
+  _getCallerInfo() {
+    try {
+      const stackFrame = StackTraceParser.parse(new Error());
+      // The caller is typically the 4th frame in the stack
+      const callerFrame = stackFrame[3] || stackFrame[2] || stackFrame[1];
+
+      if (!callerFrame) {
+        return { file: "unknown", line: "unknown", column: "unknown" };
+      }
+
+      const {
+        functionName,
+        source,
+        fileName: file,
+        lineNumber: lineNum,
+        columnNumber: column,
+      } = callerFrame;
+
+      const cleanFile = this._cleanFilePath(file);
+      const fullPath = this._getFullFilePath(file);
+
+      return {
+        function: functionName || "anonymous",
+        file: cleanFile,
+        fullPath: fullPath,
+        source: source || "unknown",
+        line: parseInt(lineNum),
+        column: parseInt(column),
+        clickableUrl: this._createClickableUrl(
+          fullPath,
+          parseInt(lineNum),
+          parseInt(column)
+        ),
+      };
+    } catch (error) {
+      return {
+        file: "error",
+        line: "error",
+        column: "error",
+        error: error.message,
+      };
+    }
+  }
+
+  _getlineandColumn() {
+    try {
+      const stackFrame = StackTraceParser.parse(new Error());
+      // The caller is typically the 4th frame in the stack
+      const callerFrame = stackFrame[3] || stackFrame[2] || stackFrame[1];
+
+      if (!callerFrame) {
+        return { line: "unknown", column: "unknown" };
+      }
+
+      const { lineNumber: lineNum, columnNumber: column } = callerFrame;
+      return { line: parseInt(lineNum), column: parseInt(column) };
+    } catch (err) {
+      return {
+        line: "error",
+        column: "error",
+        error: err.message(),
+      };
+    }
+  }
+
+  _cleanFilePath(filePath) {
+    if (!filePath) return "unknown";
+
+    // Remove protocol
+    if (filePath.startsWith("file://")) {
+      filePath = filePath.replace("file://", "");
+    }
+    //replace parameters and origin with port if present
+    filePath = filePath.replace(/(\?t=\d+)?$/, "");
+    filePath = filePath.replace(/^https?:\/\/[^/]+/, "");
+    // Extract filename
+    const parts = filePath.split("/");
+    return parts[parts.length - 1];
+  }
+
+  _getFullFilePath(filePath) {
+    if (!filePath) return "unknown";
+
+    // Remove protocol but keep full path
+    if (filePath.startsWith("file://")) {
+      filePath = filePath.replace("file://", "");
+    }
+    //remove parameters and origin with port if present
+    filePath = filePath.replace(/(\?t=\d+)?$/, "");
+
+    return filePath;
+  }
+
+  _createClickableUrl(filePath, line, column) {
+    // Create a VSCode URL scheme for direct linking
+    if (this.isBrowser) {
+      //remove protocol,oring and port and some time t = numbers at the end if present
+      const url = filePath.replace(/(\?t=\d+)?$/, "");
+      const cleanurl = url.replace(/^https?:\/\/[^/]+/, "");
+
+      const full_parth = this.workingFolder + cleanurl;
+      const vscodeUrl = `vscode://file/${full_parth}:${line}:${column}`;
+      const browserUrl = `${url}:${line}:${column}`;
+      // For browser environments, create a vscode:// URL
+      return { vscodeUrl, browserUrl };
+    } else {
+      // For Node.js or other environments
+      return `file://${full_parth}:${line}:${column}`;
     }
   }
 
@@ -354,43 +509,94 @@ class Logger {
     timestamp,
     levelLabel,
     style,
+    messageStyle,
     formattedArgs,
     context
   ) {
     const args = [];
+    const hasContext = Object.keys(context).length > 0;
+    const hasCallerInfo =
+      hasContext && context.caller && context.caller.clickableUrl;
+
+    // Extract clickable URL for browser display
+    let browserUrl = "";
+    if (hasCallerInfo) {
+      browserUrl = context.caller.clickableUrl.browserUrl;
+    }
 
     if (this.config.colors) {
       args.push(style);
+      args.push(messageStyle);
     }
-    args.push(`${prefix}${timestamp ? ` ${timestamp}` : ""} ${levelLabel}`);
+
+    // Build the main log message with optional file link
+    const mainMessage = `${prefix}${
+      timestamp ? ` ${timestamp}` : ""
+    } ${levelLabel}${browserUrl ? ` ${browserUrl}` : ""}\n ->`;
+    args.push(mainMessage);
     args.push(...formattedArgs);
 
     // Add context if present
-    if (Object.keys(context).length > 0) {
-      args.push("\n↳ Context:", { context });
+    if (hasContext) {
+      args.push({ context });
     }
 
     return args;
   }
 
   _writeToConsole(level, args = []) {
-    const color = this.config.colors ? args.shift() : "";
-    // const prefix = args.shift();
+    let levelStyle;
+    let messagestyle;
+    if (this.config.colors) {
+      levelStyle = args.shift();
+      messagestyle = args.shift();
+    } else {
+      levelStyle = "";
+      messagestyle = "";
+    }
+    const prefix = args.shift();
+    const mainMessage = "%c" + args.shift();
+
     switch (level) {
       case LOG_LEVELS.DEBUG:
-        console.debug(`${args.shift()}`, color, args);
+        console.debug(
+          `${prefix}, ${mainMessage}`,
+          levelStyle,
+          messagestyle,
+          ...args
+        );
         break;
       case LOG_LEVELS.INFO:
-        console.info(`${args.shift()}`, color, args);
+        console.info(
+          `${prefix}, ${mainMessage}`,
+          levelStyle,
+          messagestyle,
+          ...args
+        );
         break;
       case LOG_LEVELS.WARN:
-        console.warn(`${args.shift()}`, color, args);
+        console.warn(
+          `${prefix}, ${mainMessage}`,
+          levelStyle,
+          messagestyle,
+          ...args
+        );
         break;
       case LOG_LEVELS.ERROR:
-        console.error(`${args.shift()}`, color, args);
+        console.error(
+          `${prefix}, ${mainMessage}`,
+          levelStyle,
+          messagestyle,
+          ...args
+        );
         break;
       default:
-        console.log(`${args.shift()}`, color, args);
+        console.log(
+          `${prefix}, ${mainMessage}`,
+          levelStyle,
+          messagestyle,
+          ...args
+        );
     }
   }
 
@@ -493,7 +699,6 @@ class Logger {
       color: ${config.color};
       box-shadow: ${config.glow}, 0 2px 4px rgba(0, 0, 0, 0.1);
       
-      /* Hover effect shimmer */
       &::before {
         content: '';
         position: absolute;
@@ -525,6 +730,89 @@ class Logger {
   // Your main method becomes a simple wrapper
   _getLevelStyle(level) {
     return this.getLevelStyle(level);
+  }
+  _createMessageStyleGenerator = () => {
+    const cache = new Map();
+
+    const colorStyle = {
+      [LOG_LEVELS.DEBUG]: {
+        color: "#cb93fdff",
+        border: "1px solid #3b82f6",
+        glow: "0 0 8px rgba(59, 130, 246, 0.3)",
+      },
+      [LOG_LEVELS.INFO]: {
+        color: "#1258fbff",
+        border: "1px solid #60a5fa",
+        glow: "0 0 8px rgba(59, 130, 246, 0.4)",
+      },
+      [LOG_LEVELS.WARN]: {
+        color: "#e0ce0aff",
+        border: "1px solid #b45309",
+        glow: "0 0 8px rgba(245, 158, 11, 0.4)",
+      },
+      [LOG_LEVELS.ERROR]: {
+        color: "#f70e0aff",
+        border: "1px solid #7f1d1d",
+        glow: "0 0 8px rgba(239, 68, 68, 0.4)",
+      },
+    };
+
+    // Base style: minimal & console-friendly
+    const base = [
+      "font-family: 'SF Mono', Monaco, Consolas, 'Roboto Mono', monospace",
+      "font-size: 12px",
+      "font-weight: 400",
+      "padding: 2px 6px",
+      "border-radius: 4px",
+      "line-height: 1",
+      "margin: 0", // ignored usually but harmless
+    ].join("; ");
+
+    return (level, opts = {}) => {
+      const key = level;
+      if (cache.has(key)) return cache.get(key);
+
+      // Use options to vary style (eg. muted, highlight)
+      const cfg = {
+        level,
+        muted: opts.muted || false, // less contrast
+        highlight: opts.highlight || false, // eye-catching
+      };
+      const config = colorStyle[level] || STYLE_CONFIGS[BUG];
+
+      const color = cfg.muted
+        ? "#9CA3AF"
+        : cfg.highlight
+        ? config.color
+        : "#E6E7E8";
+      const bg = cfg.muted
+        ? "transparent"
+        : cfg.highlight
+        ? "rgba(14,165,233,0.06)"
+        : "transparent";
+      const weight = cfg.highlight ? 600 : 400;
+
+      // Keep only console-supported properties
+      const style = [
+        base,
+        `boder: ${config.border}`,
+        `color: ${color}`,
+        `box-shadow: ${config.glow}, 0 2px 4px rgba(0, 0, 0, 0.1)`,
+        bg !== "transparent" ? `background: ${bg}` : "",
+        `font-weight: ${weight}`,
+        `border-radius: 4px`,
+      ]
+        .filter(Boolean)
+        .join("; ");
+
+      cache.set(key, style);
+      return style;
+    };
+  };
+
+  getMessageStyle = this._createMessageStyleGenerator();
+  _getMessageStyle(level, option = {}) {
+    return this.getMessageStyle(level, option);
   }
 
   _mergeContext(context) {
@@ -803,15 +1091,12 @@ class Logger {
 }
 
 // Create default instance with common configuration
-const defaultLogger = new Logger();
+const logger = new Logger();
 
 // Legacy export for backward compatibility - maintains exact original API
 export function _log(...args) {
-  defaultLogger.info(...args);
+  logger.info(...args);
 }
-
-// Enhanced default export with full API
-export default defaultLogger;
 
 // Named exports for specific use cases
 export { LOG_LEVELS, Logger };
@@ -820,4 +1105,36 @@ export { LOG_LEVELS, Logger };
 export const createLogger = (config) => new Logger(config);
 
 // Quick setup for common environments
-export const logger = defaultLogger;
+export default logger.withContext({
+  application: "BirthdayCelebration",
+  version: "1.0.0",
+  environment: process.env.NODE_ENV || "development",
+  timestamp: new Date().toISOString(),
+
+  application: "BirthdayCelebration",
+  version: "1.0.0",
+  environment: isBrowser ? process.env.NODE_ENV || "development" : "production",
+  timestamp: new Date().toISOString(),
+  runtime: isBrowser ? "browser" : "node",
+
+  // Page context
+  page: getPageContext(),
+
+  // Browser context
+  browser: getBrowserContext(),
+
+  // Device context
+  device: getDeviceContext(),
+
+  // PWA capabilities
+  pwa: getPWAInfo(),
+
+  // Network information
+  network: getNetworkInfo(),
+
+  // Performance context
+  performance: getPerformanceContext(),
+
+  // Service worker context
+  serviceWorker: getServiceWorkerInfo(),
+});

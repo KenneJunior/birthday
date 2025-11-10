@@ -875,6 +875,7 @@
     <script src="/src/main.js" type="module"></script>
     <script src="src/PWA/pwa-prompt.js" type="module"></script>
     <script type="module">
+      import logger from "/src/js/utility/logger.js";
       import {
         updateLoadingText,
         showLoading,
@@ -904,7 +905,7 @@
             }
           }
         } catch (error) {
-          console.error("Authentication failed:", error);
+          logger.error("Authentication failed:", error);
           hideLoading();
           // Redirect to login page after a brief delay
           setTimeout(() => {
@@ -923,24 +924,25 @@
       }
 
       function initializePageContent() {
-        console.log("Protected content loaded successfully");
+        logger.info("Protected content loaded successfully");
         document.querySelectorAll("button, input").forEach((element) => {
           element.disabled = false;
         });
 
         //if there is no internet conncetion then
-        // the youtube container togge the youtube container off
-        setTimeout(async () => {
-          const result = await checkOnlineStatus();
+        // the youtube container togge the youtube container off          
           const music = document.getElementById("music");
-          if (result) {
+          const pwa =  document.querySelector("#pwa-prompt");
+        setInterval (async () => {
+          const result = await checkOnlineStatus();
+          if(result){
             music.classList.remove("d-none");
-            document.querySelector("#pwa-prompt").classList.add("d-none");
-          } else music.classList.add("d-none");
-        }, 4000);
+          } else{  pwa.classList.add("d-none");
+                    music.classList.add("d-none");}
+        }, 5000);
 
         // The PWA prompt will automatically initialize via connectedCallback
-        console.log("PWA Prompt should be automatically initialized");
+        logger.info("PWA Prompt should be automatically initialized");
       }
 
       if (document.readyState === "loading") {

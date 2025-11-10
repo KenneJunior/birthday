@@ -10,18 +10,93 @@
  * - Performance optimized
  */
 
-// birthday-app.js - Professional Birthday Page JavaScript
+// birthday-app( index ).js - Professional Birthday Page JavaScript
 // Features: Image loading, confetti, share functionality, animations
-import { logger } from "../js/utility/logger.js";
+import logger from "../js/utility/logger.js";
 ("use strict");
 
+const appLogger = logger.withContext({
+  module: "BirthdayApp",
+  file: "birthday-app( index ).js",
+  component: "ApplicationCore",
+});
+
 // Create contextual loggers for each module
-const confettiLogger = logger.withContext({ module: "Confetti" });
-const imageLogger = logger.withContext({ module: "ImageLoader" });
-const scrollLogger = logger.withContext({ module: "ScrollAnimator" });
-const shareLogger = logger.withContext({ module: "ShareManager" });
-const perfLogger = logger.withContext({ module: "PerformanceMonitor" });
-const appLogger = logger.withContext({ module: "BirthdayApp" });
+const confettiLogger = appLogger.withContext({
+  module: "ConfettiSystem",
+  file: "birthday-app( index ).js",
+  component: "CanvasAnimation",
+});
+
+const imageLogger = appLogger.withContext({
+  module: "ImageLoader",
+  file: "birthday-app( index ).js",
+  component: "AssetLoading",
+});
+
+const scrollLogger = appLogger.withContext({
+  module: "ScrollAnimator",
+  file: "birthday-app( index ).js",
+  component: "UIAnimation",
+});
+
+const shareLogger = appLogger.withContext({
+  module: "ShareManager",
+  file: "birthday-app( index ).js",
+  component: "SocialIntegration",
+});
+
+const perfLogger = appLogger.withContext({
+  module: "PerformanceMonitor",
+  file: "birthday-app( index ).js",
+  component: "MetricsCollection",
+});
+
+// Log application startup with comprehensive context
+appLogger.info("Birthday application initializing", {
+  startupTime: performance.now(),
+  domReady: document.readyState,
+  visibility: document.visibilityState,
+});
+let resizeTimeout;
+window.addEventListener("resize", () => {
+  clearTimeout(resizeTimeout);
+  resizeTimeout = setTimeout(() => {
+    appLogger.pushContext({
+      device: {
+        viewport: {
+          width: window.innerWidth,
+          height: window.innerHeight,
+        },
+      },
+    });
+  }, 250);
+});
+
+// Update context when going online/offline
+window.addEventListener("online", () => {
+  appLogger.pushContext({
+    pwa: { isOnline: true },
+    network: navigator.connection ? { ...appLogger.context.network } : null,
+  });
+  appLogger.info("Application came online");
+});
+
+window.addEventListener("offline", () => {
+  appLogger.pushContext({
+    pwa: { isOnline: false },
+  });
+  appLogger.warn("Application went offline");
+});
+
+// Update context when page becomes visible/hidden
+document.addEventListener("visibilitychange", () => {
+  if (document.visibilityState === "visible") {
+    logger.debug("Page became visible");
+  } else {
+    appLogger.debug("Page became hidden");
+  }
+});
 
 /**
  * CONFETTI SYSTEM - Canvas-based particle effects
