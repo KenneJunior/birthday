@@ -1140,7 +1140,7 @@ async function createOfflinePage(requestedUrl = "", logger = swLogger) {
 
   // If we precached a static offline page, prefer returning it.
   try {
-    const cachedOffline = await caches.match("/offline.html");
+    const cachedOffline = ""; // await caches.match("/offline.html");
     if (cachedOffline) {
       offlineLogger.debug("Serving pre-cached offline.html", {
         source: "pre_cached",
