@@ -1,6 +1,7 @@
 //Uncomment this out in a dev environment
 //importScripts("../src/js/utility/logger-global.js");
 import "../src/js/utility/logger-global.js";
+importScripts("./offline-template.js");
 
 const logger = self.logger;
 const CACHE_VERSION = "v1.4";
@@ -1125,65 +1126,19 @@ async function createOfflinePage(requestedUrl = "", logger = swLogger) {
   });
 
   offlineLogger.debug("Generating offline page", { requestedUrl });
-
-  // Your WhatsApp number (change this later)
-  const supportWhatsAppNumber = "670852835";
-
-  // Support message template
-  const supportMessage = `Hello! I need support with Fhavur app. I'm offline and trying to access: ${
-    requestedUrl || "Unknown page"
-  }`;
-
-  // URL encode the message for WhatsApp
-  const encodedMessage = encodeURIComponent(supportMessage);
-  const whatsappUrl = `https://wa.me/${supportWhatsAppNumber}?text=${encodedMessage}`;
-
-  // If we precached a static offline page, prefer returning it.
-  try {
-    const cachedOffline = ""; // await caches.match("/offline.html");
-    if (cachedOffline) {
-      offlineLogger.debug("Serving pre-cached offline.html", {
-        source: "pre_cached",
-        url: "/offline.html",
-      });
-      return cachedOffline;
-    }
-  } catch (e) {
-    offlineLogger.warn("Failed to access cached offline page", {
-      error: e.message,
-      fallback: "generated_page",
-    });
-  }
-
   offlineLogger.debug("Generating dynamic offline page", {
     source: "generated",
-    hasWhatsApp: !!whatsappUrl,
   });
 
-  return new Response(
-    ` <!DOCTYPE html><html lang="en"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><title>Fhavur - Offline</title><style>:root{--primary-gradient:linear-gradient(135deg,#667eea 0%,#764ba2 100%);--success-gradient:linear-gradient(135deg,#48bb78 0%,#38a169 100%);--error-gradient:linear-gradient(135deg,#ff9595 0%,#ef4d00 100%);--surface-color:rgba(255,255,255,0.95);--text-primary:#2d3748;--text-secondary:#718096;--border-radius:20px;--transition:all 0.3s cubic-bezier(0.4,0,0.2,1)}*{margin:0;padding:0;box-sizing:border-box}body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Oxygen,Ubuntu,Cantarell,sans-serif;background:var(--error-gradient);color:var(--text-primary);min-height:100vh;display:flex;align-items:center;justify-content:center;padding:20px;line-height:1.6}.offline-container{background:var(--surface-color);border-radius:var(--border-radius);padding:3rem 2rem;box-shadow:0 20px 40px rgba(0,0,0,0.1),0 0 0 1px rgba(255,255,255,0.1);text-align:center;max-width:500px;width:100%;backdrop-filter:blur(10px);border:1px solid rgba(255,255,255,0.2)}.status-indicator{display:flex;align-items:center;justify-content:center;gap:0.5rem;margin-bottom:1.5rem;font-size:0.9rem;color:var(--text-secondary)}.connection-dot{width:8px;height:8px;border-radius:50%;background:#e53e3e;animation:pulse 2s infinite}.emoji{font-size:4rem;margin-bottom:1.5rem;display:block;filter:grayscale(0.3);animation:bounce 2s infinite}h1{color:var(--text-primary);margin-bottom:1rem;font-size:2rem;font-weight:700}.subtitle{color:var(--text-secondary);margin-bottom:2rem;font-size:1.1rem}.url-info{background:#f7fafc;border:1px solid #e2e8f0;border-radius:10px;padding:1rem;margin:1.5rem 0;font-family:'SF Mono','Courier New',monospace;font-size:0.9rem;word-break:break-all;color:#4a5568}.button-group{display:flex;flex-direction:column;gap:1rem;margin-top:2rem}.btn{padding:1rem 2rem;border:none;
-      border-radius:12px;font-size:1rem;font-weight:600;cursor:pointer;transition:var(--transition);text-decoration:none;display:flex;align-items:center;justify-content:center;gap:0.5rem;position:relative;overflow:hidden}.btn::after{content:'';position:absolute;top:0;left:-100%;width:100%;height:100%;background:linear-gradient(90deg,transparent,rgba(255,255,255,0.2),transparent);transition:left 0.5s}.btn:hover::after{left:100%}.btn-primary{background:var(--primary-gradient);color:white}.btn-primary:hover{transform:translateY(-2px);box-shadow:0 10px 20px rgba(102,126,234,0.3)}.btn-success{background:var(--success-gradient);color:white}.btn-success:hover{transform:translateY(-2px);box-shadow:0 10px 20px rgba(72,187,120,0.3)}.btn:active{transform:translateY(0)}.icon{font-size:1.2rem}.tips{margin-top:2rem;padding-top:1.5rem;border-top:1px solid #e2e8f0}.tips h3{color:#4a5568;margin-bottom:1rem;font-size:1rem}.tips ul{list-style:none;text-align:left}.tips li{padding:0.5rem 0;color:#718096;display:flex;align-items:center;gap:0.5rem}.tips li:before{content:"💡";font-size:0.9rem}.retry-indicator{margin-top:1rem;font-size:0.9rem;color:var(--text-secondary)}@media(min-width:480px){.button-group{flex-direction:row}.btn{flex:1}}@keyframes bounce{0%,20%,50%,80%,100%{transform:translateY(0)}40%{transform:translateY(-10px)}60%{transform:translateY(-5px)}}@keyframes pulse{0%{opacity:1}50%{opacity:0.5}100%{opacity:1}}.fade-in{animation:fadeIn 0.5s ease-in}@keyframes fadeIn{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}</style></head><body><div class="offline-container fade-in"><div class="status-indicator"><div class="connection-dot"></div><span>Offline</span></div><span class="emoji">🔌</span><h1>Connection Lost</h1><p class="subtitle">This page requires an internet connection. You can try the following:</p>${
-        requestedUrl
-          ? `<div class="url-info"><strong>Requested URL:</strong><br>${requestedUrl}</div>`
-          : ""
-      }<div class="button-group"><button class="btn btn-primary" id="retryBtn"><span class="icon">🔄</span>Retry Connection</button><a href="/" class="btn btn-primary" id="goHomeBtn"><span class="icon">🏠</span>Go to Home</a>${
-      whatsappUrl
-        ? `<a href="${whatsappUrl}" class="btn btn-success" id="supportBtn" target="_blank" rel="noopener"><span class="icon">💬</span>Contact Support</a>`
-        : ""
-    }</div><div class="retry-indicator" id="retryIndicator">Auto-retry in <span id="countdown">10</span> seconds</div><div class="tips"><h3>Troubleshooting Tips:</h3><ul><li>Check your Wi-Fi or mobile data connection</li><li>Restart your router or modem</li><li>Verify airplane mode is turned off</li><li>Try accessing other websites to test your connection</li></ul></div></div><script>class OfflinePage{constructor(){this.retryCount=0;this.maxRetries=5;this.retryInterval=10000;this.countdownElement=document.getElementById('countdown');this.retryIndicator=document.getElementById('retryIndicator');this.retryBtn=document.getElementById('retryBtn');this.autoRetryTimer=null;this.countdownTimer=null;this.init()}init(){this.setupEventListeners();this.startAutoRetry();this.logOfflineEvent()}setupEventListeners(){if(this.retryBtn){this.retryBtn.addEventListener('click',()=>this.manualRetry())}const goHomeBtn=document.getElementById('goHomeBtn');if(goHomeBtn){goHomeBtn.addEventListener('click',(e)=>{if(window.history.length>1){e.preventDefault();window.location.href='/'}})}const supportBtn=document.getElementById('supportBtn');if(supportBtn){supportBtn.addEventListener('click',()=>{this.logEvent('support_clicked')})}window.addEventListener('online',()=>this.handleConnectionRestored());document.addEventListener('visibilitychange',()=>{if(!document.hidden){this.checkConnection()}})}startAutoRetry(){this.updateCountdown(10);this.autoRetryTimer=setTimeout(()=>{this.checkConnection()},this.retryInterval)}updateCountdown(seconds){if(!this.countdownElement)return;let count=seconds;this.countdownTimer=setInterval(()=>{this.countdownElement.textContent=count;count--;if(count<0){clearInterval(this.countdownTimer)}},1000)}manualRetry(){this.logEvent('manual_retry');this.checkConnection(true)}checkConnection(isManual=false){if(this.retryCount>=this.maxRetries){this.disableAutoRetry();return}this.retryCount++;if(isManual){this.showRetryStatus('Checking connection...')}fetch('/',{method:'HEAD',cache:'no-cache',mode:'no-cors'}).then(()=>{this.handleConnectionRestored()}).catch(()=>{if(isManual){this.showRetryStatus(Still offline (attempt ${
-      this.retryCount
-    }/${
-      this.maxRetries
-    }));setTimeout(()=>{this.showRetryStatus('Auto-retry disabled. Please check your connection.');this.disableAutoRetry()},2000)}else{this.retryConnection()}})}retryConnection(){if(this.retryCount<this.maxRetries){this.clearTimers();this.startAutoRetry()}else{this.disableAutoRetry()}}handleConnectionRestored(){this.logEvent('connection_restored',{retryCount:this.retryCount});this.showRetryStatus('Connection restored! Redirecting...');setTimeout(()=>{window.location.reload()},1000)}showRetryStatus(message){if(this.retryIndicator){this.retryIndicator.textContent=message;setTimeout(()=>{if(this.retryCount<this.maxRetries){this.startAutoRetry()}},3000)}}disableAutoRetry(){this.clearTimers();if(this.retryIndicator){this.retryIndicator.textContent='Auto-retry disabled. Please check your connection.'}}clearTimers(){if(this.autoRetryTimer)clearTimeout(this.autoRetryTimer);if(this.countdownTimer)clearInterval(this.countdownTimer)}logOfflineEvent(){this.logEvent('offline_page_loaded',{url:window.location.href,userAgent:navigator.userAgent,timestamp:new Date().toISOString()})}logEvent(eventName,data={}){if(window.location.hostname.includes('localhost')){console.log([OFFLINE_PAGE]: ,data)}if('serviceWorker' in navigator&&navigator.serviceWorker.controller){navigator.serviceWorker.controller.postMessage({type:'OFFLINE_PAGE_EVENT',event:eventName,data:data})}}}document.addEventListener('DOMContentLoaded',()=>{new OfflinePage()});if(document.readyState==='loading'){document.addEventListener('DOMContentLoaded',()=>{new OfflinePage()})}else{new OfflinePage()}}</script></body></html>`,
-    {
-      status: 200,
-      headers: {
-        "Content-Type": "text/html",
-        "Cache-Control": "no-store, no-cache, must-revalidate",
-        "X-Offline-Page": "true",
-      },
-    }
-  );
+  return new Response(OFFLINE_HTML, {
+    status: 200,
+    statusText: "OK",
+    headers: new Headers({
+      "Content-Type": "text/html",
+      "Cache-Control": "no-store, no-cache, must-revalidate",
+      "X-Offline-Page": "true",
+    }),
+  });
 }
 self.addEventListener("error", (event) => {
   swLogger.error("Service Worker runtime error", {

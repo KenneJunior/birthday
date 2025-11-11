@@ -1,5 +1,7 @@
 import logger from "./utility/logger.js";
 
+import Notification from "./notification.js";
+
 // Create contextual loggers for different modules
 const appLogger = logger.withContext({
   name: "HBD.js",
@@ -124,7 +126,6 @@ initializePWA();
 
 import { PlatformDetector } from "../PWA/pwa-prompt.js";
 import { UltimateModal } from "./Modal.js";
-import Notification from "./notification.js";
 
 document.addEventListener("DOMContentLoaded", () => {
   appLogger.time("Birthday app initialization");
@@ -350,11 +351,6 @@ document.addEventListener("DOMContentLoaded", () => {
         elements.signatureElement.style.transform = `translate(${
           moveX / 2
         }px, ${moveY / 2}px)`;
-
-        appLogger.debug("Mouse move parallax effect applied", {
-          moveX,
-          moveY,
-        });
       }
     });
 
@@ -464,7 +460,6 @@ document.addEventListener("DOMContentLoaded", () => {
       const currentFloating = document.querySelectorAll(".floating");
 
       if (currentFloating.length >= maxFloatingElements) {
-        appLogger.debug("Floating element limit reached, removing oldest");
         // Remove oldest floating elements
         for (
           let j = 0;
@@ -477,13 +472,10 @@ document.addEventListener("DOMContentLoaded", () => {
 
       setTimeout(() => {
         element.remove();
-        appLogger.debug("Floating element removed after timeout");
       }, 30000);
 
       document.body.appendChild(element);
     }
-
-    appLogger.debug("Floating elements created", { count: numElements });
     appLogger.timeEnd("Create floating elements");
   }
 
@@ -524,7 +516,6 @@ document.addEventListener("DOMContentLoaded", () => {
       // Remove extra confetti after animation
       setTimeout(() => {
         extraConfetti.remove();
-        confettiLogger.debug("Extra confetti removed");
       }, state.confetti.interval);
     }
 
@@ -535,7 +526,6 @@ document.addEventListener("DOMContentLoaded", () => {
   function getRandomColor() {
     const { colors } = state.confetti;
     const color = colors[Math.floor(Math.random() * colors.length)];
-    confettiLogger.debug("Random color selected", { color });
     return color;
   }
 
@@ -567,16 +557,11 @@ document.addEventListener("DOMContentLoaded", () => {
         const anim = randomAnimations[index % randomAnimations.length];
         span.style.animation = `${anim} 2s ${index * 0.1 + 0.1}s forwards`;
         span.style.opacity = "1";
-        appLogger.debug("Letter animation applied", {
-          letter,
-          animation: anim,
-        });
       }
       span.textContent = letter;
       span.addEventListener("animationend", () => {
         if (index === randomAnimations.length - 1) {
           state.animating = false;
-          appLogger.debug("Name animation completed");
         }
       });
       nameElement.appendChild(span);
@@ -593,10 +578,6 @@ document.addEventListener("DOMContentLoaded", () => {
       [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
     }
     const result = shuffled.slice(0, count);
-    appLogger.debug("Random animations generated", {
-      count,
-      animations: result,
-    });
     return result;
   }
 
@@ -839,7 +820,6 @@ document.addEventListener("DOMContentLoaded", () => {
       heart.addEventListener("animationend", () => {
         if (heart.parentNode) {
           heart.parentNode.removeChild(heart);
-          heartLogger.debug("Regular heart animation ended and removed");
         }
       });
     } else {

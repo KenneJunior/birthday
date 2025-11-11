@@ -25,7 +25,7 @@
 /* Pop-down notification */
 .pop-notification {
     position: fixed;
-    top: -500px;
+    top: -1000px;
     left: 50%;
     transform: translateX(-50%);
     width: 90%;

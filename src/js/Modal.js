@@ -1,4 +1,3 @@
-import Notification from "./notification";
 import logger from "./utility/logger.js";
 
 // Create contextual logger for UltimateModal
@@ -254,11 +253,6 @@ export class UltimateModal {
       this.navigate(1);
     });
 
-    this.elements.profile_pic.addEventListener("click", () => {
-      modalLogger.debug("Profile picture container clicked, showing HTU");
-      this.HTU();
-    });
-
     // Keyboard navigation
     document.addEventListener("keydown", (e) => {
       if (!this.elements.modal.classList.contains("active")) {
@@ -420,40 +414,6 @@ export class UltimateModal {
       isMaximized: this.state.isMaximized,
     });
     modalLogger.timeEnd("Toggle maximize");
-  }
-
-  HTU() {
-    modalLogger.time("How to Use notification");
-    modalLogger.debug("Showing How to Use notification");
-
-    new Notification()
-      .setupEventListeners()
-      .toggleViewDetails(false)
-      .showNotification("info", {
-        title: "📖 How to Use This Gallery",
-        message: `
-            <div style="line-height: 1.6;">
-                <p>Welcome to the image gallery! Here's how to navigate:</p>
-                <ul style="margin: 10px 0; padding-left: 20px;">
-                    <li>🖱️ <strong>Click</strong> on any thumbnail to open the image viewer</li>
-                    <li>⬅️ ➡️ Use <strong>arrow keys</strong> or navigation buttons to browse images</li>
-                    <li>🔍 <strong>Click</strong> on an open image to zoom in/out</li>
-                    <li>👆 <strong>Drag</strong> to pan around zoomed images</li>
-                    <li>📱 Use <strong>social media icons</strong> to share images</li>
-                    <li>🖼️ Press <strong>'F'</strong> or use the maximize button for fullscreen</li>
-                    <li>❌ Press <strong>ESC</strong> or click the X to close the viewer</li>
-                    <li>👆 <strong>click</strong> outside a box to create an emoji <strong>press and hold</strong> make the emoji bigger</li>
-                    <li>📷 Click the profile image anytime to see these instructions again</li>
-                </ul>
-                <p style="margin-top: 10px; font-style: italic;">Enjoy exploring this page 🥰💕💘!</p>
-            </div>
-        `,
-        icon: "fas fa-info-circle",
-        useHTML: true,
-        autoCloseTime: 15000, // Show for 15 seconds instead of 20
-      });
-
-    modalLogger.timeEnd("How to Use notification");
   }
 
   setupZoomPanFunctionality() {
@@ -737,11 +697,10 @@ export class UltimateModal {
     this.mediaData.media.forEach((mediaData, index) => {
       const figure = this.createGalleryFigure(mediaData, index);
 
-      // Hide images beyond the first 9 (index > 8) but keep the last 2 visible
-      if (index > 8 && index) {
+      // Hide images beyond the first 9 (index > 8) but  last 1 visible
+      if (index > 8 && index !== this.mediaData.media.length - 1) {
         figure.classList.add("d-none");
       }
-
       galleryContainer.appendChild(figure);
     });
 
@@ -753,7 +712,7 @@ export class UltimateModal {
     this.checkSeeMoreButton();
 
     modalLogger.info("Gallery generation completed", {
-      mediaCount: mediaData.media.length,
+      mediaCount: this.mediaData.media.length,
       thumbnailsCreated: galleryContainer.children.length,
       hiddenThumbnails: document.querySelectorAll(".photo-thumbnail.d-none")
         .length,
@@ -834,6 +793,7 @@ export class UltimateModal {
 
     // Show hidden thumbnails with staggered animation
     hiddenThumbnails.forEach((thumbnail, index) => {
+      if (index >= 6) return; // Show only 6 at a time
       setTimeout(() => {
         thumbnail.classList.remove("d-none");
         thumbnail.classList.add("revealed");
@@ -879,8 +839,8 @@ export class UltimateModal {
       // Show notification
       if (window.Notification) {
         window.Notification(
-          "More Memories!",
-          `Added ${Math.min(
+          `More Memories!"
+          Added ${Math.min(
             hiddenThumbnails.length,
             6
           )} new memories to your gallery! ✨`
@@ -942,7 +902,7 @@ export class UltimateModal {
         });
       }
     });
-
+    this.elements.allVisibleThumbnails = allVisibleThumbnails;
     this.state.media = updatedMedia;
 
     modalLogger.debug("Media array updated with media-index approach", {

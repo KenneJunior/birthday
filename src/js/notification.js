@@ -39,11 +39,25 @@ export default class Notification {
           useHTML: false,
         },
         custom: {
-          title: "Hey There 👋",
-          message: `Hey Fhavur! 🎉<br><br>
-                    I hope you're loving this little birthday site I crafted just for you—it's a temporary treat! 😊<br><br>
-                    Click the picture below to explore more, and trust me, it’s even better on a laptop or bigger screen for the full experience.<br><br>
-                    Oh, and don’t miss the "More Details" button there’s a special something from me to you.🙇‍♂️✨`,
+          title: "📖 How to Use This Gallery",
+          message: `
+            <div style="line-height: 1.6;">
+                <p>Welcome to the image gallery! Here's how to navigate:</p>
+                <ul style="margin: 10px 0; padding-left: 20px;">
+                    <li>🖱️ <strong>Click</strong> on any thumbnail to open the image viewer</li>
+                    <li>⬅️ ➡️ Use <strong>arrow keys</strong> or navigation buttons to browse images</li>
+                    <li>🔍 <strong>Click</strong> on an open image to zoom in/out</li>
+                    <li>👆 <strong>Drag</strong> to pan around zoomed images</li>
+                    <li> You can also <strong>pinch</strong> to zoom and <strong>swipe</strong> to navigate on touch devices</li>
+                    <li>📱 Use <strong>social media icons</strong> to share images</li>
+                    <li>🖼️ Press <strong>'F'</strong> or use the maximize button for fullscreen</li>
+                    <li>❌ Press <strong>ESC</strong> or click the X to close the viewer</li>
+                    <li>🖼 double the image to enter the full-screen mode<li/>
+                    <li>👆 <strong>click</strong> outside a box to create an emoji <strong>press and hold</strong> make the emoji bigger</li>
+                    <li>📷 Click the profile image anytime to see these instructions again</li>
+                </ul>
+                <p style="margin-top: 10px; font-style: italic;">Enjoy exploring this page 🥰💕💘!</p>
+            </div>`,
           icon: "",
           useHTML: true,
         },

@@ -6,10 +6,11 @@
   "scripts": {
     "sitemap": "node src/scripts/generate-sitemap.js",
     "media-json": "node src/scripts/generate-media-json.js",
-    "robots": "node scripts/generate-robots.js",
-    "robots:dev": "node scripts/generate-robots.js development",
+    "robots": "node src/scripts/generate-robots.js",
+    "robots:dev": "node src/scripts/generate-robots.js development",
+    "build:sw":"node src/scripts/build-offline-page.js",
     "prebuild": "node src/scripts/pre-build.js",
-    "build": "vite build && node src/scripts/copy-sw.js",
+    "build": "vite build && node src/scripts/copy-sw.js && npm run build:sw",
     "dev": "vite",
     "preview": "vite preview"
   },

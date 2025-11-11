@@ -157,9 +157,9 @@
       "video-src": "/vid/video6.mp4"
     },
     {
-      "src": "/pics/screenshot1.jpg",
-      "thumb": "/pics/thumbnails/screenshot1.jpg",
-      "alt": "screenshot of the app",
+      "src": "/pics/The_END.jpg",
+      "thumb": "/pics/thumbnails/The_END.jpg",
+      "alt": "Image: The_END.jpg",
       "data-type": "image"
     }
   ]
