@@ -1,6 +1,6 @@
 //Uncomment this out in a dev environment
-//importScripts("../src/js/utility/logger-global.js");
-import "../src/js/utility/logger-global.js";
+importScripts("../src/js/utility/logger-global.js");
+//import "../src/js/utility/logger-global.js";
 importScripts("./offline-template.js");
 
 const logger = self.logger;
@@ -661,6 +661,7 @@ async function htmlDocumentsStrategy(request, logger = swLogger) {
         redirected: networkResponse.redirected,
         status: networkResponse.status,
         location: networkResponse.headers.get("location"),
+        responseUrl: networkResponse.url, // Log the actual response URL
       });
 
       // If same-origin redirect, try to fetch the final URL
@@ -677,10 +678,18 @@ async function htmlDocumentsStrategy(request, logger = swLogger) {
             const finalResponse = await fetch(locationUrl.href);
             if (finalResponse && finalResponse.ok) {
               try {
-                await cache.put(request, finalResponse.clone());
+                // Create a new response with the original request URL to ensure cache key matches
+                const cacheableResponse = new Response(finalResponse.body, {
+                  status: finalResponse.status,
+                  statusText: finalResponse.statusText,
+                  headers: finalResponse.headers,
+                });
+
+                await cache.put(request, cacheableResponse);
                 strategyLogger.debug("Cached redirected HTML", {
                   originalUrl: request.url,
                   finalUrl: locationUrl.href,
+                  cachedWithUrl: request.url,
                 });
               } catch (err) {
                 strategyLogger.warn("Failed to cache redirected HTML", {
@@ -707,10 +716,27 @@ async function htmlDocumentsStrategy(request, logger = swLogger) {
     // Normal successful response: cache & return
     if (networkResponse && networkResponse.ok) {
       try {
-        await cache.put(request, networkResponse.clone());
+        // If response URL differs from request URL, create a normalized response
+        let responseToCache = networkResponse;
+        if (networkResponse.url !== request.url) {
+          strategyLogger.debug("Response URL differs from request URL", {
+            requestUrl: request.url,
+            responseUrl: networkResponse.url,
+          });
+
+          // Create a new response with the original request URL
+          responseToCache = new Response(networkResponse.body, {
+            status: networkResponse.status,
+            statusText: networkResponse.statusText,
+            headers: networkResponse.headers,
+          });
+        }
+
+        await cache.put(request, responseToCache.clone());
         strategyLogger.debug("Cached HTML document", {
           url: request.url,
           status: networkResponse.status,
+          responseUrl: networkResponse.url,
         });
       } catch (err) {
         strategyLogger.warn("Failed to cache HTML", {
@@ -737,43 +763,100 @@ async function htmlDocumentsStrategy(request, logger = swLogger) {
       error: error.message,
     });
 
-    // Network failed - attempt multiple cache strategies
-    let cachedResponse = await caches.match(request);
-    let cacheSource = "direct_match";
+    // Enhanced cache matching with URL normalization
+    let cachedResponse = null;
+    let cacheSource = "unknown";
 
+    // Strategy 1: Direct match
+    cachedResponse = await caches.match(request);
+    if (cachedResponse) {
+      cacheSource = "direct_match";
+      strategyLogger.debug("Found direct cache match", {
+        requestUrl: request.url,
+        cachedUrl: cachedResponse.url,
+      });
+    }
+
+    // Strategy 2: Try with .html extension if request doesn't have it
     if (!cachedResponse && !request.url.endsWith(".html")) {
-      cachedResponse = await caches.match(request.url + ".html");
-      cacheSource = "added_html_extension";
-      strategyLogger.debug("Trying with .html extension", {
-        attemptedUrl: request.url + ".html",
-      });
+      const htmlUrl = request.url + ".html";
+      cachedResponse = await caches.match(htmlUrl);
+      if (cachedResponse) {
+        cacheSource = "added_html_extension";
+        strategyLogger.debug("Found cache match with .html extension", {
+          requestUrl: request.url,
+          attemptedUrl: htmlUrl,
+          cachedUrl: cachedResponse.url,
+        });
+      }
     }
 
-    if (!cachedResponse) {
-      // Try without .html extension (SPA routing)
-      const altUrl = request.url.replace(/\.html$/, "");
-      cachedResponse = await caches.match(altUrl);
-      cacheSource = "removed_html_extension";
-      strategyLogger.debug("Trying without .html extension", {
-        attemptedUrl: altUrl,
-      });
+    // Strategy 3: Try without .html extension if request has it
+    if (!cachedResponse && request.url.endsWith(".html")) {
+      const baseUrl = request.url.replace(/\.html$/, "");
+      cachedResponse = await caches.match(baseUrl);
+      if (cachedResponse) {
+        cacheSource = "removed_html_extension";
+        strategyLogger.debug("Found cache match without .html extension", {
+          requestUrl: request.url,
+          attemptedUrl: baseUrl,
+          cachedUrl: cachedResponse.url,
+        });
+      }
     }
-    /*if (!cachedResponse) {
+
+    // Strategy 4: Try root path for SPA routing
+    /*    if (!cachedResponse && request.url !== self.location.origin + "/") {
       cachedResponse = await caches.match("/");
+      if (cachedResponse) {
+        cacheSource = "root_fallback";
+        strategyLogger.debug("Found cache match with root path", {
+          requestUrl: request.url,
+          attemptedUrl: "/",
+          cachedUrl: cachedResponse.url,
+        });
+      }
     }
 
+    // Strategy 5: Try index.html
     if (!cachedResponse) {
-      // Fallback to index.html for SPA routing
       cachedResponse = await caches.match("/index.html");
+      if (cachedResponse) {
+        cacheSource = "index_html_fallback";
+        strategyLogger.debug("Found cache match with index.html", {
+          requestUrl: request.url,
+          attemptedUrl: "/index.html",
+          cachedUrl: cachedResponse.url,
+        });
+      }
     }
 */
     if (cachedResponse) {
+      // If cached response URL doesn't match request URL, create a normalized response
+      let finalResponse = cachedResponse;
+      if (cachedResponse.url === request.url) {
+        strategyLogger.debug("Normalizing cached response URL", {
+          requestUrl: request.url,
+          cachedUrl: cachedResponse.url,
+        });
+
+        finalResponse = new Response(cachedResponse.body, {
+          status: cachedResponse.status,
+          ok: cachedResponse.ok,
+          type: cachedResponse.type,
+          statusText: cachedResponse.statusText,
+          headers: cachedResponse.headers,
+        });
+      }
+
       strategyLogger.info("Serving cached HTML fallback", {
         url: request.url,
         cacheSource,
+        cachedUrl: cachedResponse.url,
         status: "cache_hit",
       });
-      return cachedResponse;
+
+      return finalResponse;
     }
 
     strategyLogger.warn("No cached HTML found - generating offline page", {

@@ -15,7 +15,6 @@ dist-ssr
 # Editor directories and files
 .vscode/*
 .dirlist.sh
-public/sitemap.xml
 !.vscode/extensions.json
 .idea
 .DS_Store
@@ -31,8 +30,12 @@ node_modules/
 dist/
 build/
 coverage/
-public/sitemap.xml
 
 # environment files
 .env
 .env.local
+/public/sitemap.xml
+/public/offline.template.js
+/public/gallery-data.json
+/public/robots.txt
+.clearCache.js
