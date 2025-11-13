@@ -4,7 +4,7 @@ importScripts("../src/js/utility/logger-global.js");
 importScripts("./offline-template.js");
 
 const logger = self.logger;
-const CACHE_VERSION = "v1.4";
+const CACHE_VERSION = "v1.5";
 const STATIC_CACHE = `fhavur-static-${CACHE_VERSION}`;
 const DYNAMIC_CACHE = `fhavur-dynamic-${CACHE_VERSION}`;
 
