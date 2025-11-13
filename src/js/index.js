@@ -202,7 +202,7 @@ class ConfettiSystem {
         confettiLogger.debug(
           "Image container clicked, navigating to fhavur.html"
         );
-        window.location.href = "fhavur.html";
+        window.location.href = "fhavur";
       });
     }
 
@@ -213,7 +213,7 @@ class ConfettiSystem {
         confettiLogger.debug(
           "Name highlight clicked, navigating to fhavur.html"
         );
-        window.location.href = "fhavur.html";
+        window.location.href = "fhavur";
       });
     }
 

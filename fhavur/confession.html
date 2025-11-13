@@ -109,7 +109,7 @@
 
                 <footer class="content-footer">
                     <div class="interaction-buttons">
-                        <button class="cta-button primary" onclick="window.location.href='missus/fhav.html'" id = "continue" aria-label="Continue to next experience">
+                        <button class="cta-button primary" onclick="window.location.href='missus/fhav'" id = "continue" aria-label="Continue to next experience">
                             <span class="button-text" >Continue</span>
                             <span class="button-icon" aria-hidden="true">
                                     <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -222,7 +222,7 @@ async function initializeProtectedPage() {
     } catch (error) {
         hideLoading();
         logger.error('Authentication failed:', error);
-        window.location.href = '/login.html';
+        window.location.href = '/login';
     }
 }
 
