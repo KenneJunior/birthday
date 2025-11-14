@@ -575,15 +575,16 @@ a {
 
 .modal-container {
     /* Dimensions */
-    width: 80%;
-    max-width: 600px;
-    max-height: 90vh;
+    width: 100%;
+    max-width: 60vh;
+    max-height: 95vh;
     padding: calc(2rem * var(--zoom-factor));
     border-radius: calc(24px * var(--zoom-factor));
     /* Visual styling */
     background: rgba(219, 112, 147, 0.3);
     -webkit-backdrop-filter: blur(calc(var(--blur)*2)) ;
     backdrop-filter: blur(calc(var(--blur)*2)) ;
+    contain:layout;
 
     box-shadow: 0 30px 60px -20px rgba(219, 112, 147, 0.3),
     0 0 0 1px rgba(255, 255, 255, 0.3) inset;
@@ -598,6 +599,8 @@ a {
     -moz-user-select: none !important;
     -ms-user-select: none !important;
     user-select: none !important;
+    min-width: 55vh;
+    min-height: 66vh;
 }
 
 /* Decorative corner accents */
@@ -826,7 +829,175 @@ a {
   letter-spacing: 0.5px;
   transition: all 0.3s ease;
 }
+.tooltip-content {
+    position: absolute;
+    z-index: 10001;
+}
+.modal-tooltip {
+  position: relative;
+  background: linear-gradient(135deg, #1f2937 0%, #374151 100%);
+  color: #f9fafb;
+  padding: 12px 20px;
+  border-radius: 12px;
+  box-sizing: border-box;
+  font-size: 0.875rem;
+  font-weight: 500;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  transform: translate(-50%, 10px) scale(0.95);
+  opacity: 0;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  z-index: 10000;
+  pointer-events: none;
+  white-space: nowrap;
+  box-shadow: 
+    0 10px 25px -5px rgba(0, 0, 0, 0.3),
+    0 4px 6px -2px rgba(0, 0, 0, 0.1),
+    0 0 0 1px rgba(255, 255, 255, 0.05);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  max-width: 300px;
+  text-align: center;
+  line-height: 1.4;
+}
 
+.modal-tooltip.visible {
+  opacity: 1;
+  transform: translate(-50%, 0) scale(1);
+}
+
+/* Arrow positioning variants */
+.modal-tooltip.top::after {
+  content: '';
+  position: absolute;
+  top: 100%;
+  left: 50%;
+  transform: translateX(-50%);
+  border-width: 6px;
+  border-style: solid;
+  border-color: #1f2937 transparent transparent transparent;
+  filter: drop-shadow(0 2px 2px rgba(0, 0, 0, 0.1));
+}
+
+.modal-tooltip.bottom::after {
+  content: '';
+  position: absolute;
+  bottom: 100%;
+  left: 50%;
+  transform: translateX(-50%);
+  border-width: 6px;
+  border-style: solid;
+  border-color: transparent transparent #1f2937 transparent;
+  filter: drop-shadow(0 -2px 2px rgba(0, 0, 0, 0.1));
+}
+
+.modal-tooltip.left::after {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 100%;
+  transform: translateY(-50%);
+  border-width: 6px;
+  border-style: solid;
+  border-color: transparent transparent transparent #1f2937;
+  filter: drop-shadow(2px 0 2px rgba(0, 0, 0, 0.1));
+}
+
+.modal-tooltip.right::after {
+  content: '';
+  position: absolute;
+  top: 50%;
+  right: 100%;
+  transform: translateY(-50%);
+  border-width: 6px;
+  border-style: solid;
+  border-color: transparent #1f2937 transparent transparent;
+  filter: drop-shadow(-2px 0 2px rgba(0, 0, 0, 0.1));
+}
+
+/* Size variants */
+.modal-tooltip.small {
+  padding: 8px 16px;
+  font-size: 0.75rem;
+  border-radius: 8px;
+}
+
+.modal-tooltip.large {
+  padding: 16px 24px;
+  font-size: 1rem;
+  border-radius: 16px;
+  white-space: normal;
+  max-width: 400px;
+}
+
+/* Color variants */
+.modal-tooltip.info {
+  background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%);
+  border-color: rgba(59, 130, 246, 0.3);
+}
+
+.modal-tooltip.info::after {
+  border-top-color: #3b82f6;
+}
+
+.modal-tooltip.warning {
+  background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
+  border-color: rgba(245, 158, 11, 0.3);
+}
+
+.modal-tooltip.warning::after {
+  border-top-color: #f59e0b;
+}
+
+.modal-tooltip.error {
+  background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
+  border-color: rgba(239, 68, 68, 0.3);
+}
+
+.modal-tooltip.error::after {
+  border-top-color: #ef4444;
+}
+
+.modal-tooltip.success {
+  background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+  border-color: rgba(16, 185, 129, 0.3);
+}
+
+.modal-tooltip.success::after {
+  border-top-color: #10b981;
+}
+
+/* Animation variants */
+.modal-tooltip.bounce {
+  transition: all 0.5s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+}
+
+.modal-tooltip.fade {
+  transition: all 0.4s ease-in-out;
+}
+
+.modal-tooltip.slide {
+  transform: translate(-50%, -20px);
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.modal-tooltip.slide.visible {
+  transform: translate(-50%, 0);
+}
+
+/* Interactive states */
+.modal-tooltip:hover {
+  box-shadow: 
+    0 15px 35px -5px rgba(0, 0, 0, 0.4),
+    0 6px 10px -2px rgba(0, 0, 0, 0.15),
+    0 0 0 1px rgba(255, 255, 255, 0.1);
+}
+
+/* Focus indicator for accessibility */
+.modal-tooltip:focus {
+  outline: 2px solid #3b82f6;
+  outline-offset: 2px;
+}
 .see-more-arrow:hover .text {
   color: #ff8e8e;
   text-shadow: 0 2px 10px rgba(255, 107, 107, 0.3);
@@ -1313,13 +1484,13 @@ a {
 
 @keyframes gradientBG {
     0% {
-        background-position: 0% 50%;
+        background-position: 0 50%;
     }
     50% {
         background-position: 100% 50%;
     }
     100% {
-        background-position: 0% 50%;
+        background-position: 0 50%;
     }
 }
 
@@ -1521,7 +1692,18 @@ a {
         height: 2.5rem;
         font-size: 1.2rem;
     }
-
+  .modal-tooltip {
+    font-size: 0.8rem;
+    padding: 10px 16px;
+    max-width: 280px;
+    white-space: normal;
+    text-align: center;
+  }
+  
+  .modal-tooltip.large {
+    max-width: 320px;
+    padding: 12px 20px;
+  }
 
     .modal-nav {
         width: 3rem;
@@ -1706,6 +1888,32 @@ a {
         animation: none !important;
         transition: none !important;
     }
+      .modal-tooltip {
+    transition: opacity 0.1s ease;
+  }
+}
+
+@media (prefers-color-scheme: dark) {
+  .modal-tooltip {
+    background: linear-gradient(135deg, #374151 0%, #1f2937 100%);
+    color: #f3f4f6;
+    border-color: rgba(255, 255, 255, 0.1);
+  }
+  
+  .modal-tooltip::after {
+    border-top-color: #374151;
+  }
+}
+@media (prefers-contrast: more) {
+  .modal-tooltip {
+    background: #000;
+    border: 2px solid #fff;
+    color: #fff;
+  }
+  
+  .modal-tooltip::after {
+    border-top-color: #000;
+  }
 }
 
 @supports not (backdrop-filter: blur(12px)) {

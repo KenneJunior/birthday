@@ -113,6 +113,7 @@ class ConfettiSystem {
     this.animationId = null;
     this.colors = ["#8E2DE2", "#4A00E0", "#FF6B6B", "#FECA57", "#1DD1A1"];
     this.isActive = false;
+    this.mainPage = "fhavur";
 
     confettiLogger.debug("ConfettiSystem instance created", {
       container: container?.className || "unknown",
@@ -202,7 +203,7 @@ class ConfettiSystem {
         confettiLogger.debug(
           "Image container clicked, navigating to fhavur.html"
         );
-        window.location.href = "fhavur";
+        window.location.href = this.mainPage;
       });
     }
 
@@ -213,7 +214,7 @@ class ConfettiSystem {
         confettiLogger.debug(
           "Name highlight clicked, navigating to fhavur.html"
         );
-        window.location.href = "fhavur";
+        window.location.href = this.mainPage;
       });
     }
 
@@ -293,12 +294,12 @@ class ConfettiSystem {
       this.drawParticles(p);
     }
 
-    if (particlesRemoved > 0) {
+    /*if (particlesRemoved > 0) {
       confettiLogger.debug("Particles cleaned up", {
         removed: particlesRemoved,
       });
     }
-
+*/
     if (this.particleCount > 0) {
       this.animationId = requestAnimationFrame(this.animate);
     } else {

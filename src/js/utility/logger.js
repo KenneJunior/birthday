@@ -48,8 +48,9 @@ class Logger {
     this.isBrowser = typeof window !== "undefined";
     this.isNode = typeof process !== "undefined" && process.env;
     this.isWorker = typeof self !== "undefined" && self.location;
-    this.performanceMarks = new Map();   
+    this.performanceMarks = new Map();
     this.workingFolder = "/home/kenne-junior/Desktop/birthday";
+    this.useBrowserURL = true;
     this.contextStack = [];
     this._detectEnvironment();
     this._setupGlobalErrorHandling();
@@ -521,7 +522,10 @@ class Logger {
     // Extract clickable URL for browser display
     let browserUrl = "";
     if (hasCallerInfo) {
-      browserUrl = context.caller.clickableUrl.browserUrl;
+      const url = context.caller.clickableUrl;
+      browserUrl = `%c🔗 ${
+        this.useBrowserURL ? url.browserUrl : url.vscodeUrl
+      }`;
     }
 
     if (this.config.colors) {
@@ -560,7 +564,7 @@ class Logger {
     switch (level) {
       case LOG_LEVELS.DEBUG:
         console.debug(
-          `${prefix}, ${mainMessage}`,
+          `${prefix} ${mainMessage}`,
           levelStyle,
           messagestyle,
           ...args
@@ -568,7 +572,7 @@ class Logger {
         break;
       case LOG_LEVELS.INFO:
         console.info(
-          `${prefix}, ${mainMessage}`,
+          `${prefix} ${mainMessage}`,
           levelStyle,
           messagestyle,
           ...args
@@ -576,7 +580,7 @@ class Logger {
         break;
       case LOG_LEVELS.WARN:
         console.warn(
-          `${prefix}, ${mainMessage}`,
+          `${prefix} ${mainMessage}`,
           levelStyle,
           messagestyle,
           ...args
@@ -584,7 +588,7 @@ class Logger {
         break;
       case LOG_LEVELS.ERROR:
         console.error(
-          `${prefix}, ${mainMessage}`,
+          `${prefix} ${mainMessage}`,
           levelStyle,
           messagestyle,
           ...args

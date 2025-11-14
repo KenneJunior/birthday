@@ -235,39 +235,6 @@ document.addEventListener("DOMContentLoaded", () => {
     detectPlatform();
 
     // Add tooltip styles
-    const style = document.createElement("style");
-    style.textContent = `
-    .modal-tooltip {
-      position: fixed;
-      background: rgba(0, 0, 0, 0.8);
-      color: white;
-      padding: 8px 16px;
-      border-radius: 20px;
-      font-size: 0.9rem;
-      transform: translate(-50%, 10px);
-      opacity: 0;
-      transition: all 0.3s ease;
-      z-index: 10000;
-      pointer-events: none;
-      white-space: nowrap;
-    }
-    .modal-tooltip.visible {
-      opacity: 1;
-      transform: translate(-50%, 0);
-    }
-    .modal-tooltip::after {
-      content: '';
-      position: absolute;
-      top: 50%;
-      left: 50%;
-      margin-left: -5px;
-      border-width: 5px;
-      border-style: solid;
-      border-color: rgba(0, 0, 0, 0.8) transparent transparent transparent;
-    }
-  `;
-    document.head.appendChild(style);
-    appLogger.debug("Tooltip styles added to document");
 
     new Notification().toggleViewDetails(true).initialize();
     appLogger.debug("Notification system initialized");
