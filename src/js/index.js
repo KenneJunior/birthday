@@ -77,7 +77,7 @@ window.addEventListener("resize", () => {
 window.addEventListener("online", () => {
   appLogger.pushContext({
     pwa: { isOnline: true },
-    network: navigator.connection ? { ...appLogger.context.network } : null,
+    network: navigator.connection,
   });
   appLogger.info("Application came online");
 });
@@ -113,7 +113,7 @@ class ConfettiSystem {
     this.animationId = null;
     this.colors = ["#8E2DE2", "#4A00E0", "#FF6B6B", "#FECA57", "#1DD1A1"];
     this.isActive = false;
-    this.mainPage = "fhavur";
+    this.mainPage = "fhavur.html";
 
     confettiLogger.debug("ConfettiSystem instance created", {
       container: container?.className || "unknown",
@@ -1127,7 +1127,7 @@ class BirthdayApp {
     // Load image
     appLogger.debug("Starting image load");
     this.modules.imageLoader.loadImage("/pics/tata.jpg").catch((error) => {
-      appLogger.warn("Image loading failed", error);
+      appLogger.warn("Imapicsge loading failed", error);
     });
 
     // Initial animations

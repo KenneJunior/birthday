@@ -298,60 +298,42 @@
     <script type="module" src="/src/auth-check.js"></script>
     <script type="module" src="/src/js/utility/Mode.js"></script>
     <script type="module" src="src/js/HBD.js"></script>
-    <script type="module">
-      import logger from '/src/js/utility/logger.js';
-      import {
-        updateLoadingText,
-        showLoading,
-        hideLoading,
-        setupAuthProtection,
-      } from "/src/auth-check.js";
-      // Asynchronous function to initialize the protected page
-      async function initializeProtectedPage() {
-        updateLoadingText("Yeah I know again😏... Just a moment 😅😊");
-        showLoading();
+<script type="module">
+  import logger from '/src/js/utility/logger.js';
+  import { getAuthManager } from "/src/auth-check.js";
 
-        try {
-          const authResult = await setupAuthProtection();
-          if (authResult.authenticated) {
-            // Delay hiding loader for a smoother transition
-             hideLoading(1000);
-            setTimeout(() => {
-              initializePageContent();
-              const protectedContent =
-                document.getElementById("protectedContent");
-              if (protectedContent) {
-                protectedContent.classList.remove("d-none");
-              }
-            }, 1000);
-          } else {
-            // Handle case where authentication succeeds but user is not authorized
-            hideLoading();
-            logger.warn("Access denied: User not authenticated");
-            window.location.href = "/login.html";
-          }
-        } catch (error) {
-          hideLoading();
-          logger.error("Authentication fail:", error);
-          window.location.href = "/login.html";
-        }
-      }
+  // Asynchronous function to initialize the protected page
+  async function initializeProtectedPage() {
+    try {
+      const authManager = await getAuthManager();
+      authManager.updateLoadingText("Yeah I know again😏... Just a moment 😅😊");
+      authManager.showLoading();
 
-      // Function to initialize page content after authentication
-      function initializePageContent() {
-        logger.info("Protected content loaded successfully");
-        // Enable all buttons and inputs that might have been disabled during loading
-        document.querySelectorAll("button, input").forEach((element) => {
-          element.disabled = false;
-        });
-      }
-
-      // Check document ready state and initialize accordingly
-      if (document.readyState === "loading") {
-        document.addEventListener("DOMContentLoaded", initializeProtectedPage);
+      const authResult = await authManager.setupAuthProtection();
+      if (authResult.authenticated) {
+        // Delay hiding loader for a smoother transition
+        authManager.hideLoading(1000);
+      
       } else {
-        initializeProtectedPage();
+        authManager.hideLoading();
+        logger.warn("Access denied: User not authenticated");
+        window.location.href = "/login.html";
       }
-    </script>
+    } catch (error) {
+      const authManager = await getAuthManager();
+      authManager.hideLoading();
+      logger.error("Authentication fail:", error);
+      window.location.href = "/login.html";
+    }
+  }
+
+  
+  // Check document ready state and initialize accordingly
+  if (document.readyState === "loading") {
+    document.addEventListener("DOMContentLoaded", initializeProtectedPage);
+  } else {
+    initializeProtectedPage();
+  }
+</script>
   </body>
 </html>

@@ -61,7 +61,7 @@ body {
   background-size: 200% 200%;
   animation: gradientShift 15s ease infinite;
   position: relative;
-  overflow: hidden;
+  overflow: scroll;
 }
 body::before {
 content: '';
@@ -189,7 +189,7 @@ animation: subtleFloat 15s ease-in-out infinite;
 
 /* ===== Content Section ===== */
 .content-section {
-padding: 3rem 3.5rem;
+padding: 0.7rem 1.5rem;
 display: flex;
 flex-direction: column;
 justify-content: center;
@@ -540,10 +540,6 @@ animation: orbitReverse 15s linear infinite;
   }
 }
 
-@keyframes gradientShift {
-0%, 100% { background-position: 0% 50%; }
-50% { background-position: 100% 50%; }
-}
 @keyframes subtleFloat {
 0%, 100% { transform: translateY(0px) scale(1); }
 50% { transform: translateY(-10px) scale(1.02); }
@@ -945,20 +941,20 @@ box-shadow: 0 0 0 3px rgba(142, 45, 226, 0.2);
 /* Dark mode support */
 /* ===== Dark Mode Support ===== */
 [data-theme="dark"] {
-  /* Core colors - cooler, deeper tones for reduced eye strain */
-  --primary: #a855f7; /* Softer purple for dark */
+
+  --primary: #a855f7; 
   --primary-dark: #2f037b;
   --primary-light: #4c1d95;
-  --secondary: #06b6d4; /* Cyan for contrast */
+  --secondary: #06b6d4; 
   --secondary-dark: #0891b2;
-  --accent: #f87171; /* Muted red */
+  --accent: #f87171; 
   --accent-dark: #dc2626;
-  --light: #0f172a; /* Near-black for surfaces */
-  --dark: #f8fafc; /* Off-white for accents */
-  --text: #f1f5f9; /* High-contrast white */
-  --text-muted: #cbd5e1; /* Soft gray */
-  --border: #334155; /* Dark border */
-  --success: #10b981; /* Keep green but softer */
+  --light: #0f172a; 
+  --dark: #f8fafc; 
+  --text: #f1f5f9; 
+  --text-muted: #cbd5e1; 
+  --border: #334155; 
+  --success: #10b981; 
 
   /* Shadows - lighter for dark mode to avoid over-darkening */
   --shadow-sm: 0 1px 4px rgba(0, 0, 0, 0.15);
@@ -980,8 +976,10 @@ html[data-theme="dark"],
 body[data-theme="dark"] {
   transition: background 0.6s cubic-bezier(0.16, 1, 0.3, 1), color 0.4s ease;
   background: var(--bg-gradient) !important;
+    background-size: 200% 200%;
+
   background-size: 200% 200% !important;
-  animation: gradientShiftDark 20s ease infinite; /* Slower, subtler animation */
+  animation: gradientShiftDark 5s ease infinite !important;
   color: var(--text) !important;
 }
 

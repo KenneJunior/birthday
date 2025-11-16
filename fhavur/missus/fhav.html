@@ -239,42 +239,34 @@
     <script src="fhav.js" type="module"></script>
     <script type="module" src="/src/auth-check.js"></script>
 
-    <script type="module">
-      import logger from '/src/js/utility/logger.js';
-      import {
-        updateLoadingText,
-        showLoading,
-        hideLoading,
-        setupAuthProtection,
-      } from "/src/auth-check.js";
-      async function initializeProtectedPage() {
-        showLoading();
+<script type="module">
+  import logger from '/src/js/utility/logger.js';
+  import { getAuthManager } from "/src/auth-check.js";
 
-        try {
-          const authResult = await setupAuthProtection();
-          if (authResult.authenticated) {
-            // Hide loading with smooth transition
-            setTimeout(hideLoading, 500);
-            initializePageContent();
-          }
-        } catch (error) {
-          hideLoading();
-          logger.error("Authentication failed:", error);
-          window.location.href = "/login";
-        }
-      }
+  async function initializeProtectedPage() {
+    try {
+      const authManager = await getAuthManager();
+      authManager.showLoading();
 
-      function initializePageContent() {
-        logger.info("Protected content loaded successfully");
-        document.querySelectorAll("button, input").forEach((element) => {
-          element.disabled = false;
-        });
+      const authResult = await authManager.setupAuthProtection();
+      
+      if (authResult.authenticated) {
+        // Hide loading with smooth transition
+        authManager.hideLoading()
+      
       }
-      if (document.readyState === "loading") {
-        document.addEventListener("DOMContentLoaded", initializeProtectedPage);
-      } else {
-        initializeProtectedPage();
-      }
-    </script>
+    } catch (error) {
+      const authManager = await getAuthManager();
+      authManager.hideLoading();
+      logger.error("Authentication failed:", error);
+      window.location.href = "/login.html";
+    }
+  }
+  if (document.readyState === "loading") {
+    document.addEventListener("DOMContentLoaded", initializeProtectedPage);
+  } else {
+    initializeProtectedPage();
+  }
+</script>
   </body>
 </html>

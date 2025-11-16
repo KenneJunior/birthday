@@ -200,61 +200,44 @@
 <script type="module" src="/src/js/date.js"></script>
 <script type="module" src="/src/auth-check.js"></script>
 
-  <script type="module">
-    import logger from '/src/js/utility/logger.js';
-          import {
-        updateLoadingText,
-        showLoading,
-        hideLoading,
-        setupAuthProtection,
-      } from "/src/auth-check.js";
-    // Loading screen management
-async function initializeProtectedPage() {
-        if (localStorage.getItem('myapp-theme') === 'dark' ||
-        (window.matchMedia('(prefers-color-scheme: light)').matches)) {
-        document.documentElement.setAttribute('data-theme', 'dark');
-    }else{
-        document.documentElement.setAttribute('data-theme', 'dark');
-    }
+ <script type="module">
+  import logger from '/src/js/utility/logger.js';
+  import { getAuthManager } from "/src/auth-check.js";
 
-    updateLoadingText('Authenticating let me check things out');
-    showLoading();
-    
+  // Loading screen management
+  async function initializeProtectedPage() {
     try {
-        const authResult = await setupAuthProtection();
-        if (authResult.authenticated) {
-            // Hide loading with smooth transition
-            hideLoading();
-            setTimeout(initializePageContent);
-        }
+      const authManager = await getAuthManager();
+      authManager.updateLoadingText('Authenticating let me check things out');
+      authManager.showLoading();
+      
+      const authResult = await authManager.setupAuthProtection();
+      if (authResult.authenticated) {
+        // Hide loading with smooth transition
+        authManager.hideLoading();
+      }
     } catch (error) {
-        hideLoading();
-        logger.error('Authentication failed:', error);
-        window.location.href = '/login';
+      const authManager = await getAuthManager();
+      authManager.hideLoading();
+      logger.error('Authentication failed:', error);
+      window.location.href = '/login.html';
     }
-}
-
-function initializePageContent() {
-    logger.info('Protected content loaded successfully');
-        document.querySelectorAll('button, input').forEach(element => {
-        element.disabled = false;
-    });
-}
-if (document.readyState === 'loading') {
+  }
+  if (document.readyState === 'loading') {
     document.addEventListener('DOMContentLoaded', initializeProtectedPage);
-} else {
+  } else {
     initializeProtectedPage();
-}
+  }
 
-    // Remove no-js class and add js class
-    document.documentElement.classList.remove('no-js');
-    document.documentElement.classList.add('js');
+  // Remove no-js class and add js class
+  document.documentElement.classList.remove('no-js');
+  document.documentElement.classList.add('js');
 
-    // Initialize theme based on user preference
-    if (localStorage.getItem('myapp-theme') === 'dark' ||
-        (window.matchMedia('(prefers-color-scheme: dark)').matches)) {
-        document.documentElement.setAttribute('data-theme', 'light');
-    }
-  </script>
+  // Initialize theme based on user preference
+  if (localStorage.getItem('myapp-theme') === 'dark' ||
+      (window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+    document.documentElement.setAttribute('data-theme', 'light');
+  }
+</script>
 </body>
 </html>

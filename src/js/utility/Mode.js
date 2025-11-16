@@ -1,21 +1,23 @@
 // ThemeManager.js - Exportable class for theme switching with localStorage persistence
-import logger from "./logger";
+import logger from "./logger.js";
 const modeLogger = logger.withContext({
   module: "Mode",
 });
 export class ThemeManager {
   constructor(config = {}) {
     // Default config
-    this.config = {
+    this.config = Object.freeze({
       defaultTheme: "light",
       storageKey: "theme",
+      selector: "body",
       buttonSelector: "#mode-toggle",
       iconSelector: ".mode-icon",
       textSelector: ".mode-text",
-      systemPreference: true, // Respect prefers-color-scheme if no saved theme
+      systemPreference: true,
       ...config,
-    };
+    });
 
+    this.element = null;
     this.button = null;
     this.icon = null;
     this.text = null;
@@ -24,9 +26,18 @@ export class ThemeManager {
 
   // Initialize: Setup DOM elements and load theme
   init() {
+    this.element = document.querySelector(this.config.selector);
     this.button = document.querySelector(this.config.buttonSelector);
     this.icon = this.button?.querySelector(this.config.iconSelector);
     this.text = this.button?.querySelector(this.config.textSelector);
+
+    if (!this.element) {
+      console.warn(
+        "ThemeManager: No element found for selector",
+        this.config.selector
+      );
+      return;
+    }
 
     if (!this.button) {
       modeLogger.warn(
@@ -47,7 +58,7 @@ export class ThemeManager {
       this.setupSystemListener();
     }
 
-    modeLogger.log("ThemeManager initialized with theme:", this.currentTheme);
+    modeLogger.debug("ThemeManager initialized with theme:", this.currentTheme);
   }
 
   // Load theme from localStorage or default/system
@@ -77,7 +88,7 @@ export class ThemeManager {
       return;
     }
 
-    document.documentElement.setAttribute("data-theme", theme);
+    this.element.setAttribute("data-theme", theme);
     localStorage.setItem(this.config.storageKey, theme);
     this.currentTheme = theme;
 
