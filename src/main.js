@@ -1,4 +1,5 @@
 import logger from "./js/utility/logger.js";
+import { ThemeManager } from "./js/utility/Mode.js";
 // PWA Service Worker Registration
 
 function initializePWA() {
@@ -85,43 +86,20 @@ function showUpdateNotification(registration) {
 // Initialize PWA
 initializePWA();
 
-import {
-  hideLoading,
-  setupAuthProtection,
-  showLoading,
-  updateLoadingText,
-} from "./auth-check.js";
 import BirthdayApp from "./js/index.js";
 
 // If BirthdayApp is a default export in src/js/index.js this import works; otherwise adjust.
-
+const themeManager = new ThemeManager({
+  defaultTheme: "light", // Optional override
+  storageKey: "myapp-theme", // Custom key
+  systemPreference: true,
+});
 async function init() {
-  // Show loading and verify auth for protected pages
-  if (document.getElementById("protectedContent")) {
-    updateLoadingText("Verifying access please wait ⚒👷‍♀️👩‍🏭");
-    showLoading();
-
-    try {
-      const authResult = await setupAuthProtection();
-      if (authResult.authenticated) {
-        setTimeout(hideLoading, 500);
-        // initialize app
-        if (typeof BirthdayApp === "function") {
-          new BirthdayApp().init();
-        }
-      }
-    } catch (err) {
-      logger.error("Auth initialization failed", err);
-      hideLoading();
-    }
-  } else {
-    // Not a protected page, initialize app normally
-    if (typeof BirthdayApp === "function") {
-      new BirthdayApp().init();
-    }
+  themeManager.init();
+  if (typeof BirthdayApp === "function") {
+    new BirthdayApp().init();
   }
 }
-
 // Auto-run when loaded as module
 init();
 

@@ -3,6 +3,7 @@ import { defineConfig } from "vite";
 import { createHtmlPlugin } from "vite-plugin-html";
 import htmlMinifier from "vite-plugin-html-minifier-terser";
 import { qrcode } from "vite-plugin-qrcode";
+import devtoolsJson from "vite-plugin-devtools-json";
 
 export default defineConfig({
   server: {
@@ -11,6 +12,7 @@ export default defineConfig({
   },
   plugins: [
     qrcode(),
+      devtoolsJson(),
     createHtmlPlugin(),
     htmlMinifier({
       minify: {

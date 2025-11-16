@@ -226,26 +226,23 @@
         properly.
       </div>
     </noscript>
-
+    <button id="mode-toggle" class="mode-toggle" aria-label="Toggle dark mode">
+        <span class="mode-icon">🌙</span>
+        <span class="mode-text">Dark Mode</span>
+    </button>
     <!-- Loading Animation -->
-    <div
-      class="loading-container"
-      id="loading"
-      aria-live="polite"
-      aria-label="Loading content"
-    >
-      <div class="loading-spinner">
-        <div class="loading-spinner-inner" aria-hidden="true"></div>
-      </div>
-      <div class="loading-text">
-        <span class="sr-only">Loading</span>
-        Verifying access
-        <span class="loading-dots" aria-hidden="true">
-          <span></span>
-          <span></span>
-          <span></span>
-        </span>
-      </div>
+    <div class="loading-container" id="loadingSpinner" aria-hidden="true" aria-live="polite">
+        <div class="loading-spinner"></div>
+        <div class="loading-text">
+            Loading<span class="loading-dots">
+                <span class="loading-dots__dot"></span>
+                <span class="loading-dots__dot"></span>
+                <span class="loading-dots__dot"></span>
+            </span>
+        </div>
+        <div class="loading-progress">
+            <div class="loading-progress__bar"></div>
+        </div>
     </div>
 
     <!-- Main Content -->
@@ -274,7 +271,7 @@
               <!-- to Actual image go inside the index.js and inside the app function change the link to you new image  -->
               <img
                 class="birthday-image d-none"
-                src="/pics/tata.jpg"
+                src="/pics/profile_pic.jpg"
                 alt="Beautiful birthday celebration photo"
                 id="birthdayImage"
                 loading="eager"
@@ -297,7 +294,7 @@
                 >
                   Happy Day
                   <span class="name-highlight glow" tabindex="0" role="button"
-                    >My Princess! 💝💘💗💓</span
+                    >My Princess! 💘💗💓</span
                   >
                 </h1>
               </header>
@@ -366,7 +363,7 @@
                     <i class="fab fa-instagram" aria-hidden="true"></i>
                   </a>
                   <a
-                    href="https://www.facebook.com/sharer/sharer.php?u=example.com"
+                    href="https://www.facebook.com/sharer/sharer.php?u=fhavur.vercel.app"
                     class="share-btn facebook"
                     aria-label="Share on Facebook"
                     rel="noopener noreferrer"
@@ -375,7 +372,7 @@
                     <i class="fab fa-facebook-f" aria-hidden="true"></i>
                   </a>
                   <a
-                    href="https://twitter.com/intent/tweet?text=Beautiful%20birthday%20wishes&url=example.com"
+                    href="https://twitter.com/intent/tweet?text=Beautiful%20birthday%20wishes&url=fhavur.vervel.app"
                     class="share-btn twitter"
                     aria-label="Share on Twitter"
                     rel="noopener noreferrer"
@@ -384,7 +381,7 @@
                     <i class="fab fa-twitter" aria-hidden="true"></i>
                   </a>
                   <a
-                    href="https://t.me/share/url?url=example.com&text=Beautiful%20birthday%20wishes"
+                    href="https://t.me/share/url?url=fhavur.vercel.app&text=Beautiful%20birthday%20wishes"
                     class="share-btn telegram"
                     aria-label="Share on Telegram"
                     rel="noopener noreferrer"
@@ -884,7 +881,7 @@
       } from "/src/auth-check.js";
 
       async function initializeProtectedPage() {
-        updateLoadingText("Verifying access please wait ⚒👷‍♀️👩‍🏭");
+        updateLoadingText("Ok just give me a second to load this stuffs ⚒👷‍♀️👩‍🏭");
         showLoading();
         try {
           const authResult = await setupAuthProtection();
@@ -893,10 +890,6 @@
             // Show protected content
             const protectedContent =
               document.getElementById("protectedContent");
-
-            // Hide loading with smooth transition
-            hideLoading;
-
             if (protectedContent) {
               setTimeout(() => {
                 protectedContent.classList.remove("d-none");
@@ -909,7 +902,7 @@
           hideLoading();
           // Redirect to login page after a brief delay
           setTimeout(() => {
-            window.location.href = "/login";
+            window.location.href = "/login.html";
           }, 1000);
         }
       }
@@ -941,11 +934,12 @@
                     music.classList.add("d-none");}
         }, 5000);
 
-        // The PWA prompt will automatically initialize via connectedCallback
+        hideLoading();
         logger.info("PWA Prompt should be automatically initialized");
       }
 
       if (document.readyState === "loading") {
+        showLoading();
         document.addEventListener("DOMContentLoaded", initializeProtectedPage);
       } else {
         initializeProtectedPage();

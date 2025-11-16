@@ -406,6 +406,7 @@ body.loaded .loading-screen {
 }
 
 .interaction-buttons {
+    margin-bottom: 1.5rem;
     display: flex;
     gap: var(--space-md);
     flex-wrap: wrap;

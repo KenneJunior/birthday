@@ -1,6 +1,6 @@
 import logger from "./utility/logger.js";
-
 import Notification from "./notification.js";
+import {ThemeManager} from "./utility/Mode.js";
 
 // Create contextual loggers for different modules
 const appLogger = logger.withContext({
@@ -227,11 +227,16 @@ document.addEventListener("DOMContentLoaded", () => {
     "tada",
     "jello",
   ];
+    const themeManager = new ThemeManager({
+        defaultTheme: 'light', // Optional override
+        storageKey: 'myapp-theme', // Custom key
+        systemPreference: true
+    });
 
   // Initialize the application
   function init() {
     appLogger.time("App component initialization");
-
+    themeManager.init();
     detectPlatform();
 
     // Add tooltip styles

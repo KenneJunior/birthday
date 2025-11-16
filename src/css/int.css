@@ -112,7 +112,7 @@ body {
     content: '';
     position: absolute;
     inset: 0;
-    background: radial-gradient(circle, rgba(255, 255, 255, 0.3), transparent);
+    /* background: radial-gradient(circle, rgba(255, 255, 255, 0.3), transparent); */
     z-index: 2;
 }
 
@@ -1129,8 +1129,8 @@ a {
     font-weight: bold;
     color: var(--pink-medium);
     padding: 0.3rem 0.8rem;  
-    -webkit-backdrop-filter: blur(var(--blur)) saturate(180%) brightness(0.9);
-    backdrop-filter:  blur(var(--blur)) saturate(180%) brightness(0.9);
+    -webkit-backdrop-filter: blur(var(--blur));
+    backdrop-filter:  blur(var(--blur)) ;
     border-radius: 20px;
     min-width: 60px;
     max-width: 100px;
@@ -1279,7 +1279,7 @@ a {
     align-items: center;
     justify-content: center;
     background: rgba(219, 112, 147, 0.1);
-    color: var(--pink-medium);
+    color: #d76685;
     font-size: 1.1rem;
     transition: all 0.3s ease;
 }
@@ -1942,5 +1942,472 @@ a {
     .image-container {
         box-shadow: none;
         border: 5px solid #f0f0f0;
+    }
+}
+.mode-toggle {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    z-index: 1000;
+    background: var(--primary);
+    color: white;
+    border: none;
+    padding: 10px 15px;
+    border-radius: 50px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 14px;
+    box-shadow: var(--shadow-lg);
+    transition: var(--transition);
+}
+
+.mode-toggle:hover {
+    transform: scale(1.05);
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
+}
+
+.mode-icon {
+    font-size: 18px;
+    transition: var(--transition);
+}
+
+.mode-text {
+    font-weight: 500;
+    opacity: 0.9;
+}
+
+/* Icon/text changes in dark mode */
+[data-theme="dark"] .mode-toggle .mode-icon {
+    content: "☀️"; /* Or use JS to swap */
+}
+
+[data-theme="dark"] .mode-toggle .mode-text {
+    content: "Light Mode";
+}
+
+
+[data-theme="dark"] {
+        --primary: #C084FC;
+        --secondary: #A78BFA;
+        --accent: #FDBA74;
+        --light: #111827;
+        --dark: #F9FAFB;
+        --text: #E5E7EB;
+        --text-secondary: #D1D5DB;
+        --shadow-lg: 0 20px 40px rgba(0, 0, 0, 0.4);
+        --shadow-sm: 0 4px 12px rgba(0, 0, 0, 0.2);
+        --transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+        --border-color: rgba(255, 255, 255, 0.1);
+        --pink-champagne: #2d1b1b; /* Deep rose */
+        --blush-pink: #4a1a2a; /* Muted blush */
+        --rose-quartz: #3a1f1f; /* Soft charcoal rose */
+        --pink-light: #5d3a3a; /* Warm gray-pink */
+        --pink-medium: #7a4e5a; /* Deeper mauve */
+        --pink-dark: #9a5c6a; /* Rich burgundy */
+        --purple-light: #2a1d2a; /* Dark lavender */
+        --purple-medium: #3d2b3d; /* Plum gray */
+        --lilac: #4a334a; /* Muted lilac */
+        --pearl: #1a1a1a; /* Near-black pearl */
+        --text-soft: #e6d3d3; /* Soft pinkish white */
+        --text-dark: #f0e6e6; /* Brighter off-white */
+        --info: #60a5fa; /* Blue remains vibrant */
+        --success: #34d399; /* Green for positivity */
+        --warning: #fbbf24; /* Gold warning */
+        --error: #f87171; /* Soft red */
+        --gold: #facc15; /* Bright gold */
+        --silver: #d1d5db; /* Cool silver */
+        --shadow-soft: 0 4px 30px rgba(122, 78, 90, 0.3); /* Pink-tinted shadow */
+        --shadow-hard: 0 10px 40px rgba(122, 78, 90, 0.4);
+
+
+    body {
+        background: linear-gradient(135deg, #0f172a 0%, #1e293b 50%, #334155 100%);
+        color: var(--text);
+        line-height: 1.7;
+    }
+
+    .birthday-card {
+        background: linear-gradient(145deg, #1f2937 0%, #111827 100%);
+        border: 1px solid var(--border-color);
+        color: var(--text);
+        box-shadow: var(--shadow-lg);
+        backdrop-filter: blur(10px);
+    }
+
+    .birthday-card:hover {
+        transform: translateY(-8px) scale(1.02);
+        box-shadow: 0 25px 50px rgba(0, 0, 0, 0.5);
+        border-color: rgba(192, 132, 252, 0.2);
+    }
+
+    .image-container {
+        position: relative;
+        overflow: hidden;
+    }
+
+    .image-container::after {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: linear-gradient(135deg,
+        rgba(192, 132, 252, 0.15),
+        rgba(167, 139, 250, 0.15),
+        rgba(253, 186, 116, 0.1)
+        );
+        z-index: 1;
+        opacity: 0;
+        transition: var(--transition);
+    }
+
+    .image-container:hover::after {
+        opacity: 1;
+    }
+
+    .image-placeholder {
+        background: linear-gradient(135deg, var(--primary), var(--secondary));
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        color: var(--dark);
+        position: relative;
+        min-height: 400px;
+    }
+
+    .birthday-image {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        object-position: center;
+        transition: var(--transition);
+        position: absolute;
+        top: 0;
+        left: 0;
+        filter: brightness(0.9) contrast(1.1);
+    }
+
+    .image-container:hover .birthday-image {
+        transform: scale(1.08);
+        filter: brightness(1.05) contrast(1.15);
+    }
+
+    .content-section {
+        padding: 3rem 3.5rem;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        position: relative;
+        background: transparent;
+    }
+
+    .birthday-title {
+        font-weight: 700;
+        margin-bottom: 1.5rem;
+        color: var(--primary);
+        position: relative;
+        display: inline-block;
+        font-size: 2.5rem;
+        text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+    }
+
+    .birthday-title::after {
+        content: '';
+        position: absolute;
+        bottom: -12px;
+        left: 0;
+        width: 80px;
+        height: 4px;
+        background: linear-gradient(to right, var(--primary), var(--secondary));
+        border-radius: 3px;
+        transition: var(--transition);
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+    }
+
+    .birthday-card:hover .birthday-title::after {
+        width: 120px;
+    }
+
+    .name-highlight {
+        font-family: 'Dancing Script', cursive;
+        color: var(--accent);
+        font-size: 1.2em;
+        text-shadow: 0 2px 8px rgba(253, 186, 116, 0.4);
+    }
+
+    .birthday-message {
+        margin-bottom: 2rem;
+    }
+
+    .message-item {
+        margin-bottom: 1rem;
+        padding-left: 2rem;
+        position: relative;
+        transition: var(--transition);
+        color: var(--text);
+    }
+
+    .message-item:hover {
+        transform: translateX(5px);
+        color: var(--text-secondary);
+    }
+
+    .message-item::before {
+        content: '';
+        position: absolute;
+        left: 0;
+        top: 0.7em;
+        width: 1rem;
+        height: 3px;
+        background: linear-gradient(to right, var(--accent), var(--primary));
+        border-radius: 3px;
+        box-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
+    }
+
+    .birthday-icon {
+        color: var(--accent);
+        margin-right: 12px;
+        font-size: 1.3rem;
+        vertical-align: middle;
+        text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
+    }
+
+    .birthday-wishes {
+        font-family: 'Dancing Script', cursive;
+        font-size: 1.8rem;
+        color: var(--secondary);
+        margin-top: 2rem;
+        padding-top: 2rem;
+        border-top: 1px dashed rgba(167, 139, 250, 0.3);
+        text-align: center;
+        position: relative;
+        text-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
+    }
+
+    .birthday-wishes::before,
+    .birthday-wishes::after {
+        content: '\f004';
+        font-family: 'Font Awesome 6 Free';
+        font-weight: 900;
+        color: var(--accent);
+        position: absolute;
+        top: 1.8rem;
+        font-size: 1.2rem;
+        text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
+    }
+
+    .birthday-wishes::before {
+        left: 30%;
+    }
+
+    .birthday-wishes::after {
+        right: 30%;
+    }
+
+    .share-section {
+        margin-top: 2.5rem;
+        padding-top: 2rem;
+        border-top: 1px solid var(--border-color);
+    }
+
+    .share-title {
+        font-size: 0.9rem;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        color: var(--text-secondary);
+        opacity: 0.8;
+        margin-bottom: 1rem;
+        text-align: center;
+    }
+
+    .share-buttons {
+        display: flex;
+        justify-content: center;
+        gap: 1rem;
+    }
+
+    .share-btn {
+        width: 42px;
+        height: 42px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: var(--dark);
+        font-size: 1.2rem;
+        transition: var(--transition);
+        position: relative;
+        overflow: hidden;
+        box-shadow: var(--shadow-sm);
+        border: 1px solid var(--border-color);
+        }
+
+
+    .share-btn::after {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: linear-gradient(135deg, rgba(255, 255, 255, 0.2), rgba(255, 255, 255, 0.1));
+        opacity: 0;
+        transition: var(--transition);
+    }
+
+    .share-btn:hover {
+        transform: translateY(-3px) scale(1.1);
+        box-shadow: 0 8px 20px rgba(0, 0, 0, 0.3);
+        border-color: rgba(255, 255, 255, 0.2);
+    }
+
+    .share-btn:hover::after {
+        opacity: 1;
+    }
+
+    .whatsapp {
+        background: linear-gradient(135deg, #25D366, #128C7E);
+    }
+
+    .instagram {
+        background: linear-gradient(45deg, #405DE6, #5851DB, #833AB4, #C13584, #E1306C, #FD1D1D);
+    }
+
+    .facebook {
+        background: linear-gradient(135deg, #1877F2, #0E5A8A);
+    }
+
+    .twitter {
+        background: linear-gradient(135deg, #1DA1F2, #0D8BD9);
+    }
+
+    .telegram {
+        background: linear-gradient(135deg, #0088CC, #006699);
+    }
+
+    .photo-icon {
+        font-size: 3.5rem;
+        margin-bottom: 1.5rem;
+        color: var(--dark);
+        text-shadow: 0 2px 10px rgba(0, 0, 0, 0.4);
+    }
+
+    .photo-text {
+        font-size: 1.1rem;
+        color: var(--dark);
+        opacity: 0.95;
+        letter-spacing: 0.5px;
+    }
+
+    .floating {
+        animation: float 4s ease-in-out infinite;
+    }
+
+    @keyframes glow {
+        from {
+            text-shadow: 0 0 5px rgba(192, 132, 252, 0.6), 0 0 10px rgba(192, 132, 252, 0.4);
+        }
+        to {
+            text-shadow: 0 0 20px rgba(192, 132, 252, 0.8), 0 0 30px rgba(192, 132, 252, 0.6);
+        }
+    }
+
+    .glow {
+        animation: glow 2s ease-in-out infinite alternate;
+    }
+
+    .decorative-circle {
+        position: absolute;
+        border-radius: 50%;
+        opacity: 0.05;
+        z-index: -1;
+    }
+
+    .circle-1 {
+        width: 200px;
+        height: 200px;
+        background: radial-gradient(circle, var(--primary) 0%, transparent 70%);
+        top: -100px;
+        right: -100px;
+    }
+
+    .circle-2 {
+        width: 150px;
+        height: 150px;
+        background: radial-gradient(circle, var(--accent) 0%, transparent 70%);
+        bottom: -75px;
+        left: -75px;
+    }
+
+
+    @media (prefers-contrast: high) {
+        :root {
+            --text: #FFFFFF;
+            --text-secondary: #F3F4F6;
+            --border-color: rgba(255, 255, 255, 0.3);
+        }
+
+        .birthday-card {
+            border: 2px solid #FFFFFF;
+        }
+
+        .message-item::before {
+            background: #FFFFFF;
+            height: 4px;
+        }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+        * {
+            animation-duration: 0.01ms !important;
+            animation-iteration-count: 1 !important;
+            transition-duration: 0.01ms !important;
+        }
+    }
+
+
+
+    body {
+        background: linear-gradient(135deg, var(--pink-dark) 0%, var(--purple-medium) 50%, var(--pearl) 100%);
+        color: var(--text-soft);
+    }
+
+    .container {
+        background: rgba(42, 29, 42, 0.9);
+        backdrop-filter: blur(20px);
+        border: 2px solid var(--border-color);
+        color: var(--text-soft);
+        box-shadow: var(--shadow-hard);
+    }
+
+    .message {
+        background: linear-gradient(to right, rgba(122, 78, 90, 0.6), rgba(61, 43, 61, 0.6));
+        border-left: 5px solid var(--pink-medium);
+        color: var(--text-soft);
+        box-shadow: var(--shadow-soft);
+    }
+
+    .btn-celebrate {
+        background: linear-gradient(45deg, var(--purple-medium), var(--pink-medium));
+        border: 2px solid var(--border-color);
+        box-shadow: var(--shadow-soft);
+    }
+
+    .btn-celebrate:hover {
+        box-shadow: var(--shadow-hard);
+        background: linear-gradient(45deg, var(--pink-medium), var(--purple-medium));
+    }
+
+    h1 {
+        color: var(--pink-dark);
+        text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+    }
+
+    .signature {
+        color: var(--pink-dark);
     }
 }

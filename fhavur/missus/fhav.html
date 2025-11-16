@@ -26,18 +26,18 @@
   </script>
 
   <body>
-    <div class="loading-container" id="loading">
-      <div class="loading-spinner">
-        <div class="loading-spinner-inner"></div>
-      </div>
-      <div class="loading-text">
-        Verifying access
-        <span class="loading-dots">
-          <span></span>
-          <span></span>
-          <span></span>
-        </span>
-      </div>
+    <div class="loading-container" id="loadingSpinner" aria-hidden="true" aria-live="polite">
+        <div class="loading-spinner"></div>
+        <div class="loading-text">
+            Loading<span class="loading-dots">
+                <span class="loading-dots__dot"></span>
+                <span class="loading-dots__dot"></span>
+                <span class="loading-dots__dot"></span>
+            </span>
+        </div>
+        <div class="loading-progress">
+            <div class="loading-progress__bar"></div>
+        </div>
     </div>
 
     <div class="cursor-follower" aria-hidden="true">

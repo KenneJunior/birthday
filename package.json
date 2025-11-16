@@ -8,7 +8,7 @@
     "media-json": "node src/scripts/generate-media-json.js",
     "robots": "node src/scripts/generate-robots.js",
     "robots:dev": "node src/scripts/generate-robots.js development",
-    "build:sw":"node src/scripts/build-offline-page.js",
+    "build:sw": "node src/scripts/build-offline-page.js",
     "prebuild": "node src/scripts/pre-build.js",
     "build": "vite build && node src/scripts/copy-sw.js && npm run build:sw",
     "dev": "vite",
@@ -19,6 +19,7 @@
     "sitemap": "^8.0.1",
     "terser": "^5.44.0",
     "vite": "^7.1.0",
+    "vite-plugin-devtools-json": "^1.0.0",
     "vite-plugin-html": "^3.2.2",
     "vite-plugin-html-minifier-terser": "^3.8.0",
     "vite-plugin-qrcode": "^0.3.0"

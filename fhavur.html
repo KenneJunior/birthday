@@ -56,18 +56,22 @@
   </head>
 
   <body>
-    <div class="loading-container" id="loading">
-      <div class="loading-spinner">
-        <div class="loading-spinner-inner"></div>
-      </div>
-      <div class="loading-text">
-        Verifying access
-        <span class="loading-dots">
-          <span></span>
-          <span></span>
-          <span></span>
-        </span>
-      </div>
+      <button id="mode-toggle" class="mode-toggle" aria-label="Toggle dark mode">
+          <span class="mode-icon">🌙</span>
+          <span class="mode-text">Dark Mode</span>
+      </button>
+    <div class="loading-container" id="loadingSpinner" aria-hidden="true" aria-live="polite">
+        <div class="loading-spinner"></div>
+        <div class="loading-text">
+            Loading<span class="loading-dots">
+                <span class="loading-dots__dot"></span>
+                <span class="loading-dots__dot"></span>
+                <span class="loading-dots__dot"></span>
+            </span>
+        </div>
+        <div class="loading-progress">
+            <div class="loading-progress__bar"></div>
+        </div>
     </div>
     <!-- Background Elements -->
     <div class="glitter" aria-hidden="true"></div>
@@ -135,7 +139,7 @@
         </button>
 
         <address class="signature animate__animated animate__fadeIn">
-          <a href="fhavur/confession">
+          <a href="fhavur/confession.html">
             With all my love,<br />
             Your Secret Admirer
           </a>
@@ -292,6 +296,7 @@
     </div>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/hammer.js/2.0.8/hammer.min.js"></script>
     <script type="module" src="/src/auth-check.js"></script>
+    <script type="module" src="/src/js/utility/Mode.js"></script>
     <script type="module" src="src/js/HBD.js"></script>
     <script type="module">
       import logger from '/src/js/utility/logger.js';
@@ -310,8 +315,7 @@
           const authResult = await setupAuthProtection();
           if (authResult.authenticated) {
             // Delay hiding loader for a smoother transition
-
-            hideLoading();
+             hideLoading(1000);
             setTimeout(() => {
               initializePageContent();
               const protectedContent =
@@ -319,17 +323,17 @@
               if (protectedContent) {
                 protectedContent.classList.remove("d-none");
               }
-            }, 2500);
+            }, 1000);
           } else {
             // Handle case where authentication succeeds but user is not authorized
             hideLoading();
             logger.warn("Access denied: User not authenticated");
-            window.location.href = "/login";
+            window.location.href = "/login.html";
           }
         } catch (error) {
           hideLoading();
           logger.error("Authentication fail:", error);
-          window.location.href = "/login";
+          window.location.href = "/login.html";
         }
       }
 

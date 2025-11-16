@@ -1,5 +1,3 @@
-import { _log } from "../../src/js/utility/logger";
-
 document.addEventListener("DOMContentLoaded", () => {
   const interBubble = document.querySelector(".interactive");
   const card = document.getElementById("proposalCard");
@@ -7,14 +5,7 @@ document.addEventListener("DOMContentLoaded", () => {
   const nopeBtn = document.getElementById("nope-btn");
   const yesBtn = document.getElementById("yes-btn");
   const maybeBtn = document.getElementById("maybe-btn");
-  const hoversound = document.getElementById("hover-sound");
 
-  card.addEventListener("click", () => {
-    hoversound.play().catch((error) => {
-      _log("Sound play was prevented:", error);
-    });
-    _log("playing sound");
-  });
   let curX = 0;
   let curY = 0;
   let tgX = 0;

@@ -21,8 +21,6 @@
     --card-bg: rgba(255, 255, 255, 0.95);
 }
 
-
-/* Pop-down notification */
 .pop-notification {
     position: fixed;
     top: -1000px;
@@ -30,7 +28,7 @@
     transform: translateX(-50%);
     width: 90%;
     backdrop-filter: var(--backdrop);
-    -webkit-backdrop-filter:var(--backdrop);
+    -webkit-backdrop-filter: var(--backdrop);
     max-width: 700px;
     color: var(--dark);
     padding: 0;
@@ -47,10 +45,12 @@
     top: 0;
     animation: popupFadeIn 1s ease-in-out;
 }
+
 @keyframes popupFadeIn {
     from { opacity: 0; transform: translate(-50%, -50%) scale(0); }
     to { opacity: 1; transform: translate(-50%, -5%) scale(1); }
 }
+
 .notification-header {
     display: flex;
     align-items: center;
@@ -99,7 +99,6 @@
     gap: 15px;
     justify-content: flex-end;
 }
-
 
 .action-btn {
     padding: 10px 20px;
@@ -192,8 +191,6 @@
     background: rgba(255, 255, 255, 0.15);
     transform: rotate(90deg);
 }
-
-/* Notification types */
 .success .notification-header {
     background: linear-gradient(135deg, var(--success) 0%, var(--success-dark) 100%);
 }
@@ -210,7 +207,6 @@
     background: linear-gradient(135deg, var(--info) 0%, var(--info-dark) 100%);
 }
 
-/* Enhanced Progress bar */
 .progress-bar {
     height: 5px;
     width: 100%;
@@ -244,7 +240,6 @@
     background: linear-gradient(135deg, var(--info) 0%, var(--info-dark) 100%);
 }
 
-/* Enhanced animations */
 @keyframes ring {
     0% { transform: rotate(0); }
     5% { transform: rotate(15deg); }
@@ -270,16 +265,12 @@
     animation: ring 2s ease-in-out, pulse 2s infinite 2s;
 }
 
-/* Responsive design */
-/* ===== MOBILE RESPONSIVE MEDIA QUERIES ===== */
-
-/* Large smartphones (landscape) */
 @media (max-width: 769px) {
     .pop-notification {
         width: 95%;
         max-width: none;
         border-radius: 12px;
-        top: -650px;
+        top: -750px;
         left: 50%;
         transform: translateX(-50%);
         margin: 0;
@@ -332,12 +323,11 @@
     }
 }
 
-/* Small smartphones (portrait) */
 @media (max-width: 480px) {
     .pop-notification {
         width: 92%;
         border-radius: 10px;
-        top: -800px;
+        top: -1000px;
     }
 
     .notification-header {
@@ -364,7 +354,6 @@
         padding: 12px 18px;
     }
 
-    /* Adjust font sizes for very small devices */
     body {
         font-size: 14px;
     }
@@ -374,10 +363,9 @@
     }
 }
 
-/* Extra small devices (very small phones) */
 @media (max-width: 360px) {
     .pop-notification {
-        top: -900px !important;
+        top: -1000px !important;
         width: 90%;
         border-radius: 8px;
     }
@@ -405,11 +393,11 @@
     }
 }
 
-/* Height adjustments for landscape mode */
 @media (max-height: 500px) and (orientation: landscape) {
     .pop-notification {
         max-height: 80vh;
         overflow-y: auto;
+        top: 1000px !important;
     }
 
     .notification-content {
@@ -422,7 +410,6 @@
     }
 }
 
-/* iPhone notch safe areas */
 @supports(padding: max(0px)) {
     .pop-notification {
         padding-left: max(0px, env(safe-area-inset-left));
@@ -430,14 +417,12 @@
     }
 }
 
-/* High-resolution devices */
 @media (-webkit-min-device-pixel-ratio: 2), (min-resolution: 192dpi) {
     .pop-notification {
         border: 0.5px solid rgba(0, 0, 0, 0.1);
     }
 }
 
-/* Reduced motion for accessibility */
 @media (prefers-reduced-motion: reduce) {
     .pop-notification {
         transition: opacity 0.3s ease;
@@ -456,7 +441,6 @@
     }
 }
 
-/* Dark mode support */
 @media (prefers-color-scheme: dark) {
     .pop-notification {
         --card-bg: rgba(30, 30, 40, 0.95);
@@ -472,7 +456,6 @@
     }
 }
 
-/* Orientation-specific styles */
 @media (orientation: portrait) {
     .pop-notification {
         max-width: 85%;
@@ -485,14 +468,12 @@
     }
 }
 
-/* Touch device optimizations */
 @media (hover: none) and (pointer: coarse) {
     .action-btn, .close-btn {
-        min-height: 44px; /* Minimum touch target size */
+        min-height: 44px;
     }
 
     .action-btn {
-        padding: 16px 24px; /* Larger touch targets */
+        padding: 16px 24px;
     }
 }
-
