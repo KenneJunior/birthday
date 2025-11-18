@@ -565,12 +565,13 @@ a {
     /* Animation */
     opacity: 0;
     visibility: hidden;
-    transition: all 0.4s cubic-bezier(0.32, 0.72, 0, 1);
+    transition: all 0.4s cubic-bezier(0.32, 0.72, 0, 1);    
 }
 
 .modal-overlay.active {
-    opacity: 1;
     visibility: visible;
+    opacity: 1;
+    animation: rubberBand 2s cubic-bezier(0.22, 1, 0.36, 1) forwards;
 }
 
 .modal-container {
@@ -1567,7 +1568,7 @@ a {
         opacity: 0;
     }
     10% {
-        opacity: 0.8;
+        opacity: 1;
     }
     100% {
         transform: translateY(-100vh) rotate(360deg);

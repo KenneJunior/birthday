@@ -270,7 +270,7 @@
         width: 95%;
         max-width: none;
         border-radius: 12px;
-        top: -750px;
+        top: -950px;
         left: 50%;
         transform: translateX(-50%);
         margin: 0;
@@ -365,7 +365,7 @@
 
 @media (max-width: 360px) {
     .pop-notification {
-        top: -1000px !important;
+        top: -1500px !important;
         width: 90%;
         border-radius: 8px;
     }

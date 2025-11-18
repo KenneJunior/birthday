@@ -205,24 +205,38 @@
     </aside>
 
     <!-- Image Modal -->
-    <dialog class="modal-overlay" id="imageModal">
+    <dialog class="modal-overlay d-none" id="mediaModal" aria-label="Media modal">
       <div class="modal-container">
         <button class="modal-close" aria-label="Close modal">
           <i class="fas fa-times"></i>
         </button>
-
         <button class="modal-maximize" aria-label="Maximize modal">
           <i class="fas fa-expand"></i>
         </button>
         <div class="tooltip-content">
-        <div class="modal-tooltip">This is a tooltip message</div>
+        <div class="modal-tooltip">Hello world</div>
       </div>
         <div class="modal-content">
+                        <div class="loading-container" id="Modal-loading__container" aria-hidden="true" aria-live="polite">
+                  <div class="loading-spinner is-loading loading-spinner--pulse"></div>
+                  <div class="loading-text">
+                      Loading<span class="loading-dots">
+                <span class="loading-dots__dot"></span>
+                <span class="loading-dots__dot"></span>
+                <span class="loading-dots__dot"></span>
+            </span>
+                  </div>
+                  <div class="loading-progress">
+                      <div class="loading-progress__bar"></div>
+                  </div>
+              </div>
           <div class="modal-image-container">
             <button class="modal-nav modal-prev" aria-label="Previous image">
               <i class="fas fa-chevron-left"></i>
             </button>
-            <img
+
+
+              <img
               class="modal-image zoomable"
               src=""
               alt="Enlarged memory photo"
@@ -285,7 +299,7 @@
           Your notification message goes here. This is a default message.
         </p>
         <div class="notification-actions">
-          <button class="action-btn secondary-action" id="dismiss">
+          <button> class="action-btn secondary-action" id="dismiss">
             Dismiss
           </button>
           <button class="action-btn primary-action" id="view-details">

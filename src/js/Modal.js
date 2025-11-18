@@ -6,25 +6,28 @@ const modalLogger = logger.withContext({ module: "UltimateModal" });
 export class UltimateModal {
   constructor() {
     modalLogger.time("UltimateModal constructor");
-
+    const MediaModal = document.getElementById("mediaModal");
+    const cardContent = document.querySelector(".card-content");
     this.elements = {
-      modal: document.getElementById("imageModal"),
-      modalContainer: document.querySelector(".modal-container"),
-      openModalBtn: document.getElementById("modal_open"),
-      modalImage: document.querySelector(".modal-image"),
-      modalVideo: document.querySelector(".modal-video"),
-      galleryContainer: document.getElementById("photo-gallery"),
-      profileImage: document.querySelector("#profile_pic"),
-      profileImageContainer: document.querySelector("#profile_image"),
-      closeButton: document.querySelector(".modal-close"),
-      maximizeModalBtn: document.querySelector(".modal-maximize"),
-      prevButton: document.querySelector(".modal-prev"),
-      nextButton: document.querySelector(".modal-next"),
-      counter: document.querySelector(".modal-counter"),
-      socialLinks: document.querySelectorAll(".modal-social a"),
-      profile_pic: document.querySelector(".image-container"),
-      seeMoreBtn: document.querySelector(".see-more-arrow"),
-      modalTooltip: document.querySelector(".modal-tooltip"),
+      modalContainer: MediaModal.querySelector(".modal-container"),
+      openModalBtn: cardContent.querySelector("#modal_open"),
+      modalImage: MediaModal.querySelector(".modal-image"),
+      modalVideo: MediaModal.querySelector(".modal-video"),
+      Modal_loading__container: MediaModal.querySelector(".loading-container"),
+      galleryContainer: cardContent.querySelector("#photo-gallery"),
+      profileImage: cardContent.querySelector("#profile_pic"),
+      profileImageContainer: cardContent.querySelector(".image-container"),
+      closeButton: MediaModal.querySelector(".modal-close"),
+      maximizeModalBtn: MediaModal.querySelector(".modal-maximize"),
+      prevButton: MediaModal.querySelector(".modal-prev"),
+      nextButton: MediaModal.querySelector(".modal-next"),
+      counter: MediaModal.querySelector(".modal-counter"),
+      socialLinks: MediaModal.querySelectorAll(".modal-social a"),
+      profile_pic: cardContent.querySelector(".image-container"),
+      seeMoreBtn: cardContent.querySelector(".see-more-arrow"),
+      modalTooltip: MediaModal.querySelector(".modal-tooltip"),
+      modal: MediaModal,
+      cardContent: cardContent,
     };
 
     modalLogger.debug("DOM elements cached", {
@@ -35,6 +38,7 @@ export class UltimateModal {
     });
 
     this.state = {
+      animations: [],
       currentIndex: 0,
       media: [],
       isZoomed: false,
@@ -152,14 +156,147 @@ export class UltimateModal {
     }
   }
 
+  showMediaLoading(mediaElement) {
+    modalLogger.time("Show media loading animation");
+
+    // Show loading container with proper classes
+    const loadingContainer = this.elements.Modal_loading__container;
+    if (loadingContainer) {
+      loadingContainer.classList.add("is-visible", "is-loading");
+      loadingContainer.setAttribute("aria-hidden", "false");
+      loadingContainer.setAttribute("aria-live", "off");
+
+      this._startProgressAnimation();
+
+      modalLogger.debug("Loading container activated", {
+        hasVisible: loadingContainer.classList.contains("is-visible"),
+        hasLoading: loadingContainer.classList.contains("is-loading"),
+        ariaHidden: loadingContainer.getAttribute("aria-hidden"),
+        ariaLive: loadingContainer.getAttribute("aria-live"),
+      });
+    }
+
+    // Hide navigation elements and counter
+    const elementsToHide = [
+      this.elements.prevButton,
+      this.elements.nextButton,
+      this.elements.counter,
+    ];
+
+    elementsToHide.forEach((element) => {
+      if (element) {
+        element.style.visibility = "hidden";
+        element.style.opacity = "0";
+        element.style.transition = "opacity 0.2s ease";
+        element.classList.add("d-none");
+        modalLogger.debug("Element hidden", { element: element.className });
+      }
+    });
+
+    // Optional: Add loading class to media element if provided
+    if (mediaElement) {
+      mediaElement.classList.add("d-none");
+      mediaElement.classList.add("is-loading");
+      modalLogger.debug("Loading class added to media element", {
+        element: mediaElement.tagName,
+      });
+    }
+
+    modalLogger.info("Media loading animation displayed successfully");
+    modalLogger.timeEnd("Show media loading animation");
+  }
+
+  hideMediaLoading(mediaElement) {
+    modalLogger.time("Hide media loading animation");
+    const progressBar = this.elements.Modal_loading__container.querySelector(
+      ".loading-progress__bar"
+    );
+
+    if (progressBar) {
+      progressBar.style.width = "100%";
+    }
+
+    // Hide loading container and reset attributes
+    setTimeout(() => {
+      const loadingContainer = this.elements.Modal_loading__container;
+      if (loadingContainer) {
+        loadingContainer.classList.remove("is-visible", "is-loading");
+        loadingContainer.setAttribute("aria-hidden", "true");
+        loadingContainer.setAttribute("aria-live", "polite");
+
+        modalLogger.debug("Loading container deactivated", {
+          ariaHidden: loadingContainer.getAttribute("aria-hidden"),
+          ariaLive: loadingContainer.getAttribute("aria-live"),
+        });
+      }
+
+      // Show navigation elements and counter
+      const elementsToShow = [
+        this.elements.prevButton,
+        this.elements.nextButton,
+        document.query,
+        this.elements.counter,
+      ];
+
+      elementsToShow.forEach((element) => {
+        if (element) {
+          element.style.visibility = "visible";
+          element.style.opacity = "1";
+          element.classList.remove("d-none");
+          modalLogger.debug("Element shown", { element: element.className });
+        }
+      });
+
+      // Remove loading class from media element if provided
+      if (mediaElement) {
+        mediaElement.classList.remove("d-none");
+        mediaElement.classList.remove("is-loading");
+        modalLogger.debug("Loading class removed from media element", {
+          element: mediaElement.tagName,
+        });
+      }
+    }, 500);
+
+    modalLogger.info("Media loading animation hidden successfully");
+    modalLogger.timeEnd("Hide media loading animation");
+  }
+
+  /**
+   * Starts the progress bar animation
+   * @private
+   */
+  _startProgressAnimation() {
+    const progressBar = this.elements.Modal_loading__container.querySelector(
+      ".loading-progress__bar"
+    );
+    if (!progressBar) return;
+
+    let progress = 0;
+    const maxProgress = 85;
+
+    const interval = setInterval(() => {
+      const currentWidth = parseFloat(progressBar.style.width) || 0;
+
+      if (currentWidth >= maxProgress) {
+        clearInterval(interval);
+        return;
+      }
+
+      progress += 2 + Math.random() * 3;
+      progressBar.style.width = Math.min(progress, maxProgress) + "%";
+    }, 300);
+  }
+
   cacheImages() {
     modalLogger.time("Image caching");
 
     // Get only visible thumbnails (not hidden with d-none)
-    this.elements.thumbnails = document.querySelectorAll(".photo-thumbnail");
-    this.elements.allVisibleThumbnails = document.querySelectorAll(
-      ".photo-thumbnail:not(.d-none)"
-    );
+    this.elements.thumbnails =
+      this.elements.cardContent.querySelectorAll(".photo-thumbnail");
+    this.elements.allVisibleThumbnails =
+      this.elements.cardContent.querySelectorAll(
+        ".photo-thumbnail:not(.d-none)"
+      );
 
     modalLogger.debug("Found visible thumbnails", {
       visibleCount: this.elements.allVisibleThumbnails.length,
@@ -338,8 +475,10 @@ export class UltimateModal {
       totalMedia: this.state.media.length,
     });
 
-    this.state.currentIndex = index;
+    this._setCurrentIndex(index);
+    const currentMedia = this._getCurrentMedia();
     document.body.style.overflow = "hidden";
+    this.elements.modal.classList.remove("d-none");
     this.elements.modal.classList.add("active");
     this.updateModalContent();
 
@@ -378,11 +517,22 @@ export class UltimateModal {
     this.hideImageTooltip();
 
     this.elements.modal.classList.remove("active");
+    this.elements.modal.classList.add("d-none");
     this.elements.allVisibleThumbnails[
       this.state.currentIndex
     ].classList.remove("active");
 
     modalLogger.timeEnd("Modal close");
+  }
+
+  _getCurrentMedia() {
+    return this.state.media[this.state.currentIndex];
+  }
+  _setCurrentIndex(index) {
+    this.state.currentIndex = Math.max(
+      0,
+      Math.min(index, this.state.media.length - 1)
+    );
   }
 
   toggleMaximize() {
@@ -446,6 +596,12 @@ export class UltimateModal {
       direction,
       currentIndex: this.state.currentIndex,
     });
+    const current = this._getCurrentMedia();
+    const mediaElement =
+      current.data_type === "image"
+        ? this.elements.modalImage
+        : this.elements.modalVideo;
+    this.showMediaLoading(mediaElement);
 
     if (!this.elements.modalVideo.classList.contains("d-none")) {
       modalLogger.debug("Pausing current video during navigation");
@@ -454,15 +610,11 @@ export class UltimateModal {
     this.hideImageTooltip();
 
     this.state.currentIndex += direction;
-
     // Circular navigation
-    if (this.state.currentIndex < 0) {
-      this.state.currentIndex = this.state.media.length - 1;
-      modalLogger.debug("Wrapped to end of gallery");
-    } else if (this.state.currentIndex >= this.state.media.length) {
-      this.state.currentIndex = 0;
-      modalLogger.debug("Wrapped to start of gallery");
-    }
+    this.state.currentIndex =
+      ((this.state.currentIndex % this.state.media.length) +
+        this.state.media.length) %
+      this.state.media.length;
 
     this.updateModalContent();
     this.animateTransition(direction);
@@ -475,7 +627,7 @@ export class UltimateModal {
 
   updateModalContent() {
     modalLogger.time("Update modal content");
-    const current = this.state.media[this.state.currentIndex];
+    const current = this._getCurrentMedia();
     modalLogger.debug("Updating modal content", {
       index: this.state.currentIndex,
       mediaType: current.data_type,
@@ -528,12 +680,12 @@ export class UltimateModal {
       this.hideImageTooltip();
     });
 
-    if(this.hammer){
-        this.hammer.on('tap',(event) => {
-            event.preventDefault();
-            modalLogger.debug(" tap detected, toggling tooltip");
-            this.showImageTooltip(event);
-        })
+    if (this.hammer) {
+      this.hammer.on("tap", (e) => {
+        event.preventDefault();
+        modalLogger.debug(" tap detected, toggling tooltip");
+        this.showImageTooltip(e);
+      });
     }
 
     // Hide tooltip on escape key
@@ -547,161 +699,161 @@ export class UltimateModal {
     modalLogger.timeEnd("ImageTooltipSetup");
   }
 
-    showImageTooltip(event) {
-        // Don't show tooltip if we're in zoomed mode or if tooltip doesn't exist
-        if (this.state.isZoomed || !this.tooltip) {
-            return;
-        }
-
-        modalLogger.debug("Showing image tooltip", {
-            clientX: event.clientX,
-            clientY: event.clientY,
-        });
-
-        // Set tooltip message based on device type and current state
-        const current = this.state.media[this.state.currentIndex];
-        const message = current.alt;
-        // Update tooltip text
-        this.tooltip.textContent = message;
-
-        // OFFSCREEN MEASUREMENT TECHNIQUE: Temporarily position offscreen to measure accurately
-        // without affecting the visible UI or relying on hidden visibility
-        const originalDisplay = this.tooltip.style.display;
-        const originalLeft = this.tooltip.style.left;
-        const originalTop = this.tooltip.style.top;
-        const originalVisibility = this.tooltip.style.visibility;
-
-        // Set up for measurement: display block, visible, positioned way offscreen
-        this.tooltip.style.display = 'block';
-        this.tooltip.style.visibility = 'visible';
-        this.tooltip.style.left = '-9999px';  // Offscreen left
-        this.tooltip.style.top = 'auto';      // Reset top for natural height
-        this.tooltip.classList.add('visible'); // Ensure full styles (e.g., animations/transitions) are applied
-
-        // Force reflow to apply styles and compute dimensions
-        this.tooltip.offsetHeight; // Trigger reflow
-
-        // Now measure
-        const tooltipRect = this.tooltip.getBoundingClientRect();
-        const tooltipWidth = tooltipRect.width;
-        const tooltipHeight = tooltipRect.height;
-
-        // Reset to original state for positioning (will re-apply position later)
-        this.tooltip.classList.remove('visible');
-        this.tooltip.style.display = originalDisplay;
-        this.tooltip.style.left = originalLeft;
-        this.tooltip.style.top = originalTop;
-        this.tooltip.style.visibility = originalVisibility;
-
-        // Get modal and viewport dimensions
-        const modalRect = this.elements.modalContainer.getBoundingClientRect();
-        const viewportWidth = window.innerWidth;
-        const viewportHeight = window.innerHeight;
-
-        // Calculate ideal position (centered near click with offset)
-        const clickX = event.clientX;
-        const clickY = event.clientY;
-
-        // Adjusted for "directly under the mouse": position below click, centered horizontally
-        const offsetY = 10; // Small offset below the click
-        let tooltipX = clickX - (tooltipWidth / 2); // Center horizontally relative to click
-        let tooltipY = clickY + offsetY;
-
-        // Smart boundary detection and adjustment with priorities:
-        // 1. Prefer below, then above, then clamp
-        // 2. Horizontal: prefer centered at click, then shift left/right, then clamp
-        const safeMargin = 12; // Slightly larger margin for better UX
-
-        // HORIZONTAL POSITIONING
-        // Check right boundary first (viewport)
-        if (tooltipX + tooltipWidth > viewportWidth - safeMargin) {
-            // Shift left from click position (without extra offset to avoid being too far)
-            tooltipX = clickX - tooltipWidth;
-        }
-
-        // Check left boundary (viewport)
-        if (tooltipX < safeMargin) {
-            // Clamp to left edge or center if too narrow
-            if (tooltipWidth > viewportWidth - (2 * safeMargin)) {
-                // Tooltip too wide for screen: center it
-                tooltipX = (viewportWidth - tooltipWidth) / 2;
-            } else {
-                tooltipX = safeMargin;
-            }
-        }
-
-        // VERTICAL POSITIONING
-        // Prefer below click
-        if (tooltipY + tooltipHeight > viewportHeight - safeMargin) {
-            // Not enough space below: try above
-            tooltipY = clickY - tooltipHeight - 10; // Above with small offset
-            // If still hits top, clamp to top
-            if (tooltipY < safeMargin) {
-                tooltipY = safeMargin;
-            }
-        }
-
-        // MODAL BOUNDS ADJUSTMENT: Ensure tooltip stays INSIDE modal
-        // This is crucial if modal has overflow: hidden or padding
-        const modalPadding = 20; // Account for modal's internal padding/borders
-
-        // Horizontal modal bounds
-        const modalSafeLeft = modalRect.left + modalPadding;
-        const modalSafeRight = modalRect.right - modalPadding;
-        if (tooltipX < modalSafeLeft) {
-            tooltipX = modalSafeLeft;
-        }
-        if (tooltipX + tooltipWidth > modalSafeRight) {
-            tooltipX = modalSafeRight - tooltipWidth;
-            // If still overflows left, center in modal
-            if (tooltipX < modalSafeLeft) {
-                tooltipX = (modalRect.width - tooltipWidth) / 2 + modalRect.left;
-            }
-        }
-
-        // Vertical modal bounds
-        const modalSafeTop = modalRect.top + modalPadding;
-        const modalSafeBottom = modalRect.bottom - modalPadding;
-        if (tooltipY < modalSafeTop) {
-            tooltipY = modalSafeTop;
-        }
-        if (tooltipY + tooltipHeight > modalSafeBottom) {
-            tooltipY = modalSafeBottom - tooltipHeight;
-            // If still overflows top, center vertically in modal
-            if (tooltipY < modalSafeTop) {
-                tooltipY = (modalRect.height - tooltipHeight) / 2 + modalRect.top;
-            }
-        }
-
-        // Apply final position (absolute to document)
-        this.tooltip.style.left = `${Math.round(tooltipX)}px`;
-        this.tooltip.style.top = `${Math.round(tooltipY)}px`;
-
-        // Show tooltip with smooth animation
-        requestAnimationFrame(() => {
-            this.tooltip.classList.add('visible');
-        });
-
-        // Auto-hide after 3.5 seconds (slight increase for readability)
-        clearTimeout(this.tooltipTimeout);
-        this.tooltipTimeout = setTimeout(() => {
-            this.hideImageTooltip();
-        }, 3500);
-
-        modalLogger.debug("Image tooltip displayed", {
-            message,
-            clickPosition: { x: clickX, y: clickY },
-            finalPosition: { x: tooltipX, y: tooltipY },
-            tooltipDimensions: { width: tooltipWidth, height: tooltipHeight },
-            viewport: { width: viewportWidth, height: viewportHeight },
-            modalBounds: {
-                left: modalRect.left,
-                right: modalRect.right,
-                top: modalRect.top,
-                bottom: modalRect.bottom,
-            },
-        });
+  showImageTooltip(event) {
+    // Don't show tooltip if we're in zoomed mode or if tooltip doesn't exist
+    if (this.state.isZoomed || !this.tooltip) {
+      return;
     }
+
+    modalLogger.debug("Showing image tooltip", {
+      clientX: event.clientX,
+      clientY: event.clientY,
+    });
+
+    // Set tooltip message based on device type and current state
+    const current = this._getCurrentMedia();
+    const message = current.alt;
+    // Update tooltip text
+    this.tooltip.textContent = message;
+
+    // OFFSCREEN MEASUREMENT TECHNIQUE: Temporarily position offscreen to measure accurately
+    // without affecting the visible UI or relying on hidden visibility
+    const originalDisplay = this.tooltip.style.display;
+    const originalLeft = this.tooltip.style.left;
+    const originalTop = this.tooltip.style.top;
+    const originalVisibility = this.tooltip.style.visibility;
+
+    // Set up for measurement: display block, visible, positioned way offscreen
+    this.tooltip.style.display = "block";
+    this.tooltip.style.visibility = "visible";
+    this.tooltip.style.left = "-9999px"; // Offscreen left
+    this.tooltip.style.top = "auto"; // Reset top for natural height
+    this.tooltip.classList.add("visible"); // Ensure full styles (e.g., animations/transitions) are applied
+
+    // Force reflow to apply styles and compute dimensions
+    this.tooltip.offsetHeight; // Trigger reflow
+
+    // Now measure
+    const tooltipRect = this.tooltip.getBoundingClientRect();
+    const tooltipWidth = tooltipRect.width;
+    const tooltipHeight = tooltipRect.height;
+
+    // Reset to original state for positioning (will re-apply position later)
+    this.tooltip.classList.remove("visible");
+    this.tooltip.style.display = originalDisplay;
+    this.tooltip.style.left = originalLeft;
+    this.tooltip.style.top = originalTop;
+    this.tooltip.style.visibility = originalVisibility;
+
+    // Get modal and viewport dimensions
+    const modalRect = this.elements.modalContainer.getBoundingClientRect();
+    const viewportWidth = window.innerWidth;
+    const viewportHeight = window.innerHeight;
+
+    // Calculate ideal position (centered near click with offset)
+    const clickX = event.clientX;
+    const clickY = event.clientY;
+
+    // Adjusted for "directly under the mouse": position below click, centered horizontally
+    const offsetY = 10; // Small offset below the click
+    let tooltipX = clickX - tooltipWidth / 2; // Center horizontally relative to click
+    let tooltipY = clickY + offsetY;
+
+    // Smart boundary detection and adjustment with priorities:
+    // 1. Prefer below, then above, then clamp
+    // 2. Horizontal: prefer centered at click, then shift left/right, then clamp
+    const safeMargin = 12; // Slightly larger margin for better UX
+
+    // HORIZONTAL POSITIONING
+    // Check right boundary first (viewport)
+    if (tooltipX + tooltipWidth > viewportWidth - safeMargin) {
+      // Shift left from click position (without extra offset to avoid being too far)
+      tooltipX = clickX - tooltipWidth;
+    }
+
+    // Check left boundary (viewport)
+    if (tooltipX < safeMargin) {
+      // Clamp to left edge or center if too narrow
+      if (tooltipWidth > viewportWidth - 2 * safeMargin) {
+        // Tooltip too wide for screen: center it
+        tooltipX = (viewportWidth - tooltipWidth) / 2;
+      } else {
+        tooltipX = safeMargin;
+      }
+    }
+
+    // VERTICAL POSITIONING
+    // Prefer below click
+    if (tooltipY + tooltipHeight > viewportHeight - safeMargin) {
+      // Not enough space below: try above
+      tooltipY = clickY - tooltipHeight - 10; // Above with small offset
+      // If still hits top, clamp to top
+      if (tooltipY < safeMargin) {
+        tooltipY = safeMargin;
+      }
+    }
+
+    // MODAL BOUNDS ADJUSTMENT: Ensure tooltip stays INSIDE modal
+    // This is crucial if modal has overflow: hidden or padding
+    const modalPadding = 20; // Account for modal's internal padding/borders
+
+    // Horizontal modal bounds
+    const modalSafeLeft = modalRect.left + modalPadding;
+    const modalSafeRight = modalRect.right - modalPadding;
+    if (tooltipX < modalSafeLeft) {
+      tooltipX = modalSafeLeft;
+    }
+    if (tooltipX + tooltipWidth > modalSafeRight) {
+      tooltipX = modalSafeRight - tooltipWidth;
+      // If still overflows left, center in modal
+      if (tooltipX < modalSafeLeft) {
+        tooltipX = (modalRect.width - tooltipWidth) / 2 + modalRect.left;
+      }
+    }
+
+    // Vertical modal bounds
+    const modalSafeTop = modalRect.top + modalPadding;
+    const modalSafeBottom = modalRect.bottom - modalPadding;
+    if (tooltipY < modalSafeTop) {
+      tooltipY = modalSafeTop;
+    }
+    if (tooltipY + tooltipHeight > modalSafeBottom) {
+      tooltipY = modalSafeBottom - tooltipHeight;
+      // If still overflows top, center vertically in modal
+      if (tooltipY < modalSafeTop) {
+        tooltipY = (modalRect.height - tooltipHeight) / 2 + modalRect.top;
+      }
+    }
+
+    // Apply final position (absolute to document)
+    this.tooltip.style.left = `${Math.round(tooltipX)}px`;
+    this.tooltip.style.top = `${Math.round(tooltipY)}px`;
+
+    // Show tooltip with smooth animation
+    requestAnimationFrame(() => {
+      this.tooltip.classList.add("visible");
+    });
+
+    // Auto-hide after 3.5 seconds (slight increase for readability)
+    clearTimeout(this.tooltipTimeout);
+    this.tooltipTimeout = setTimeout(() => {
+      this.hideImageTooltip();
+    }, 3500);
+
+    modalLogger.debug("Image tooltip displayed", {
+      message,
+      clickPosition: { x: clickX, y: clickY },
+      finalPosition: { x: tooltipX, y: tooltipY },
+      tooltipDimensions: { width: tooltipWidth, height: tooltipHeight },
+      viewport: { width: viewportWidth, height: viewportHeight },
+      modalBounds: {
+        left: modalRect.left,
+        right: modalRect.right,
+        top: modalRect.top,
+        bottom: modalRect.bottom,
+      },
+    });
+  }
 
   hideImageTooltip() {
     if (this.tooltip) {
@@ -732,19 +884,49 @@ export class UltimateModal {
 
   _showImage(src, alt) {
     modalLogger.debug("Showing image in modal", { src, alt });
+
+    this.showMediaLoading(this.elements.modalImage);
+
+    this.elements.modalVideo.classList.add("d-none");
     this.elements.modalImage.src = src;
     this.elements.modalImage.alt = alt;
-    this.elements.modalVideo.classList.add("d-none");
     this.elements.modalImage.classList.remove("d-none");
+
+    this.elements.modalImage.onload = () => {
+      this.hideMediaLoading(this.elements.modalImage);
+      modalLogger.debug("Image loaded successfully");
+    };
     modalLogger.debug("Image display configured");
   }
 
   _showVideo(src, alt) {
     modalLogger.debug("Showing video in modal", { src, alt });
+    this.showMediaLoading(this.elements.modalVideo);
+
+    this.elements.modalImage.classList.add("d-none");
     this.elements.modalVideo.src = src;
     this.elements.modalVideo.alt = alt;
     this.elements.modalVideo.classList.remove("d-none");
-    this.elements.modalImage.classList.add("d-none");
+
+    this.elements.modalVideo.addEventListener("loadeddata", () => {
+      modalLogger.debug("Video data loaded");
+      this.hideMediaLoading(this.elements.modalVideo);
+    });
+
+    this.elements.modalVideo.addEventListener("error", () => {
+      modalLogger.error("Video failed to load");
+      this.hideMediaLoading(this.elements.modalVideo);
+    });
+
+    this.elements.modalVideo.addEventListener("waiting", () => {
+      modalLogger.debug("Video buffering, show loading");
+      this.showMediaLoading(this.elements.modalVideo);
+    });
+
+    this.elements.modalVideo.addEventListener("canplay", () => {
+      modalLogger.debug("Video can play, hide loading");
+      this.hideMediaLoading(this.elements.modalVideo);
+    });
 
     this.elements.modalVideo
       .play()
@@ -930,8 +1112,9 @@ export class UltimateModal {
     modalLogger.info("Gallery generation completed", {
       mediaCount: this.mediaData.media.length,
       thumbnailsCreated: galleryContainer.children.length,
-      hiddenThumbnails: document.querySelectorAll(".photo-thumbnail.d-none")
-        .length,
+      hiddenThumbnails: this.elements.cardContent.querySelectorAll(
+        ".photo-thumbnail.d-none"
+      ).length,
     });
     modalLogger.timeEnd("Gallery generation");
   }
@@ -939,7 +1122,7 @@ export class UltimateModal {
    * Check if See More button should be visible
    */
   checkSeeMoreButton() {
-    const hiddenThumbnails = document.querySelectorAll(
+    const hiddenThumbnails = this.elements.cardContent.querySelectorAll(
       ".photo-thumbnail.d-none"
     );
 
@@ -993,7 +1176,7 @@ export class UltimateModal {
     }
 
     // Get all hidden thumbnails
-    const hiddenThumbnails = document.querySelectorAll(
+    const hiddenThumbnails = this.elements.cardContent.querySelectorAll(
       ".photo-thumbnail.d-none"
     );
     modalLogger.debug("Found hidden thumbnails", {
@@ -1024,7 +1207,7 @@ export class UltimateModal {
 
     // Check if there are still hidden thumbnails after revealing some
     setTimeout(() => {
-      const remainingHidden = document.querySelectorAll(
+      const remainingHidden = this.elements.cardContent.querySelectorAll(
         ".photo-thumbnail.d-none"
       );
 
@@ -1081,7 +1264,7 @@ export class UltimateModal {
   updateMediaArray() {
     modalLogger.time("Update media array");
 
-    const allVisibleThumbnails = document.querySelectorAll(
+    const allVisibleThumbnails = cardContent.querySelectorAll(
       ".photo-thumbnail:not(.d-none)"
     );
     const updatedMedia = [];

@@ -1,6 +1,8 @@
 import logger from "./utility/logger.js";
 import Notification from "./notification.js";
 import {ThemeManager} from "./utility/Mode.js";
+import {PlatformDetector} from "../PWA/pwa-prompt.js";
+import {UltimateModal} from "./Modal.js";
 
 // Create contextual loggers for different modules
 const appLogger = logger.withContext({
@@ -123,9 +125,6 @@ function showUpdateNotification(registration) {
 
 // Initialize PWA
 initializePWA();
-
-import { PlatformDetector } from "../PWA/pwa-prompt.js";
-import { UltimateModal } from "./Modal.js";
 
 document.addEventListener("DOMContentLoaded", () => {
   appLogger.time("Birthday app initialization");
@@ -549,8 +548,7 @@ document.addEventListener("DOMContentLoaded", () => {
       const j = Math.floor(Math.random() * (i + 1));
       [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
     }
-    const result = shuffled.slice(0, count);
-    return result;
+      return shuffled.slice(0, count);
   }
 
   // Event Listeners setup
