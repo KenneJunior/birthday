@@ -3,7 +3,7 @@ import logger from "./utility/logger.js";
 // Create contextual logger for UltimateModal
 const modalLogger = logger.withContext({ module: "UltimateModal" });
 
-export class UltimateModal {
+class UltimateModal {
   constructor() {
     modalLogger.time("UltimateModal constructor");
     const MediaModal = document.getElementById("mediaModal");
@@ -26,6 +26,7 @@ export class UltimateModal {
       profile_pic: cardContent.querySelector(".image-container"),
       seeMoreBtn: cardContent.querySelector(".see-more-arrow"),
       modalTooltip: MediaModal.querySelector(".modal-tooltip"),
+        loadingProgressBar: MediaModal.querySelector('.loading-progress__bar'),
       modal: MediaModal,
       cardContent: cardContent,
     };
@@ -208,10 +209,7 @@ export class UltimateModal {
 
   hideMediaLoading(mediaElement) {
     modalLogger.time("Hide media loading animation");
-    const progressBar = this.elements.Modal_loading__container.querySelector(
-      ".loading-progress__bar"
-    );
-
+    const progressBar = this.elements.loadingProgressBar;
     if (progressBar) {
       progressBar.style.width = "100%";
     }
@@ -266,9 +264,7 @@ export class UltimateModal {
    * @private
    */
   _startProgressAnimation() {
-    const progressBar = this.elements.Modal_loading__container.querySelector(
-      ".loading-progress__bar"
-    );
+    const progressBar = this.elements.loadingProgressBar;
     if (!progressBar) return;
 
     let progress = 0;
@@ -892,10 +888,10 @@ export class UltimateModal {
     this.elements.modalImage.alt = alt;
     this.elements.modalImage.classList.remove("d-none");
 
-    this.elements.modalImage.onload = () => {
+    this.elements.modalImage.addEventListener("load", () => {
       this.hideMediaLoading(this.elements.modalImage);
       modalLogger.debug("Image loaded successfully");
-    };
+    });
     modalLogger.debug("Image display configured");
   }
 
@@ -934,6 +930,7 @@ export class UltimateModal {
         modalLogger.debug("Video playback started successfully");
       })
       .catch((error) => {
+        this.elements.modalVideo.classList.add("d-none");
         modalLogger.error("Video playback failed", error);
       });
 
@@ -1264,7 +1261,7 @@ export class UltimateModal {
   updateMediaArray() {
     modalLogger.time("Update media array");
 
-    const allVisibleThumbnails = cardContent.querySelectorAll(
+    const allVisibleThumbnails = this.elements.cardContent.querySelectorAll(
       ".photo-thumbnail:not(.d-none)"
     );
     const updatedMedia = [];
@@ -1745,3 +1742,5 @@ export class UltimateModal {
     }
   }
 }
+
+export default UltimateModal

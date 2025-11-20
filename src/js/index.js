@@ -1,17 +1,3 @@
-/**
- * Birthday Celebration Page - Main JavaScript
- *
- * Features:
- * - Image loading with transition
- * - Confetti animation system
- * - Share functionality
- * - Interactive elements
- * - Scroll animations
- * - Performance optimized
- */
-
-// birthday-app( index ).js - Professional Birthday Page JavaScript
-// Features: Image loading, confetti, share functionality, animations
 import logger from "../js/utility/logger.js";
 ("use strict");
 
@@ -957,7 +943,6 @@ class BirthdayApp {
     this.performanceMonitor = new PerformanceMonitor();
     this.isInitialized = false;
     this.eventHandlers = {};
-
     appLogger.debug("BirthdayApp instance created");
     appLogger.timeEnd("BirthdayApp constructor");
   }
@@ -992,6 +977,95 @@ class BirthdayApp {
     }
   }
 
+
+  showMediaLoading(){
+      appLogger.time('show media loading animation');
+      const loadingContainer = this.elements.loadingContainer;
+      if(loadingContainer){
+          loadingContainer.classList.add("is-visible", "is-loading");
+          loadingContainer.setAttribute("aria-hidden", "false");
+          loadingContainer.setAttribute("aria-live", "off");
+
+          this._startProgressAnimation();
+
+          appLogger.debug("Loading container activated", {
+              hasVisible: loadingContainer.classList.contains("is-visible"),
+              hasLoading: loadingContainer.classList.contains("is-loading"),
+              ariaHidden: loadingContainer.getAttribute("aria-hidden"),
+              ariaLive: loadingContainer.getAttribute("aria-live"),
+          });
+          if(this.elements.birthdayImage){
+              this.elements.birthdayImage.classList.add('d-none');
+              this.elements.classList.add('is-loading');
+              appLogger.debug('birthday image was hidden successfully',{
+                  element:this.elements.birthdayImage.tagName
+              });
+          }
+      }
+      appLogger.info("Media loading animation displayed successfully");
+      appLogger.timeEnd("Show media loading animation");
+  }
+
+  hideMediaLoading(){
+      appLogger.time("Hide media loading animation");
+      const {loadingProgressBar: progressBar} = this.elements;
+    if (progressBar){
+        progressBar.style.width = '100%';
+    }
+
+    setTimeout(()=>{
+        const loadingContainer = this.elements.loadingContainer;
+        if (loadingContainer) {
+            loadingContainer.classList.remove("is-visible", "is-loading");
+            loadingContainer.setAttribute("aria-hidden", "true");
+            loadingContainer.setAttribute("aria-live", "polite");
+
+            appLogger.debug("Loading container deactivated", {
+                ariaHidden: loadingContainer.getAttribute("aria-hidden"),
+                ariaLive: loadingContainer.getAttribute("aria-live"),
+            });
+        }
+        const profileImage = this.elements.birthdayImage;
+        profileImage.classList.remove("d-none");
+        profileImage.classList.remove("is-loading");
+        appLogger.debug("Loading class removed from media element", {
+            element: profileImage.tagName,
+        });
+  }, 500);
+
+
+      appLogger.info("Media loading animation hidden successfully");
+      appLogger.timeEnd("Hide media loading animation");
+  }
+
+    /**
+     * Starts the progress bar animation
+     * @private
+     */
+    _startProgressAnimation() {
+        const progressBar = this.elements.loadingProgressBar
+        if (!progressBar) return;
+
+        let progress = 0;
+        const maxProgress = 85;
+
+        const interval = setInterval(() => {
+            const currentWidth = parseFloat(progressBar.style.width) || 0;
+
+            if (currentWidth >= maxProgress) {
+                clearInterval(interval);
+                return;
+            }
+
+            progress += 2 + Math.random() * 3;
+            progressBar.style.width = Math.min(progress, maxProgress) + "%";
+        }, 300);
+    }
+
+    /**
+     * @param eventName
+     * @param data
+     */
   trackEvent(eventName, data = {}) {
     appLogger.debug("Tracking analytics event", { eventName, data });
     if (typeof gtag !== "undefined") {
@@ -1035,6 +1109,12 @@ class BirthdayApp {
     }
   }
 
+    /**
+     *  Creates a Module with a fullback system
+     * @param ModuleClass
+     * @param args
+     * @returns {{init: function(): *, destroy: function(): *}|*}
+     */
   createModuleWithFallback(ModuleClass, ...args) {
     try {
       appLogger.debug(`Initializing ${ModuleClass.name}`);
@@ -1047,6 +1127,11 @@ class BirthdayApp {
     }
   }
 
+    /**
+     *
+     * @param ModuleClass
+     * @returns {{init: function(): *, destroy: function(): *}}
+     */
   createFallbackModule(ModuleClass) {
     appLogger.warn(`Creating fallback for ${ModuleClass.name}`);
     return {
@@ -1066,7 +1151,9 @@ class BirthdayApp {
       imageContainer: document.querySelector(".image-container"),
       imagePlaceholder: document.querySelector(".image-placeholder"),
       birthdayImage: document.getElementById("birthdayImage"),
-      messageItems: document.querySelectorAll(".message-item"),
+        loadingContainer : document.getElementById('Modal-loading__container'),
+        messageItems: document.querySelectorAll(".message-item"),
+        loadingProgressBar: document.querySelector('.loading-progress__bar'),
     };
 
     appLogger.debug("DOM elements cached", {
@@ -1111,7 +1198,7 @@ class BirthdayApp {
     } else {
       appLogger.warn("Image container not found for event listeners");
     }
-
+    this.elements.birthdayImage.addEventListener('load',()=>{this.hideMediaLoading()})
     window.addEventListener("resize", this.eventHandlers.resize);
     appLogger.debug("Window resize listener attached");
 
@@ -1272,55 +1359,11 @@ class BirthdayApp {
   }
 }
 
-// Global error handling with logging
-window.addEventListener("error", (event) => {
-  logger.error("Global error caught", {
-    message: event.error?.message,
-    filename: event.filename,
-    lineno: event.lineno,
-    colno: event.colno,
-  });
-});
-
-window.addEventListener("unhandledrejection", (event) => {
-  logger.error("Unhandled promise rejection", {
-    reason: event.reason?.message || event.reason,
-  });
-});
-
 // Initialize the application when DOM is ready
 document.addEventListener("DOMContentLoaded", () => {
   appLogger.time("DOMContentLoaded initialization");
   appLogger.debug("DOM content loaded, starting application initialization");
-
-  // Check if we're on a protected page
-  const isProtectedPage = document.getElementById("protectedContent");
-
-  if (isProtectedPage) {
-    appLogger.debug("Protected page detected, waiting for authentication");
-    // Wait for authentication before initializing
-    const initApp = async () => {
-      try {
-        appLogger.debug("Checking authentication status");
-        const authResult = await window.setupAuthProtection?.();
-        if (authResult?.authenticated) {
-          appLogger.info("Authentication successful, initializing BirthdayApp");
-          new BirthdayApp().init();
-        } else {
-          appLogger.warn("Authentication failed or not available");
-        }
-      } catch (error) {
-        appLogger.error("Authentication check failed", error);
-      }
-    };
-
-    initApp();
-  } else {
-    appLogger.debug("Non-protected page, initializing immediately");
-    // Initialize immediately for non-protected pages
     new BirthdayApp().init();
-  }
-
   appLogger.timeEnd("DOMContentLoaded initialization");
 });
 

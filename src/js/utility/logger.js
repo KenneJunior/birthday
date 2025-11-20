@@ -1,15 +1,3 @@
-// Central logger used across the project with enhanced capabilities
-// Features:
-// - Multi-level logging (debug, info, warn, error)
-// - Browser: logs only when running on localhost/127.0.0.1 or when debug flag is enabled
-// - Node: logs when DEBUG environment variable is set
-// - Service Worker: respects same origin rules
-// - Performance monitoring and analytics integration
-// - Structured logging with context and metadata
-
-/**
- * Log levels for consistent logging across environments
- */
 import StackTraceParser from "error-stack-parser";
 import {
   getBrowserContext,
@@ -241,14 +229,17 @@ class Logger {
     if (this.isBrowser) {
       window.addEventListener("error", (event) => {
         this.error("Uncaught error", event.error, {
-          filename: ` ${event.filename}:${event.lineno}:${event.colno}`,
+            message: event.error?.message,
+            filename: ` ${event.filename}:${event.lineno}:${event.colno}`,
           lineno: event.lineno,
           colno: event.colno,
         });
       });
 
       window.addEventListener("unhandledrejection", (event) => {
-        this.error("Unhandled promise rejection", event.reason);
+        this.error("Unhandled promise rejection", {
+            reason: event.reason?.message || event.reason,
+        });
       });
     }
 
@@ -357,27 +348,6 @@ class Logger {
     }
   }
 
-  _getlineandColumn() {
-    try {
-      const stackFrame = StackTraceParser.parse(new Error());
-      // The caller is typically the 4th frame in the stack
-      const callerFrame = stackFrame[3] || stackFrame[2] || stackFrame[1];
-
-      if (!callerFrame) {
-        return { line: "unknown", column: "unknown" };
-      }
-
-      const { lineNumber: lineNum, columnNumber: column } = callerFrame;
-      return { line: parseInt(lineNum), column: parseInt(column) };
-    } catch (err) {
-      return {
-        line: "error",
-        column: "error",
-        error: err.message(),
-      };
-    }
-  }
-
   _cleanFilePath(filePath) {
     if (!filePath) return "unknown";
 
@@ -408,12 +378,13 @@ class Logger {
 
   _createClickableUrl(filePath, line, column) {
     // Create a VSCode URL scheme for direct linking
+      let full_parth;
     if (this.isBrowser) {
       //remove protocol,oring and port and some time t = numbers at the end if present
       const url = filePath.replace(/(\?t=\d+)?$/, "");
       const cleanurl = url.replace(/^https?:\/\/[^/]+/, "");
 
-      const full_parth = this.workingFolder + cleanurl;
+       full_parth = this.workingFolder + cleanurl;
       const vscodeUrl = `vscode://file/${full_parth}:${line}:${column}`;
       const browserUrl = `${url}:${line}:${column}`;
       // For browser environments, create a vscode:// URL
@@ -1110,11 +1081,6 @@ export const createLogger = (config) => new Logger(config);
 
 // Quick setup for common environments
 export default logger.withContext({
-  application: "BirthdayCelebration",
-  version: "1.0.0",
-  environment: process.env.NODE_ENV || "development",
-  timestamp: new Date().toISOString(),
-
   application: "BirthdayCelebration",
   version: "1.0.0",
   environment: isBrowser ? process.env.NODE_ENV || "development" : "production",

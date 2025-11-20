@@ -740,7 +740,7 @@ h1 {
         <!-- Main heading hierarchy -->
         <header class="offline-header">
             <h1 class="offline-title">Connection Lost</h1>
-            <p class="subtitle">
+            <p class="subtitle" id="subtitle">
                 This page requires an internet connection. You can try the following:
             </p>
         </header>
@@ -835,24 +835,11 @@ h1 {
     </template>
 
 <script>
-/**
- * FHAVUR OFFLINE PAGE - JAVASCRIPT ENHANCEMENTS
- * 
- * Changes:
- * - Modern ES6+ class with private methods and proper error handling
- * - Exponential backoff retry strategy with jitter
- * - Network status monitoring with robust connection testing
- * - Performance optimizations with requestAnimationFrame
- * - Enhanced analytics and event tracking
- * - Service Worker integration for offline capabilities
- * - Better state management and cleanup
- * - Accessibility improvements for screen readers
- */
 
 class OfflinePage {
     // Private fields
     #retryCount = 0;
-    #maxRetries = 8; // Increased with exponential backoff
+    #maxRetries = 4; // Increased with exponential backoff
     #baseRetryInterval = 3000; // 3 seconds base
     #maxRetryInterval = 120000; // 2 minute maximum
     #autoRetryTimer = null;
@@ -880,14 +867,16 @@ class OfflinePage {
             goHomeBtn: document.getElementById('goHomeBtn'),
             supportBtn: document.getElementById('supportBtn'),
             urlInfo: document.getElementById('url-info'),
-            requestedUrl: document.getElementById('requested-url')
+            requestedUrl: document.getElementById('requested-url'),
+            subtitle: document.getElementById('subtitle')
         };
 
         this.state = {
             isRetrying: false,
             lastOnline: null,
             connectionQuality: 'unknown',
-            userInteracted: false
+            userInteracted: false,
+            pages:['fhavur','fhav','confession','login','logout']
         };
 
         this.supportWhatsAppNumber = document.documentElement.dataset.whatsappNumber || "670852835";
@@ -906,10 +895,17 @@ class OfflinePage {
             this.#checkConnection().catch(() => {
                 this.#startAutoRetry();
             });
-
+            
             this.#log('Offline page initialized', 'info');
         } catch (error) {
             this.#log(`Initialization failed: ${error.message}`, 'error');
+        }
+    }
+    #setupPageInfo(){
+        if(!this.state.pages.some(page=>
+             window.location.href.toLowerCase.includes(page)
+        )){
+            this.elements.subtitle.textContent = 'Page Not Found Please try again'
         }
     }
 
@@ -1310,7 +1306,7 @@ class OfflinePage {
             };
 
             console.log(
-                `%c[FHAVUR-OFFLINE]%c ${timestamp} ${message}`,
+                `%c[FHAVUR-OFFLINE] ${timestamp}%c ${message}`,
                 'background: #7c3aed; color: white; padding: 2px 4px; border-radius: 3px;',
                 styles[level] || '',
                 data || ''

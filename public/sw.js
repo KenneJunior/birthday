@@ -1,12 +1,14 @@
 //Uncomment this out in a dev environment
 //importScripts("../src/js/utility/logger-global.js");
 import "../src/js/utility/logger-global.js";
+
 importScripts("./offline-template.js");
 
 const logger = self.logger;
 const CACHE_VERSION = "v1.5";
 const STATIC_CACHE = `fhavur-static-${CACHE_VERSION}`;
 const DYNAMIC_CACHE = `fhavur-dynamic-${CACHE_VERSION}`;
+const CSS_JS_CACHE = `fhavur-css_js-${CACHE_VERSION}`;
 
 // Create a specialized logger for Service Worker with custom context
 const swLogger = logger.withContext({
@@ -329,8 +331,7 @@ self.addEventListener("fetch", (event) => {
   });
 
   try {
-    fetchLogger.debug("Fetch event intercepted");
-    event.respondWith(handleFetchStrategies(event.request, fetchLogger));
+      event.respondWith(handleFetchStrategies(event.request, fetchLogger));
   } catch (err) {
     fetchLogger.error("an error occured while fetching " + url.request.url, {
       errorStack: err.stack,
@@ -557,7 +558,7 @@ async function cssAndExternalStrategy(
     type: request.url.endsWith(".css") ? "css" : "external",
   });
 
-  const cacheName = isExternal ? DYNAMIC_CACHE : STATIC_CACHE;
+  const cacheName = isExternal ? DYNAMIC_CACHE : CSS_JS_CACHE;
 
   strategyLogger.time("CSSExternalFetch");
   strategyLogger.debug("Starting CSS/external strategy", {
@@ -883,10 +884,10 @@ async function staleWhileRevalidateStrategy(
   strategyLogger.time("SWRFetch");
   strategyLogger.debug("Starting stale-while-revalidate strategy", {
     url: request.url,
-    cache: isExternal ? DYNAMIC_CACHE : STATIC_CACHE,
+    cache: isExternal ? DYNAMIC_CACHE : CSS_JS_CACHE,
   });
 
-  const cacheName = isExternal ? DYNAMIC_CACHE : STATIC_CACHE;
+  const cacheName = isExternal ? DYNAMIC_CACHE : CSS_JS_CACHE;
   const cache = await caches.open(cacheName);
   const cachedResponse = await cache.match(request);
 
@@ -1003,11 +1004,11 @@ async function trimStaticCache() {
   trimLogger.debug("Starting cache trimming operation");
 
   try {
-    const cache = await caches.open(STATIC_CACHE);
+    const cache = await caches.open(CSS_JS_CACHE);
     const keys = await cache.keys();
 
     trimLogger.debug("Current cache state", {
-      cache: STATIC_CACHE,
+      cache: CSS_JS_CACHE,
       currentSize: keys.length,
       limit: STATIC_CACHE_LIMIT,
     });
@@ -1088,7 +1089,7 @@ async function cleanupOldCaches() {
 
   try {
     const cacheNames = await caches.keys();
-    const currentCaches = [STATIC_CACHE, DYNAMIC_CACHE];
+    const currentCaches = [STATIC_CACHE, DYNAMIC_CACHE, CSS_JS_CACHE];
 
     cleanupLogger.debug("Found caches", {
       allCaches: cacheNames,
@@ -1243,17 +1244,19 @@ self.addEventListener("unhandledrejection", (event) => {
 // Periodic health check (optional)
 async function performHealthCheck() {
   const healthLogger = swLogger.withContext({ operation: "health_check" });
-
+   const cachesToCheck = [CSS_JS_CACHE,DYNAMIC_CACHE]
   try {
-    const cache = await caches.open(STATIC_CACHE);
+    cachesToCheck.forEach(async(cache_name)=>{
+    const cache = await caches.open(cache_name);
     const keys = await cache.keys();
 
-    healthLogger.debug("Service Worker health check", {
+    healthLogger.info("Service Worker health check", {
       cacheSize: keys.length,
       cacheStatus: "healthy",
       timestamp: new Date().toISOString(),
     });
 
+    })
     return true;
   } catch (error) {
     healthLogger.error("Service Worker health check failed", {
@@ -1269,12 +1272,13 @@ setInterval(() => {
   if (self.shouldLog) {
     performHealthCheck();
   }
-}, 5 * 60 * 1000);
+}, 0.5 * 60 * 1000);
 
 swLogger.info("🎯 Service Worker fully initialized", {
   version: CACHE_VERSION,
   staticCache: STATIC_CACHE,
   dynamicCache: DYNAMIC_CACHE,
+  cssAndJsCache: CSS_JS_CACHE,
   cacheLimit: STATIC_CACHE_LIMIT,
   essentialUrls: ESSENTIAL_URLS.length,
   timestamp: new Date().toISOString(),

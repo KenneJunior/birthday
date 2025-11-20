@@ -48,7 +48,7 @@ class PWAPrompt extends HTMLElement {
   }
   /**
    * to be short and brief what im doing is creating some templetate
-   * tags each pair for a platform (e.i andriod, ios and default)
+   * tags each pair for a platform (e.g andriod, ios and default)
    * that will be injected in a thier approprite tags in the the
    * <prompt-tag></prompt-tag>
    *
@@ -64,6 +64,9 @@ class PWAPrompt extends HTMLElement {
     this.monitorUserEngagement();
   }
 
+    /**
+     * detect the platform to see if it andriod or windows or ios
+     */
   detectPlatform() {
     const ua = navigator.userAgent;
 
@@ -86,15 +89,39 @@ class PWAPrompt extends HTMLElement {
     );
   }
 
+    /**
+     * check if the app has already been installed
+     */
   detectStandalone() {
     this.state.isStandalone =
       window.navigator.standalone === true ||
       window.matchMedia("(display-mode: standalone)").matches;
   }
 
+    shownNotification(){
+     const numberOfNotificationShown = window.localStorage.getItem('Welcome_Notification');
+      if (numberOfNotificationShown){
+          try {
+              let numberOfTime = parseInt(numberOfNotificationShown);
+              if (numberOfTime === 3) {
+                  return false;
+              } else {
+                  window.localStorage.setItem('Welcome_Notification', numberOfTime + 1);
+                  return true
+              }
+          }catch (e) {
+              window.localStorage.setItem('Welcome_Notification', 1);
+              return true
+          }
+      }
+        window.localStorage.setItem('Welcome_Notification', 1);
+        return true
+    }
+
   shouldInitialize() {
     // Don't initialize if already installed
-    if (this.state.isStandalone) {
+    if (this.state.isStandalone && this.shownNotification()) {
+
       this.log("App is already installed");
       this.Notification.setNotificationType()
         .toggleViewDetails(false)

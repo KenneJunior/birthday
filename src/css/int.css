@@ -50,7 +50,10 @@ body {
     transform-origin: center center;
     animation: gradientBG 15s ease infinite;
 }
-
+button{
+  transform-style: preserve-3d;
+    cursor: pointer;
+}
 /* ========== BACKGROUND EFFECTS ========== */
 .glitter {
     position: fixed;
@@ -669,7 +672,7 @@ a {
     width: calc(3rem * var(--zoom-factor));
     height: calc(3rem * var(--zoom-factor));
     font-size: calc(1.4rem * var(--zoom-factor));
-    background: linear-gradient(135deg, var(--pink-medium), var(--lilac));
+    background: linear-gradient(135deg, var(--pink-medium), var(--rose-quartz));
     border: none !important;
     outline: none !important;
     border-radius: 50%;
@@ -686,7 +689,7 @@ a {
 
 .modal-close:hover {
     transform: rotate(90deg) scale(1.1);
-    background: linear-gradient(135deg, var(--lilac), var(--pink-medium));
+    background: linear-gradient(135deg, var(--pink-medium), var(--lilac));
     box-shadow: 0 6px 20px rgba(219, 112, 147, 0.5),
     0 0 0 2px rgba(255, 255, 255, 0.3) inset;
 }
@@ -1619,7 +1622,7 @@ a {
 }
 
 @keyframes bounce {
-    0%, 100% { transform: translateY(0); }
+    0%, 100% { transform: translateY(0); opacity: 1;}
     50% { transform: translateY(-20px); }
 }
 
@@ -1655,11 +1658,13 @@ a {
 
 @media (max-width: 768px) {
     :root {
-        --zoom-factor: 0.75;
+        --zoom-factor: 0.85;
     }
     .modal-container {
         width: 90%;
         max-width: 95%;
+        min-width: calc(42vh - 3rem);
+        min-height: calc(55vh - 5rem);
         border-radius: 18px;
         margin: 20px auto;
     }
@@ -1769,6 +1774,32 @@ a {
         width: calc(300px * var(--zoom-factor));
     }
 }
+@media (max-width: 530px) {
+    :root {
+        --zoom-factor: 0.9;
+    }
+    .container {
+        padding: calc(20px * var(--zoom-factor)) calc(5px * var(--zoom-factor));
+        margin: calc(10px * var(--zoom-factor));
+    }
+
+    .image-container {
+        width: calc(180px * var(--zoom-factor));
+        height: calc(180px * var(--zoom-factor));
+    }
+
+    .photo-thumbnail {
+        width: calc(70px * var(--zoom-factor));
+        height: calc(70px * var(--zoom-factor));
+    }
+
+    .btn-celebrate {
+        padding: calc(12px * var(--zoom-factor)) calc(25px * var(--zoom-factor));    }
+
+    h1::after {
+        width: calc(300px * var(--zoom-factor));
+    }
+}
 @media (max-width: 480px) {
     :root {
         --zoom-factor: 0.95;
@@ -1838,6 +1869,10 @@ a {
 
     h1 {
         font-size: 2rem;
+    }
+    .modal-container{
+        min-width: calc(20vh - 3rem);
+        min-height: calc(35vh - 5rem);
     }
 
     .image-container {
@@ -1946,26 +1981,27 @@ a {
     }
 }
 .mode-toggle {
-    position: fixed;
-    top: 20px;
-    right: 20px;
-    z-index: 1000;
-    background: var(--primary);
-    color: white;
-    border: none;
-    padding: 10px 15px;
-    border-radius: 50px;
-    cursor: pointer;
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    font-size: 14px;
-    box-shadow: var(--shadow-lg);
-    transition: var(--transition);
+position: fixed;
+top: 40px;
+right: 20px;
+z-index: 1000;
+background: linear-gradient(135deg, var(--primary), var(--lilac));
+color: white;
+border: none;
+padding: 12px 18px;
+border-radius: 50px;
+cursor: pointer;
+display: flex;
+align-items: center;
+gap: 8px;
+font-size: 16px;
+box-shadow: var(--shadow-lg);
+transition: var(--transition);
+animation: nav-float 5s cubic-bezier(0.445, 0.05, 0.55, 0.95) infinite;
 }
 
 .mode-toggle:hover {
-    transform: scale(1.05);
+    transform: scale(1.05) translateY(-2px);;
     box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
 }
 
@@ -2001,25 +2037,25 @@ a {
         --shadow-sm: 0 4px 12px rgba(0, 0, 0, 0.2);
         --transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
         --border-color: rgba(255, 255, 255, 0.1);
-        --pink-champagne: #2d1b1b; /* Deep rose */
-        --blush-pink: #4a1a2a; /* Muted blush */
-        --rose-quartz: #3a1f1f; /* Soft charcoal rose */
-        --pink-light: #5d3a3a; /* Warm gray-pink */
-        --pink-medium: #7a4e5a; /* Deeper mauve */
-        --pink-dark: #9a5c6a; /* Rich burgundy */
-        --purple-light: #2a1d2a; /* Dark lavender */
-        --purple-medium: #3d2b3d; /* Plum gray */
-        --lilac: #4a334a; /* Muted lilac */
-        --pearl: #1a1a1a; /* Near-black pearl */
-        --text-soft: #e6d3d3; /* Soft pinkish white */
-        --text-dark: #f0e6e6; /* Brighter off-white */
-        --info: #60a5fa; /* Blue remains vibrant */
-        --success: #34d399; /* Green for positivity */
-        --warning: #fbbf24; /* Gold warning */
-        --error: #f87171; /* Soft red */
-        --gold: #facc15; /* Bright gold */
-        --silver: #d1d5db; /* Cool silver */
-        --shadow-soft: 0 4px 30px rgba(122, 78, 90, 0.3); /* Pink-tinted shadow */
+        --pink-champagne: #2d1b1b; 
+        --blush-pink: #4a1a2a; 
+        --rose-quartz: #3a1f1f; 
+        --pink-light: #5d3a3a; 
+        --pink-medium: #7a4e5a; 
+        --pink-dark: #9a5c6a; 
+        --purple-light: #2a1d2a;
+        --purple-medium: #3d2b3d;
+        --lilac: #4a334a; 
+        --pearl: #1a1a1a;
+        --text-soft: #e6d3d3;
+        --text-dark: #f0e6e6; 
+        --info: #60a5fa; 
+        --success: #34d399;
+        --warning: #fbbf24;
+        --error: #f87171; 
+        --gold: #facc15; 
+        --silver: #d1d5db; 
+        --shadow-soft: 0 4px 30px rgba(122, 78, 90, 0.3);
         --shadow-hard: 0 10px 40px rgba(122, 78, 90, 0.4);
 
 
@@ -2258,6 +2294,9 @@ a {
         background: linear-gradient(135deg, rgba(255, 255, 255, 0.2), rgba(255, 255, 255, 0.1));
         opacity: 0;
         transition: var(--transition);
+    }
+    .social-share a {
+        color: var(--pearl);
     }
 
     .share-btn:hover {

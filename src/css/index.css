@@ -77,6 +77,12 @@ z-index: -1;
 animation: subtleFloat 15s ease-in-out infinite;
 }
 
+button{
+  transform-style: preserve-3d;
+    cursor: pointer;
+
+}
+
 /* ===== Layout Components ===== */
 .container {
   max-width: 1200px;
@@ -416,7 +422,6 @@ transition: var(--transition-fast);
   box-shadow: var(--shadow-sm);
   border: none;
   cursor: pointer;
-  transform-style: preserve-3d;
 }
 
 .share-btn::before {
@@ -545,6 +550,7 @@ animation: orbitReverse 15s linear infinite;
 0%, 100% { transform: translateY(0px) scale(1); }
 50% { transform: translateY(-10px) scale(1.02); }
 }
+
 @keyframes cardEntry {
 from {
 opacity: 0;
@@ -890,7 +896,7 @@ gap: 8px;
 font-size: 16px;
 box-shadow: var(--shadow-lg);
 transition: var(--transition);
-animation: buttonFloat 3s ease-in-out infinite;
+animation: subtleFloat 5s cubic-bezier(0.445, 0.05, 0.55, 0.95) infinite;
 }
 .mode-toggle:hover {
 transform: scale(1.08) translateY(-2px);

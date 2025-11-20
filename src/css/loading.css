@@ -547,6 +547,7 @@
 .is-loading {
   pointer-events: none;
   color: transparent;
+  border-radius: 10px;
 }
 
 .is-loading::after {

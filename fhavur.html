@@ -60,7 +60,7 @@
           <span class="mode-icon">🌙</span>
           <span class="mode-text">Dark Mode</span>
       </button>
-    <div class="loading-container" id="loadingSpinner" aria-hidden="true" aria-live="polite">
+    <div class="loading-container is-visible" id="loadingSpinner" aria-hidden="false" aria-live="off">
         <div class="loading-spinner"></div>
         <div class="loading-text">
             Loading<span class="loading-dots">
@@ -216,6 +216,12 @@
         <div class="tooltip-content">
         <div class="modal-tooltip">Hello world</div>
       </div>
+
+          <div class="modal-image-container">
+            <button class="modal-nav modal-prev" aria-label="Previous image">
+              <i class="fas fa-chevron-left"></i>
+            </button>
+
         <div class="modal-content">
                         <div class="loading-container" id="Modal-loading__container" aria-hidden="true" aria-live="polite">
                   <div class="loading-spinner is-loading loading-spinner--pulse"></div>
@@ -230,12 +236,6 @@
                       <div class="loading-progress__bar"></div>
                   </div>
               </div>
-          <div class="modal-image-container">
-            <button class="modal-nav modal-prev" aria-label="Previous image">
-              <i class="fas fa-chevron-left"></i>
-            </button>
-
-
               <img
               class="modal-image zoomable"
               src=""
@@ -299,7 +299,7 @@
           Your notification message goes here. This is a default message.
         </p>
         <div class="notification-actions">
-          <button> class="action-btn secondary-action" id="dismiss">
+          <button class="action-btn secondary-action" id="dismiss">
             Dismiss
           </button>
           <button class="action-btn primary-action" id="view-details">
@@ -309,7 +309,8 @@
       </div>
     </div>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/hammer.js/2.0.8/hammer.min.js"></script>
-    <script type="module" src="/src/auth-check.js"></script>
+      <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+      <script type="module" src="/src/auth-check.js"></script>
     <script type="module" src="/src/js/utility/Mode.js"></script>
     <script type="module" src="src/js/HBD.js"></script>
 <script type="module">

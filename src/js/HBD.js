@@ -1,8 +1,8 @@
-import logger from "./utility/logger.js";
+import { PlatformDetector } from "../PWA/pwa-prompt.js";
+import UltimateModal from "./Modal.js";
 import Notification from "./notification.js";
-import {ThemeManager} from "./utility/Mode.js";
-import {PlatformDetector} from "../PWA/pwa-prompt.js";
-import {UltimateModal} from "./Modal.js";
+import logger from "./utility/logger.js";
+import { ThemeManager } from "./utility/Mode.js";
 
 // Create contextual loggers for different modules
 const appLogger = logger.withContext({
@@ -294,7 +294,7 @@ document.addEventListener("DOMContentLoaded", () => {
     appLogger.time("Grow button event setup");
 
     elements.growButton.addEventListener("mousedown", startGrowing);
-    elements.growButton.addEventListener("touchstart", startGrowing);
+    elements.growButton.addEventListener("touchstart", startGrowing,{passive:true});
 
     // When mouse/touch ends
     elements.growButton.addEventListener("mouseup", releaseButton);
@@ -606,7 +606,7 @@ document.addEventListener("DOMContentLoaded", () => {
         heartLogger.debug("Touch start on empty space - starting heart growth");
         startGrowingHeart(e.touches[0]);
       }
-    });
+    },{passive:false});
 
     setupGrowButtonEventListeners();
 
