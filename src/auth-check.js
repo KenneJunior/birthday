@@ -9,7 +9,7 @@ class AuthManager {
   static AuthConfig = Object.freeze({
     PASSWORD_KEY: "{KEY}",
     CORRECT_PASSWORD: "{PASSWORD}",
-    LOGIN_URL: "/login.html",
+    LOGIN_URL: "/login",
     RETRY_ATTEMPTS: 3,
     RETRY_DELAY: 1000,
     SESSION_TIMEOUT: 30 * 60 * 1000,

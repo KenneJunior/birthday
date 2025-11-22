@@ -86,7 +86,7 @@
     {
       "name": "confession message",
       "short_name": "confession",
-      "url": "fhavur/confession.html",
+      "url": "fhavur/confession",
       "icons": [
         {
           "src": "/icon/shortcut/confession.svg",
@@ -98,7 +98,7 @@
     {
       "name": "Out for A date ?",
       "short_name": "Date",
-      "url": "fhavur/missus/fhav.html",
+      "url": "fhavur/missus/fhav",
       "icons": [
         {
           "src": "/icon/shortcut/ask_out.svg",

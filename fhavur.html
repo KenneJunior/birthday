@@ -139,7 +139,7 @@
         </button>
 
         <address class="signature animate__animated animate__fadeIn">
-          <a href="fhavur/confession.html">
+          <a href="fhavur/confession">
             With all my love,<br />
             Your Secret Admirer
           </a>
@@ -332,13 +332,13 @@
       } else {
         authManager.hideLoading();
         logger.warn("Access denied: User not authenticated");
-        window.location.href = "/login.html";
+        window.location.href = "/login";
       }
     } catch (error) {
       const authManager = await getAuthManager();
       authManager.hideLoading();
       logger.error("Authentication fail:", error);
-      window.location.href = "/login.html";
+      window.location.href = "/login";
     }
   }
 

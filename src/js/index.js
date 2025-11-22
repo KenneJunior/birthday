@@ -99,7 +99,7 @@ class ConfettiSystem {
     this.animationId = null;
     this.colors = ["#8E2DE2", "#4A00E0", "#FF6B6B", "#FECA57", "#1DD1A1"];
     this.isActive = false;
-    this.mainPage = "fhavur.html";
+    this.mainPage = "fhavur";
 
     confettiLogger.debug("ConfettiSystem instance created", {
       container: container?.className || "unknown",
@@ -187,7 +187,7 @@ class ConfettiSystem {
     if (imageContainer) {
       imageContainer.addEventListener("click", () => {
         confettiLogger.debug(
-          "Image container clicked, navigating to fhavur.html"
+          "Image container clicked, navigating to fhavur"
         );
         window.location.href = this.mainPage;
       });

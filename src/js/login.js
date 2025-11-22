@@ -363,7 +363,7 @@ const Auth0Manager = (() => {
     try {
       auth0Logger.info("Initiating Auth0 logout");
       auth0.logout({
-        returnTo: window.location.origin + "/logOut.html",
+        returnTo: window.location.origin + "/logOut",
       });
       auth0Logger.timeEnd("Auth0 logout");
     } catch (error) {
