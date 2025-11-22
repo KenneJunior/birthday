@@ -462,7 +462,7 @@ class PWAPrompt extends HTMLElement {
 
         if (outcome === "accepted") {
           this.hide("accepted");
-          this.Notification.setNotificationType()
+          this.Notification.setupEventListeners.setNotificationType()
             .toggleViewDetails(false)
             .showNotification("success", {
               title: "Installation Successful",
