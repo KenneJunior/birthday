@@ -586,10 +586,9 @@ a {
     border-radius: calc(24px * var(--zoom-factor));
     /* Visual styling */
     background: rgba(219, 112, 147, 0.3);
-    -webkit-backdrop-filter: blur(calc(var(--blur)*2)) ;
-    backdrop-filter: blur(calc(var(--blur)*2)) ;
+    -webkit-backdrop-filter: blur(calc(var(--blur)*2));
+    backdrop-filter: blur(calc(var(--blur)*2));
     contain:layout;
-
     box-shadow: 0 30px 60px -20px rgba(219, 112, 147, 0.3),
     0 0 0 1px rgba(255, 255, 255, 0.3) inset;
     border: none !important;
@@ -1663,8 +1662,8 @@ a {
     .modal-container {
         width: 90%;
         max-width: 95%;
-        min-width: calc(42vh - 3rem);
-        min-height: calc(55vh - 5rem);
+        min-width: 400px;
+        min-height: 470px;
         border-radius: 18px;
         margin: 20px auto;
     }
@@ -1871,8 +1870,10 @@ a {
         font-size: 2rem;
     }
     .modal-container{
-        min-width: calc(20vh - 3rem);
-        min-height: calc(35vh - 5rem);
+        padding: 15px;
+        min-width: 300px;
+        min-height: 451px;
+        margin: 5px;
     }
 
     .image-container {
