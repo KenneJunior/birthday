@@ -235,7 +235,7 @@ animation: titleGlow 3s ease-in-out infinite alternate;
 }
 
 .birthday-card:hover .birthday-title::after {
-  width: 160px;
+  width: 320px;
   animation: underlineExpand 0.4 ease;
 }
 
@@ -699,6 +699,11 @@ transition: var(--transition-fast);
   .image-container {
     min-height: 57rem;
   }
+    .birthday-card:hover .birthday-title::after {
+  width: 510px;
+  animation: underlineExpand 0.4 ease;
+}
+
 }
 
 @media (max-width: 768px) {
@@ -723,6 +728,10 @@ transition: var(--transition-fast);
   .birthday-title::after {
     left: 50%;
     transform: translateX(-50%);
+  }
+  .message-item {
+    padding-left: 2rem;
+    font-size: 1.05rem;
   }
 
   .birthday-wishes {

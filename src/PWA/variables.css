@@ -56,7 +56,7 @@
     /* Transitions */
     --transition-fast: 150ms ease;
     --transition-base: 250ms ease;
-    --transition-slow: 350ms ease;
+    --transition-slow: 650ms ease;
 
     /* Z-index */
     --z-backdrop: 1000;

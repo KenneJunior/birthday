@@ -77,9 +77,9 @@
       "url": "fhavur",
       "icons": [
         {
-          "src": "/icon/shortcut/memories.svg",
+          "src": "/icon/shortcut/memories.jpeg",
           "sizes": "96x96",
-          "type": "image/svg+xml"
+          "type": "image"
         }
       ]
     },
@@ -89,9 +89,9 @@
       "url": "fhavur/confession",
       "icons": [
         {
-          "src": "/icon/shortcut/confession.svg",
+          "src": "/icon/shortcut/confession.jpeg",
           "sizes": "96x96",
-          "type": "image/svg+xml"
+          "type": "image"
         }
       ]
     },
@@ -101,9 +101,9 @@
       "url": "fhavur/missus/fhav",
       "icons": [
         {
-          "src": "/icon/shortcut/ask_out.svg",
+          "src": "/icon/shortcut/ask_out.jpeg",
           "sizes": "96x96",
-          "type": "image/svg+xml"
+          "type": "image"
         }
       ]
     }

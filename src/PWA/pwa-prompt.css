@@ -1,6 +1,3 @@
-/* ==========================================================================
-   PWA PROMPT COMPONENT - ENHANCED
-   ========================================================================== */
 
 .pwa-prompt {
     /* Layout */
@@ -8,7 +5,6 @@
     inset: 0;
     z-index: var(--z-modal);
 
-    /* Flexbox for centering */
     display: flex;
     align-items: flex-end;
     justify-content: center;
@@ -742,33 +738,6 @@
     transition: all var(--transition-fast);
     position: relative;
     overflow: hidden;
-
-    /* Ripple Effect */
-    &::before {
-        content: '';
-        position: absolute;
-        top: 50%;
-        left: 50%;
-        width: 0;
-        height: 0;
-        border-radius: 50%;
-        background: currentColor;
-        opacity: 0;
-        transform: translate(-50%, -50%);
-        transition: width 0.3s, height 0.3s, opacity 0.3s;
-    }
-
-    &:active::before {
-        width: 100px;
-        height: 100px;
-        opacity: 0.1;
-    }
-
-    /* Focus Management */
-    &:focus-visible {
-        outline: 2px solid var(--color-primary);
-        outline-offset: 2px;
-    }
 }
 
 .btn--primary {
@@ -787,6 +756,7 @@
     &:active {
         transform: translateY(0);
     }
+    overflow: visible;
 }
 
 .btn--secondary {
@@ -802,6 +772,54 @@
         transform: translateY(-1px);
     }
 }
+
+.animated-border-btn::before {
+content: "";
+  position: absolute;
+  inset: -3px;
+  border-radius: 10px;
+  padding: 3px;
+  background: linear-gradient(
+    90deg,
+    #ff3d3d,
+    #ff9f1c,
+    #40c057,
+    #339af0,
+    #845ef7,
+    #ff3d3d
+  );
+  background-size: 300% 100%;
+  z-index: -1;
+  
+  -webkit-mask: 
+    linear-gradient(#fff 0 0) content-box,
+    linear-gradient(#fff 0 0);
+  -webkit-mask-composite: xor;
+  mask: 
+    linear-gradient(#fff 0 0) content-box,
+    linear-gradient(#fff 0 0);
+  mask-composite: exclude;
+  
+  animation: slideBorder 3s linear infinite;
+  opacity: 0.9;
+}
+
+@keyframes slideBorder {
+  0% { background-position: 0% 0; }
+  100% { background-position: 300% 0; }
+}
+
+.animated-border-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 5px 20px rgba(0, 123, 255, 0.3);
+}
+
+.animated-border-btn:hover::before {
+  animation-duration: 1.5s;
+  opacity: 1;
+}
+
+
 
 .btn__icon {
     width: 1rem;

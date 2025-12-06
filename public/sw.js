@@ -8,7 +8,7 @@ const logger = self.logger;
 const CACHE_VERSION = "v1.5";
 const STATIC_CACHE = `fhavur-static-${CACHE_VERSION}`;
 const DYNAMIC_CACHE = `fhavur-dynamic-${CACHE_VERSION}`;
-const CSS_JS_CACHE = `fhavur-css_js-${CACHE_VERSION}`;
+const CSS_JS_CACHE = `fhavur-css_js-1.6`;
 
 // Create a specialized logger for Service Worker with custom context
 const swLogger = logger.withContext({

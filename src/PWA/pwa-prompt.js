@@ -1,22 +1,24 @@
 // Utility: Fetch manifest and get app name
 import Notification from "../js/notification.js";
-import { _log } from "../js/utility/logger.js";
+import logger from "../js/utility/logger.js";
 import { getAppName } from "../js/utility/utils.js";
 // PWA Prompt Manager - Advanced Implementation
 class PWAPrompt extends HTMLElement {
   static get observedAttributes() {
     return ["hidden", "platform"];
-  }
-
+  };
   constructor() {
     super();
-    // Configuration
+    // Configuration 
+  this.appLogger = logger.withContext({
+  name: "PWA_Prompt.js",
+  });
     this.config = {
-      dismissDuration: 7 * 24 * 60 * 60 * 1000, // 7 days
-      remindDuration: 24 * 60 * 60 * 1000, // 1 day
-      showDelay: 3000,
+      dismissDuration: 10 * 60 * 1000, // 10 mins
+      remindDuration: 15 * 60 * 1000, // 15 mins
+      showDelay: 10000,
       minSessionTime: 10000, // 10 seconds
-      maxDisplayCount: 5,
+      maxDisplayCount: 15,
     };
 
     // State
@@ -27,6 +29,8 @@ class PWAPrompt extends HTMLElement {
       sessionStart: Date.now(),
       displayCount: 0,
     };
+        this.shouldShowReopenNotification = true;
+
 
     this.Notification = new Notification();
 
@@ -83,7 +87,7 @@ class PWAPrompt extends HTMLElement {
     }
 
     this.setAttribute("platform", this.state.platform);
-    this.log(
+    this.appLogger.info(
       "Detected platform:",
       " Type: " + this.state.platform + " name: " + ua
     );
@@ -122,7 +126,7 @@ class PWAPrompt extends HTMLElement {
     // Don't initialize if already installed
     if (this.state.isStandalone && this.shownNotification()) {
 
-      this.log("App is already installed");
+      this.appLogger.debug("App is already installed");
       this.Notification.setNotificationType()
         .toggleViewDetails(false)
         .showNotification("info", {
@@ -144,7 +148,7 @@ class PWAPrompt extends HTMLElement {
 
     // Check if platform is supported
     if (!this.isPlatformSupported()) {
-      this.log(
+      this.appLogger.warn(
         `Platform ${this.state.platform} not supported for PWA installation`
       );
       return false;
@@ -153,13 +157,13 @@ class PWAPrompt extends HTMLElement {
     // Check dismissal state
     const dismissal = this.getDismissalState();
     if (dismissal && this.isDismissalValid(dismissal)) {
-      this.log("Prompt recently dismissed");
+      this.appLogger.debug("Prompt recently dismissed");
       return false;
     }
 
     // Check display count
     if (this.hasExceededDisplayCount()) {
-      this.log("Maximum display count reached");
+      this.appLogger.debug("Maximum display count reached");
       return false;
     }
 
@@ -171,7 +175,7 @@ class PWAPrompt extends HTMLElement {
     const content = this.querySelector("#pwa-prompt-content");
     const actions = this.querySelector("#pwa-prompt-actions");
     if (content && actions) {
-      _log("Injecting templates for platform:", platform);
+      this.appLogger.info("Injecting templates for platform:", platform);
       content.innerHTML = "";
       actions.innerHTML = "";
       const templateConfig = this.getTemplateConfig(platform);
@@ -226,10 +230,38 @@ class PWAPrompt extends HTMLElement {
     return ["ios", "android", "windows"].includes(this.state.platform);
   }
 
+  /**
+   * Helper method to check if dismissal is still valid
+   * Uses timestamp for accurate time calculations
+   */
   isDismissalValid(dismissal) {
+    if (!dismissal || !dismissal.timestamp) return false;
+    
     const timeSinceDismiss = Date.now() - dismissal.timestamp;
-    return timeSinceDismiss < dismissal.duration;
+    const isValid = timeSinceDismiss < dismissal.duration;
+    
+    this.appLogger.debug("Dismissal validity check:", {
+      timeSinceDismiss: this.formatDuration(timeSinceDismiss),
+      duration: this.formatDuration(dismissal.duration),
+      isValid: isValid
+    });
+    
+    return isValid;
   }
+
+   /**
+   * Helper method to format duration for logging
+   */
+  formatDuration(ms) {
+    const seconds = Math.floor(ms / 1000);
+    const minutes = Math.floor(seconds / 60);
+    const hours = Math.floor(minutes / 60);
+    
+    if (hours > 0) return `${hours}h ${minutes % 60}m`;
+    if (minutes > 0) return `${minutes}m ${seconds % 60}s`;
+    return `${seconds}s`;
+  }
+
 
   hasExceededDisplayCount() {
     const displayHistory = this.getDisplayHistory();
@@ -250,7 +282,7 @@ class PWAPrompt extends HTMLElement {
 
     // Action buttons
     this.delegate("[data-action]", "click", this.handleActionClick);
-    this.delegate("[data-dismiss]", "click", () => this.hide());
+    this.delegate("[data-dismiss]", "click", () => this.hide('dismissed'));
 
     //query the data-action install button
     const installBtn = document.querySelector('[data-action="install"]');
@@ -280,7 +312,7 @@ class PWAPrompt extends HTMLElement {
     this.state.deferredPrompt = event;
 
     // For Android, we can trigger the prompt immediately or wait for user engagement
-    this.log("BeforeInstallPrompt event captured");
+    this.appLogger.debug("BeforeInstallPrompt event captured");
 
     // Show prompt for Android after short delay
     if (this.state.platform === "android" || "windows") {
@@ -289,7 +321,7 @@ class PWAPrompt extends HTMLElement {
   }
 
   handleAppInstalled() {
-    this.log("App installed successfully");
+    this.appLogger.info("App installed successfully");
     this.setAttribute("installed", "true");
     this.hide("installed");
 
@@ -413,7 +445,7 @@ class PWAPrompt extends HTMLElement {
         })
       );
 
-      this.log("Prompt shown");
+      this.appLogger.debug("Prompt shown");
     }
   }
 
@@ -433,15 +465,164 @@ class PWAPrompt extends HTMLElement {
 
       this.handleDismissal(reason);
 
-      this.dispatchEvent(
+ this.dispatchEvent(
         new CustomEvent("pwa-prompt:hide", {
           bubbles: true,
-          detail: { reason, platform: this.state.platform },
+          detail: { 
+            reason, 
+            platform: this.state.platform,
+            canReopen: this.canReopenPrompt(reason)
+          },
         })
       );
 
-      this.log(`Prompt hidden: ${reason}`);
+            if (this.shouldShowReopenNotification && this.shouldShowReopenNotificationForReason(reason)) {
+        this.showReopenNotification(reason);
+      }
+
+
+      this.appLogger.debug(`Prompt hidden: ${reason}`);
     }
+  }
+
+  /**
+   * Check if prompt can be reopened after this dismissal reason
+   */
+  canReopenPrompt(reason) {
+    const nonReopenableReasons = ['accepted', 'installed', 'error'];
+    return !nonReopenableReasons.includes(reason);
+  }
+
+  /**
+   * Determine if we should show reopen notification for this dismissal reason
+   */
+  shouldShowReopenNotificationForReason(reason) {
+    const showForReasons = ['backdrop', 'escape', 'understand', 'remind-later', 'dismissed'];
+    return showForReasons.includes(reason) && this.canReopenPrompt(reason);
+  }
+
+   /**
+   * Show notification with option to reopen the prompt
+   */
+  showReopenNotification(reason) {
+    const platformInstructions = this.getPlatformInstructions();
+    
+    this.Notification
+      .setNotificationType("info")
+      .showNotification("info", {
+        title: "Installation Prompt Hidden",
+        message: `
+          <div style="line-height: 1.6;">
+            <p>The installation prompt was hidden. You can install this app anytime to:</p>
+            <ul style="margin: 10px 0; padding-left: 20px;">
+              <li>📱 <strong>Get app-like experience</strong></li>
+              <li>⚡ <strong>Faster loading times</strong></li>
+              <li>🔒 <strong>Work offline</strong></li>
+              <li>🎯 <strong>Quick access from home screen</strong></li>
+            </ul>
+            ${platformInstructions}
+          </div>`,
+        icon: "fas fa-info-circle",
+        useHTML: true,
+        autoCloseTime: 15000, // Longer timeout for this important notification
+      })
+      .setupEventListeners();
+
+    setTimeout(() => {
+      const reopenBtn = document.getElementById('view-details');
+      const dismissBtn = document.getElementById('dimiss');
+
+      reopenBtn.innerText = 'Install Again'
+      
+      if (reopenBtn) {
+        reopenBtn.addEventListener('click', () => {
+          this.Notification.hideNotification();
+          this.showPromptAgain();
+        });
+      }
+      
+      if (dismissBtn) {
+        dismissBtn.addEventListener('click', () => {
+          this.Notification.hideNotification();
+          this.setExtendedDismissal();
+        });
+      }
+    }, 100);
+  }
+ /**
+   * Get platform-specific installation instructions
+   */
+  getPlatformInstructions() {
+    switch (this.state.platform) {
+      case 'ios':
+        return `
+          <p style="font-size: 12px; color: #666; margin-top: 10px;">
+            <strong>iOS Tip:</strong> Tap the Share button <span style="font-family: Arial;">⎋</span> 
+            and then "Add to Home Screen"
+          </p>`;
+      case 'android':
+        return `
+          <p style="font-size: 12px; color: #666; margin-top: 10px;">
+            <strong>Android Tip:</strong> Tap the menu button ⋮ and select "Install app" 
+            or "Add to Home Screen"
+          </p>`;
+      default:
+        return `
+          <p style="font-size: 12px; color: #666; margin-top: 10px;">
+            <strong>Tip:</strong> Look for the install option in your browser's menu
+          </p>`;
+    }
+  }
+
+  /**
+   * Show the prompt again when user requests it
+   */
+  showPromptAgain() {
+    // Clear the current dismissal state to allow immediate showing
+    this.clearDismissalState();
+    
+    // Reset display count for this session
+    this.resetDisplayCount();
+    
+    // Show the prompt again
+    this.show();
+    
+    this.appLogger.info("Prompt reopened by user request");
+  }
+
+  /**
+   * Clear dismissal state to allow prompt to show again
+   */
+  clearDismissalState() {
+    try {
+      localStorage.removeItem("pwa-prompt-dismissal");
+      this.appLogger.debug("Dismissal state cleared");
+    } catch (error) {
+      this.appLogger.error("Failed to clear dismissal state:", error);
+    }
+  }
+
+  /**
+   * Reset display count for current session
+   */
+  resetDisplayCount() {
+    this.state.displayCount = 0;
+  }
+
+  /**
+   * Set extended dismissal when user explicitly dismisses the notification
+   */
+  setExtendedDismissal() {
+    const extendedDuration = 60 * 60 * 1000; // 1 hour
+    this.setDismissalState(extendedDuration);
+    this.appLogger.debug("Extended dismissal set for 1 hour");
+  }
+
+  /**
+   * Method to manually trigger the reopen notification (for testing)
+   */
+  triggerReopenNotification() {
+    this.showReopenNotification('manual');
   }
 
   async triggerInstallation() {
@@ -458,7 +639,7 @@ class PWAPrompt extends HTMLElement {
           })
         );
 
-        this.log(`Installation: ${outcome}`);
+        this.appLogger.info(`Installation: ${outcome}`);
 
         if (outcome === "accepted") {
           this.hide("accepted");
@@ -488,7 +669,7 @@ class PWAPrompt extends HTMLElement {
             .setupEventListeners();
         }
       } catch (error) {
-        this.log("Installation failed:", error);
+        this.appLogger.error("Installation failed:", error);
         this.hide("error");
       }
     } else {
@@ -551,62 +732,199 @@ class PWAPrompt extends HTMLElement {
     this.setDismissalState(duration);
   }
 
+   /**
+   * Method to get current dismissal status (for debugging/UI)
+   */
+  getDismissalStatus() {
+    const dismissal = this.getDismissalState();
+    if (!dismissal) {
+      return { dismissed: false, message: "No dismissal recorded" };
+    }
+
+    const timeSinceDismiss = Date.now() - dismissal.timestamp;
+    const timeRemaining = Math.max(0, dismissal.duration - timeSinceDismiss);
+    
+    return {
+      dismissed: timeRemaining > 0,
+      timeRemaining: timeRemaining,
+      formattedTimeRemaining: this.formatDuration(timeRemaining),
+      dismissedAt: dismissal.readableDate,
+      dismissedTime: dismissal.readableTime,
+      platform: dismissal.platform
+    };
+  }
+
+   /**
+   * Method to get display history summary (for debugging/UI)
+   */
+  getDisplayHistorySummary() {
+    const history = this.getDisplayHistory();
+    return {
+      totalDisplays: history.count,
+      lastDisplay: history.formattedDates[history.formattedDates.length - 1],
+      displayDates: history.formattedDates,
+      lastUpdated: history.lastUpdated
+    };
+  }
+
+  /**
+   * GETTER for dismissal state
+   * Retrieves and parses dismissal state from localStorage
+   * Converts formatted date string back to timestamp
+   */
   getDismissalState() {
     try {
-      return JSON.parse(localStorage.getItem("pwa-prompt-dismissal"));
-    } catch {
+      const stored = localStorage.getItem("pwa-prompt-dismissal");
+      if (!stored) return null;
+      
+      const dismissal = JSON.parse(stored);
+      
+      // Convert formatted date string back to timestamp
+      if (dismissal.formattedDate) {
+        dismissal.timestamp = new Date(dismissal.formattedDate).getTime();
+      }
+      
+      return dismissal;
+    } catch (error) {
+      this.appLogger.error("Failed to get dismissal state:", error);
       return null;
     }
   }
 
+
+  /**
+   * SETTER for dismissal state
+   * Saves dismissal state to localStorage with formatted date
+   */
   setDismissalState(duration) {
+    const now = new Date();
     const state = {
-      timestamp: Date.now(),
+      timestamp: now.getTime(), 
+      formattedDate: this.formatDateForStorage(now), 
       duration: duration,
       platform: this.state.platform,
+      Date: this.formatDate(now), 
+      Time: this.formatTime(now), 
     };
 
     try {
       localStorage.setItem("pwa-prompt-dismissal", JSON.stringify(state));
+      this.appLogger.debug("Dismissal state saved:", state);
     } catch (error) {
-      this.log("Failed to save dismissal state:", error);
+      this.appLogger.error("Failed to save dismissal state:", error);
     }
   }
 
+
+  /**
+   * GETTER for display history
+   * Retrieves and parses display history from localStorage
+   * Converts formatted date strings back to timestamps
+   */
   getDisplayHistory() {
     try {
-      return (
-        JSON.parse(localStorage.getItem("pwa-prompt-display-history")) || {
-          count: 0,
-          dates: [],
-        }
-      );
-    } catch {
-      return { count: 0, dates: [] };
+      const stored = localStorage.getItem("pwa-prompt-display-history");
+      if (!stored) {
+        return { count: 0, dates: [], formattedDates: [] };
+      }
+      
+      const history = JSON.parse(stored);
+      
+      // Convert formatted dates back to timestamps for calculations
+      if (history.formattedDates && history.formattedDates.length > 0) {
+        history.dates = history.formattedDates.map(dateStr => 
+          new Date(dateStr).getTime()
+        );
+      }
+
+            return history;
+    } catch (error) {
+      this.appLogger.error("Failed to get display history:", error);
+      return { count: 0, dates: [], formattedDates: [] };
     }
   }
 
+ /**
+   * SETTER for display history
+   * Updates display history in localStorage with formatted dates
+   */
   updateDisplayHistory() {
     const history = this.getDisplayHistory();
-    const now = Date.now();
+    const now = new Date();
+    const nowTimestamp = now.getTime();
+    const formattedNow = this.formatDateForStorage(now);
 
-    // Clean old entries (older than 30 days)
-    const thirtyDaysAgo = now - 30 * 24 * 60 * 60 * 1000;
-    history.dates = history.dates.filter((date) => date > thirtyDaysAgo);
+    // Clean old entries (older than 7 days)
+    const thirtyDaysAgo = nowTimestamp - 7 * 24 * 60 * 60 * 1000;
+    
+    // Filter using timestamps for accurate comparison
+    const validIndices = history.dates
+      .map((timestamp, index) => ({ timestamp, index }))
+      .filter(item => item.timestamp > thirtyDaysAgo)
+      .map(item => item.index);
 
-    // Add current display
-    history.dates.push(now);
+    // Rebuild both arrays with valid entries
+    history.dates = validIndices.map(index => history.dates[index]);
+    history.formattedDates = validIndices.map(index => history.formattedDates[index]);
+
+    // Add current display with both timestamp and formatted date
+    history.dates.push(nowTimestamp);
+    history.formattedDates.push(formattedNow);
     history.count = history.dates.length;
+    
+    // Add human readable info for debugging
+    history.lastUpdated = {
+      timestamp: nowTimestamp,
+      formatted: this.formatDate(now),
+      time: this.formatTime(now)
+    };
 
     try {
       localStorage.setItem(
         "pwa-prompt-display-history",
         JSON.stringify(history)
       );
+      this.appLogger.debug("Display history updated:", {
+        count: history.count,
+        lastUpdated: history.lastUpdated
+      });
     } catch (error) {
-      this.log("Failed to update display history:", error);
+      this.appLogger.error("Failed to update display history:", error);
     }
   }
+
+ /**
+   * Format date for storage (ISO string for easy parsing)
+   */
+  formatDateForStorage(dateObject) {
+    return dateObject.toISOString();
+  }
+
+  /**
+   * Format time for display
+   */
+  formatTime(dateObject) {
+    const options = {
+      hour: '2-digit',
+      minute: '2-digit',
+      second: '2-digit',
+      hour12: false
+    };
+    return new Intl.DateTimeFormat('en-US', options).format(dateObject);
+  }
+
+  /**
+   * Format date for display
+   */
+  formatDate(dateObject) {
+    const options = {
+      year: 'numeric',
+      month: 'long',
+      day: 'numeric',
+    };
+    return new Intl.DateTimeFormat('en-US', options).format(dateObject);
+  }
+
 
   getFocusableElements() {
     return Array.from(
@@ -622,11 +940,6 @@ class PWAPrompt extends HTMLElement {
     });
   }
 
-  log(...args) {
-    if (window.location.hostname === "localhost") {
-      console.log("[PWA Prompt]", ...args);
-    }
-  }
 
   cleanup() {
     window.removeEventListener(
