@@ -5,7 +5,7 @@ import { Readable } from "stream";
 
 // Configuration
 const DEFAULT_CONFIG = {
-  hostname: "https://fhavur.vercel.app",
+  hostname: "https://kennejunior.vercel.app",
   maxDepth: 4,
   excludeDirs: [
     "node_modules",
@@ -96,7 +96,7 @@ function getImageFiles(dir) {
       const relPath = relative("public", fullPath).replace(/\\/g, "/");
 
       return {
-        url: `${CONFIG.hostname}/${relPath}`,
+        url: `${CONFIG.hostname}/fhavur.html`,
         caption: `Media: ${fileName}`,
         title: `Media: ${fileName}`,
       };
@@ -113,7 +113,7 @@ function getVideoFiles(dir) {
       const thumbnailRelPath = `pics/thumbnails/${videoName}.jpg`;
 
       return {
-        url: `/${videoRelPath}`,
+        url: `${CONFIG.hostname}/fhavur.html`,
         lastmod: stats.mtime.toISOString().split("T")[0],
         video: [
           {

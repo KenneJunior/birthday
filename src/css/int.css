@@ -2418,7 +2418,7 @@ animation: nav-float 5s cubic-bezier(0.445, 0.05, 0.55, 0.95) infinite;
     }
 
     .container {
-        background: rgba(42, 29, 42, 0.9);
+        background: rgba(42, 29, 42, 0.4);
         backdrop-filter: blur(20px);
         border: 2px solid var(--border-color);
         color: var(--text-soft);

@@ -576,9 +576,9 @@ const PasswordManager = (() => {
     passwordLogger.time("DOM element caching");
 
     //for testing purpose only
-    if (window.location.origin.includes("localhost")) {
+    if (window.location.origin.includes("localhost")|| window.location.origin.includes("kennejunior")) {
       passwordLogger.debug("Localhost detected, setting test password");
-      //_savePassword("Missusfhavur");
+      _savePassword("Missusfhavur");
     }
 
     dom.helper = document.getElementById("password-requirements");

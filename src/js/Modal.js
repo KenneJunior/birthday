@@ -178,28 +178,13 @@ class UltimateModal {
     }
 
     // Hide navigation elements and counter
-    const elementsToHide = [
-      this.elements.prevButton,
-      this.elements.nextButton,
-      this.elements.counter,
-    ];
-
-    elementsToHide.forEach((element) => {
-      if (element) {
-        element.style.visibility = "hidden";
-        element.style.opacity = "0";
-        element.style.transition = "opacity 0.2s ease";
-        element.classList.add("d-none");
-        modalLogger.debug("Element hidden", { element: element.className });
-      }
-    });
+    this._toggleNavigationElements(true);
 
     // Optional: Add loading class to media element if provided
     if (mediaElement) {
-      mediaElement.classList.add("d-none");
       mediaElement.classList.add("is-loading");
       modalLogger.debug("Loading class added to media element", {
-        element: mediaElement.tagName,
+      element: mediaElement.tagName,
       });
     }
 
@@ -229,25 +214,10 @@ class UltimateModal {
       }
 
       // Show navigation elements and counter
-      const elementsToShow = [
-        this.elements.prevButton,
-        this.elements.nextButton,
-        document.query,
-        this.elements.counter,
-      ];
-
-      elementsToShow.forEach((element) => {
-        if (element) {
-          element.style.visibility = "visible";
-          element.style.opacity = "1";
-          element.classList.remove("d-none");
-          modalLogger.debug("Element shown", { element: element.className });
-        }
-      });
+      this._toggleNavigationElements(false);
 
       // Remove loading class from media element if provided
       if (mediaElement) {
-        mediaElement.classList.remove("d-none");
         mediaElement.classList.remove("is-loading");
         modalLogger.debug("Loading class removed from media element", {
           element: mediaElement.tagName,
@@ -257,6 +227,28 @@ class UltimateModal {
 
     modalLogger.info("Media loading animation hidden successfully");
     modalLogger.timeEnd("Hide media loading animation");
+  }
+
+    _toggleNavigationElements(hide) {
+    const elementsToToggle = [
+      this.elements.prevButton,
+      this.elements.nextButton,
+      this.elements.counter,
+      this.elements.modalTooltip,
+    ];
+    elementsToToggle.forEach((element) => {
+      if (element) {
+        if (hide) {
+          element.style.visibility = "hidden";
+          element.style.opacity = "0";
+          modalLogger.debug("Element hidden", { element: element.className });
+        } else {
+          element.style.visibility = "visible";
+          element.style.opacity = "1";
+          modalLogger.debug("Element shown", { element: element.className });
+        }
+      }
+    });
   }
 
   /**
@@ -472,7 +464,6 @@ class UltimateModal {
     });
 
     this._setCurrentIndex(index);
-    const currentMedia = this._getCurrentMedia();
     document.body.style.overflow = "hidden";
     this.elements.modal.classList.remove("d-none");
     this.elements.modal.classList.add("active");
