@@ -4,7 +4,6 @@
   "version": "1.0.0",
   "type": "module",
   "scripts": {
-    "sitemap": "node src/scripts/generate-sitemap.js",
     "media-json": "node src/scripts/generate-media-json.js",
     "robots": "node src/scripts/generate-robots.js",
     "robots:dev": "node src/scripts/generate-robots.js development",
