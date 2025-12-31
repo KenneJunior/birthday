@@ -7,7 +7,7 @@ function generateRobotsTxt(environment = "production") {
     userAgent: "*",
     allow: ["/"],
     disallow: [],
-    sitemap: "https://fhavur.vercel.app/sitemap.xml",
+    sitemap: "https://kennejunior.vercel.app/sitemap.xml",
   };
 
   if (environment === "production") {
@@ -24,6 +24,8 @@ function generateRobotsTxt(environment = "production") {
       "/*.svg$",
       "/*.mp4$",
       "/*.mp3$",
+      "/*.html$",
+      "/*.json$",
       "/*.webmanifest$"
     );
 
@@ -31,8 +33,6 @@ function generateRobotsTxt(environment = "production") {
       "/src/",
       "/node_modules/",
       "/dist/src/",
-      "/login",
-      "/logout",
       "/scripts/"
     );
   } else {

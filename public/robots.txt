@@ -19,4 +19,4 @@ Disallow: /login
 Disallow: /logout
 Disallow: /scripts/
 
-Sitemap: https://fhavur.vercel.app/sitemap.xml
+Sitemap: https://kennejunior.vercel.app/sitemap.xml
