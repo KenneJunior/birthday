@@ -39,3 +39,5 @@ coverage/
 /public/gallery-data.json
 /public/robots.txt
 .clearCache.js
+.vercel
+.env*

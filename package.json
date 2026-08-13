@@ -11,7 +11,13 @@
     "prebuild": "node src/scripts/pre-build.js",
     "build": "vite build && node src/scripts/copy-sw.js && npm run build:sw",
     "dev": "vite",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "v-build": "vercel build",
+    "v-dev": "vercel dev",
+    "v-deploy": "vercel deploy --prod",
+    "v-deploy-dev": "vercel deploy --prebuilt --prod",
+    "v-deploy-preview": "vercel deploy --prebuilt",
+    "v-deploy-preview-dev": "vercel deploy --prebuilt"
   },
   "devDependencies": {
     "html-minifier-terser": "^7.2.0",
