@@ -11,12 +11,12 @@ Allow: /*.png$
 Allow: /*.svg$
 Allow: /*.mp4$
 Allow: /*.mp3$
+Allow: /*.html$
+Allow: /*.json$
 Allow: /*.webmanifest$
 Disallow: /src/
 Disallow: /node_modules/
 Disallow: /dist/src/
-Disallow: /login
-Disallow: /logout
 Disallow: /scripts/
 
 Sitemap: https://kennejunior.vercel.app/sitemap.xml

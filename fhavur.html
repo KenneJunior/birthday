@@ -316,9 +316,20 @@
 <script type="module">
   import logger from '/src/js/utility/logger.js';
   import { getAuthManager } from "/src/auth-check.js";
+  import {LiquidGlass} from "kenneliquidglass";
 
   // Asynchronous function to initialize the protected page
   async function initializeProtectedPage() {
+      LiquidGlass.init('.modal-nav',{
+        backdrop:{
+          blur:0
+        },
+        maxTilt:1,
+        magneticPull:1,
+        refractionScale:1,
+        enableOrb:false,
+        glassThickness:80,
+      });
     try {
       const authManager = await getAuthManager();
       authManager.updateLoadingText("Yeah I know again😏... Just a moment 😅😊");

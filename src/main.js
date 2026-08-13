@@ -1,5 +1,6 @@
 import logger from "./js/utility/logger.js";
 import { ThemeManager } from "./js/utility/Mode.js";
+import {LiquidGlass} from "kenneliquidglass"
 // PWA Service Worker Registration
 
 function initializePWA() {
@@ -69,6 +70,21 @@ function initializePWA() {
   });
 }
 
+function initialiseliquidglass(){
+  LiquidGlass.init('#mode-toggle',{
+    backdrop:{
+      blur:1
+    },
+    maxTilt:1,
+    magneticPull:1,
+    refractionScale:1,
+    enableOrb:false,
+
+    glassThickness:80,
+
+  });
+}
+
 function showUpdateNotification(registration) {
   // You can customize this to show a nicer UI notification later
   const shouldUpdate = confirm(
@@ -97,8 +113,9 @@ const themeManager = new ThemeManager({
 async function init() {
   themeManager.init();
   if (typeof BirthdayApp === "function") {
-    new BirthdayApp().init();
+    await new BirthdayApp().init();
   }
+  initialiseliquidglass();
 }
 // Auto-run when loaded as module
 init();

@@ -893,8 +893,8 @@ position: fixed;
 top: 20px;
 right: 20px;
 z-index: 1000;
-background: linear-gradient(135deg, var(--primary), var(--primary-dark));
-color: white;
+background: rgba(255, 255, 255, 0.1);
+color: var(--text);
 border: none;
 padding: 12px 18px;
 border-radius: 50px;
@@ -1107,8 +1107,9 @@ html.theme-transitioning::before {
 
 /* Mode toggle refinements for dark */
 [data-theme="dark"] .mode-toggle {
-  background: var(--primary-dark);
+  background: rgba(0.3, 0.25, 0.25, 0.4);
   box-shadow: var(--shadow-md);
+  color: var(--text) !important;
 }
 [data-theme="dark"] .mode-toggle:hover {
   box-shadow: var(--shadow-lg);
