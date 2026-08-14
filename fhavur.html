@@ -320,15 +320,13 @@
 
   // Asynchronous function to initialize the protected page
   async function initializeProtectedPage() {
-      LiquidGlass.init('.modal-nav',{
+      LiquidGlass.init(['.modal-nav','.mode-toggle'],{
         backdrop:{
           blur:0
         },
         maxTilt:1,
         magneticPull:1,
-        refractionScale:1,
         enableOrb:false,
-        glassThickness:80,
       });
     try {
       const authManager = await getAuthManager();

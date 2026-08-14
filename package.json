@@ -1,8 +1,27 @@
 {
   "name": "birthday",
-  "private": true,
   "version": "1.0.0",
+  "private": true,
+  "description": "A site that was build to celebrate the birthday of fhavur",
+  "keywords": [
+    "birthday",
+    "celebrate",
+    "joy",
+    "fhavur",
+    "celebration"
+  ],
+  "homepage": "https://github.com/KenneJunior/birthday#readme",
+  "bugs": {
+    "url": "https://github.com/KenneJunior/birthday/issues"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/KenneJunior/birthday.git"
+  },
+  "license": "MIT",
+  "author": "kenne Junior",
   "type": "module",
+  "main": "main.js",
   "scripts": {
     "media-json": "node src/scripts/generate-media-json.js",
     "robots": "node src/scripts/generate-robots.js",
@@ -19,6 +38,14 @@
     "v-deploy-preview": "vercel deploy --prebuilt",
     "v-deploy-preview-dev": "vercel deploy --prebuilt"
   },
+  "dependencies": {
+    "@auth0/auth0-spa-js": "^2.7.0",
+    "error-stack-parser": "^2.1.4",
+    "hammerjs": "^2.0.8",
+    "kenneliquidglass": "^1.0.3",
+    "pwa-asset-generator": "^8.1.2",
+    "sharp": "^0.34.4"
+  },
   "devDependencies": {
     "html-minifier-terser": "^7.2.0",
     "sitemap": "^9.0.1",
@@ -28,13 +55,5 @@
     "vite-plugin-html": "^3.2.2",
     "vite-plugin-html-minifier-terser": "^3.8.0",
     "vite-plugin-qrcode": "^0.3.0"
-  },
-  "dependencies": {
-    "@auth0/auth0-spa-js": "^2.7.0",
-    "error-stack-parser": "^2.1.4",
-    "hammerjs": "^2.0.8",
-    "kenneliquidglass": "^1.0.1",
-    "pwa-asset-generator": "^8.1.2",
-    "sharp": "^0.34.4"
   }
 }
