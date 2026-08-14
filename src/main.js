@@ -1,6 +1,7 @@
 import logger from "./js/utility/logger.js";
 import { ThemeManager } from "./js/utility/Mode.js";
-import {LiquidGlass} from "kenneliquidglass"
+import {LiquidGlass} from "@kennejunior/liquidglass"
+import { inject } from "@vercel/analytics"
 // PWA Service Worker Registration
 
 function initializePWA() {
@@ -111,6 +112,7 @@ const themeManager = new ThemeManager({
   systemPreference: true,
 });
 async function init() {
+  inject();
   themeManager.init();
   if (typeof BirthdayApp === "function") {
     await new BirthdayApp().init();
