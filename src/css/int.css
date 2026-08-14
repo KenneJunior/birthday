@@ -1984,8 +1984,8 @@ position: fixed;
 top: 40px;
 right: 20px;
 z-index: 1000;
-background: linear-gradient(135deg, var(--primary), var(--lilac));
-color: white;
+background: rgba(255,255,255,0.1);
+color: var(--text);
 border: none;
 padding: 12px 18px;
 border-radius: 50px;
@@ -2000,7 +2000,7 @@ animation: nav-float 5s cubic-bezier(0.445, 0.05, 0.55, 0.95) infinite;
 }
 
 .mode-toggle:hover {
-    transform: scale(1.05) translateY(-2px);;
+    transform: scale(1.2) translateY(-2px);;
     box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
 }
 
